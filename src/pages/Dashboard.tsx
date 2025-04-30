@@ -6,6 +6,7 @@ import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import DashboardSidebar from '@/components/dashboard/DashboardSidebar';
 import OfflineBanner from '@/components/dashboard/OfflineBanner';
 import StationDetailPanel from '@/components/dashboard/StationDetailPanel';
+import { Station } from '@/types/dashboard';
 
 const Dashboard = () => {
   const [selectedStation, setSelectedStation] = useState<Station | null>(null);
