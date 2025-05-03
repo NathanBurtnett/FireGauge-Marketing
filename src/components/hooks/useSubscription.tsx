@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/sonner";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 export type SubscriptionStatus = {
   subscribed: boolean;
@@ -13,6 +14,7 @@ export type SubscriptionStatus = {
 };
 
 export const useSubscription = () => {
+  const { user } = useAuth();
   const [status, setStatus] = useState<SubscriptionStatus>({
     subscribed: false,
     subscription_tier: null,
@@ -24,6 +26,15 @@ export const useSubscription = () => {
 
   const checkSubscription = async () => {
     try {
+      if (!user) {
+        setStatus(prev => ({
+          ...prev,
+          isLoading: false,
+          error: "User not authenticated"
+        }));
+        return;
+      }
+
       setStatus(prev => ({ ...prev, isLoading: true, error: null }));
       
       const { data, error } = await supabase.functions.invoke('check-subscription', {});
@@ -60,6 +71,13 @@ export const useSubscription = () => {
 
   const createCheckoutSession = async (plan: string, seasonStatus = "in-season") => {
     try {
+      if (!user) {
+        toast.error("Authentication required", {
+          description: "Please sign in to subscribe",
+        });
+        return null;
+      }
+
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: { plan, seasonStatus },
       });
@@ -83,6 +101,13 @@ export const useSubscription = () => {
 
   const openCustomerPortal = async () => {
     try {
+      if (!user) {
+        toast.error("Authentication required", {
+          description: "Please sign in to manage your subscription",
+        });
+        return null;
+      }
+
       const { data, error } = await supabase.functions.invoke('customer-portal', {});
       
       if (error) {
@@ -103,15 +128,12 @@ export const useSubscription = () => {
   };
 
   useEffect(() => {
-    const session = supabase.auth.getSession();
-    
-    // Only check subscription if the user is logged in
-    if (session) {
+    if (user) {
       checkSubscription();
     } else {
       setStatus(prev => ({ ...prev, isLoading: false }));
     }
-  }, []);
+  }, [user]);
 
   return {
     ...status,
