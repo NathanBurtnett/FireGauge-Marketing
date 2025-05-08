@@ -15,13 +15,13 @@ const ROIBanner = () => {
           
           <div className="flex flex-col md:flex-row gap-8 md:gap-12">
             <div className="text-center">
-              <div className="text-firegauge-accent text-4xl md:text-5xl font-bold mb-2">417</div>
-              <p className="text-white text-sm md:text-base">Hours of paperwork saved annually</p>
+              <div className="text-firegauge-accent text-4xl md:text-5xl font-bold mb-2">25+</div>
+              <p className="text-white text-sm md:text-base">Hours saved per test cycle</p>
             </div>
             
             <div className="text-center">
-              <div className="text-firegauge-accent text-4xl md:text-5xl font-bold mb-2">$6,270</div>
-              <p className="text-white text-sm md:text-base">Annual labor costs cut</p>
+              <div className="text-firegauge-accent text-4xl md:text-5xl font-bold mb-2">$750+</div>
+              <p className="text-white text-sm md:text-base">Labor saved per station, per year</p>
             </div>
           </div>
         </div>

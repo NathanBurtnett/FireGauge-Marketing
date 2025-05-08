@@ -15,15 +15,15 @@ interface FAQItem {
 const FAQ = () => {
   const faqs: FAQItem[] = [
     {
-      question: "What if we lose connection in the field?",
+      question: "What if I lose connection in the field?",
       answer: "FireGauge is designed to work offline. All your data is stored locally on your device and will automatically sync when you regain connection. You can continue testing and recording results even in areas with no cell coverage or in deep basements with concrete walls."
     },
     {
-      question: "Can we import existing Excel logs?",
+      question: "Can I import existing Excel logs?",
       answer: "Yes! FireGauge supports importing your existing hose inventory and test records from Excel or CSV files. Our onboarding team will help you format and import your historical data to ensure a smooth transition."
     },
     {
-      question: "How long does setup take?",
+      question: "How fast is setup?",
       answer: "Most departments are up and running in less than a day. The initial setup takes about 30 minutes, and our team provides free onboarding support to help you import your data and train your team. We also offer video tutorials and documentation to get you started quickly."
     },
     {

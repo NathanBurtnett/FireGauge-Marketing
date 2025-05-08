@@ -1,30 +1,27 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 interface PricingPlan {
   name: string;
-  offSeasonPrice: string;
-  inSeasonPrice: string;
+  price: string;
   stations: string;
-  users: string;
+  modules: string;
   features: string[];
   recommended?: boolean;
 }
 
 const Pricing = () => {
-  const [isOffSeason, setIsOffSeason] = useState(false);
-  const [switchWidth, setSwitchWidth] = useState(0);
-  const [switchLeft, setSwitchLeft] = useState(0);
+  const navigate = useNavigate();
 
   const plans: PricingPlan[] = [
     {
       name: "Starter",
-      offSeasonPrice: "$50",
-      inSeasonPrice: "$99",
+      price: "$99",
       stations: "1-5",
-      users: "2",
+      modules: "Hose only",
       features: [
         "Offline data capture",
         "Basic NFPA reports",
@@ -35,10 +32,9 @@ const Pricing = () => {
     },
     {
       name: "Growth",
-      offSeasonPrice: "$50",
-      inSeasonPrice: "$200",
+      price: "$199",
       stations: "6-15",
-      users: "5",
+      modules: "Hose + Ladder",
       features: [
         "Everything in Starter",
         "Advanced NFPA reports",
@@ -51,10 +47,9 @@ const Pricing = () => {
     },
     {
       name: "Scale",
-      offSeasonPrice: "$50",
-      inSeasonPrice: "$300",
+      price: "$299",
       stations: "16+",
-      users: "Unlimited",
+      modules: "Hose + Ladder + Pump",
       features: [
         "Everything in Growth",
         "Phone support",
@@ -66,56 +61,16 @@ const Pricing = () => {
     }
   ];
 
-  React.useEffect(() => {
-    // Get the element to set initial dimensions
-    const offSeasonButton = document.getElementById('offseason-button');
-    const inSeasonButton = document.getElementById('inseason-button');
-    const switchWrapper = document.getElementById('switch-wrapper');
-    
-    if (offSeasonButton && inSeasonButton && switchWrapper) {
-      const activeButton = isOffSeason ? offSeasonButton : inSeasonButton;
-      setSwitchWidth(activeButton.offsetWidth);
-      setSwitchLeft(activeButton.offsetLeft - switchWrapper.offsetLeft);
-    }
-  }, [isOffSeason]);
-
   return (
     <section id="pricing" className="section bg-gray-50">
       <div className="container">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-firegauge-charcoal">
-            Season-Smart Pricing Plans
+            Simple, Transparent Pricing
           </h2>
           <p className="text-lg text-gray-700 max-w-3xl mx-auto">
-            Only pay what you need, when you need it. All plans include our seasonal pricing model.
+            Choose the plan that fits your department's size and needs. All plans include a 30-day free trial.
           </p>
-          
-          {/* Season toggle */}
-          <div className="mt-8 inline-block">
-            <div id="switch-wrapper" className="switch-wrapper">
-              <div 
-                className="switch-bg" 
-                style={{ 
-                  width: switchWidth, 
-                  transform: `translateX(${isOffSeason ? 0 : switchLeft}px)`
-                }}
-              ></div>
-              <button 
-                id="offseason-button"
-                className={`switch-button ${isOffSeason ? 'text-white' : 'text-gray-700'}`}
-                onClick={() => setIsOffSeason(true)}
-              >
-                Off-Season
-              </button>
-              <button
-                id="inseason-button"
-                className={`switch-button ${!isOffSeason ? 'text-white' : 'text-gray-700'}`}
-                onClick={() => setIsOffSeason(false)}
-              >
-                In-Season
-              </button>
-            </div>
-          </div>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -137,11 +92,8 @@ const Pricing = () => {
                 
                 <div className="mb-6">
                   <div className="text-4xl font-bold text-firegauge-charcoal">
-                    {isOffSeason ? plan.offSeasonPrice : plan.inSeasonPrice}
+                    {plan.price}
                     <span className="text-base font-normal text-gray-600">/mo</span>
-                  </div>
-                  <div className="text-sm text-gray-600 mt-1">
-                    {isOffSeason ? 'During Off-Season' : 'During Testing Season (Mar-Jun)'}
                   </div>
                 </div>
                 
@@ -151,8 +103,8 @@ const Pricing = () => {
                     <span>{plan.stations}</span>
                   </div>
                   <div className="flex items-center">
-                    <span className="font-medium mr-2">Users:</span>
-                    <span>{plan.users}</span>
+                    <span className="font-medium mr-2">Modules:</span>
+                    <span>{plan.modules}</span>
                   </div>
                 </div>
                 
@@ -174,6 +126,7 @@ const Pricing = () => {
                       ? 'bg-firegauge-red hover:bg-firegauge-red/90' 
                       : 'bg-firegauge-charcoal hover:bg-firegauge-charcoal/90'
                   }`}
+                  onClick={() => navigate('/auth')}
                 >
                   Start Free 30-Day Trial
                 </Button>

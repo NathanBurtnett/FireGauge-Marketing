@@ -1,5 +1,6 @@
 
 import React, { useEffect } from 'react';
+import { Card, CardContent } from "@/components/ui/card";
 
 const Features = () => {
   useEffect(() => {
@@ -27,81 +28,110 @@ const Features = () => {
       <div className="container">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-firegauge-charcoal animate-on-scroll">
-            Powerful Features Built for Fire Professionals
+            Features Built for Fire Professionals
           </h2>
           <p className="text-lg text-gray-700 max-w-3xl mx-auto animate-on-scroll">
-            Every feature is designed with input from real fire departments and contractors to streamline your workflow.
+            Streamlined workflows designed with input from real fire departments.
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          {/* Feature 1 - Station Dashboard */}
-          <div className="flex flex-col md:flex-row gap-6 items-start animate-on-scroll">
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden w-full md:w-64 h-48 transform rotate-2">
-              <img 
-                src="https://images.unsplash.com/photo-1531297484001-80022131f5a1?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
-                alt="Station Dashboard" 
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div>
-              <h3 className="text-xl font-bold mb-2 text-firegauge-charcoal">Station Dashboard</h3>
-              <p className="text-gray-600">
-                Get a bird's-eye view of all your stations, test status, and upcoming maintenance schedules in one place.
-              </p>
-            </div>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+          {/* Feature mockups in device frames */}
+          <Card className="overflow-hidden shadow-lg animate-on-scroll">
+            <CardContent className="p-0">
+              <div className="relative pb-[178%]">
+                <div className="absolute inset-0 bg-black rounded-t-lg">
+                  <img 
+                    src="https://images.unsplash.com/photo-1563206767-5b18f218e8de?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                    alt="Barcode scan workflow" 
+                    className="w-full h-full object-cover opacity-90"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                    <h3 className="text-white font-bold text-lg">Barcode Scan Workflow</h3>
+                    <p className="text-white/80 text-sm">Quick inventory tracking with scan-to-test</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
           
-          {/* Feature 2 - Hose Asset History */}
-          <div className="flex flex-col md:flex-row gap-6 items-start animate-on-scroll">
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden w-full md:w-64 h-48 transform -rotate-2">
-              <img 
-                src="https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
-                alt="Hose Asset History" 
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div>
-              <h3 className="text-xl font-bold mb-2 text-firegauge-charcoal">Hose Asset History</h3>
-              <p className="text-gray-600">
-                Track the complete lifecycle of each hose with detailed test records, maintenance history, and automatic reminders.
-              </p>
-            </div>
-          </div>
+          <Card className="overflow-hidden shadow-lg animate-on-scroll">
+            <CardContent className="p-0">
+              <div className="relative pb-[178%]">
+                <div className="absolute inset-0 bg-black rounded-t-lg">
+                  <img 
+                    src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                    alt="Scheduled reminders dashboard" 
+                    className="w-full h-full object-cover opacity-90"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                    <h3 className="text-white font-bold text-lg">Scheduled Reminders</h3>
+                    <p className="text-white/80 text-sm">Never miss another test date or inspection</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
           
-          {/* Feature 3 - Photo Evidence */}
-          <div className="flex flex-col md:flex-row gap-6 items-start animate-on-scroll">
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden w-full md:w-64 h-48 transform rotate-2">
-              <img 
-                src="https://images.unsplash.com/photo-1473091534298-04dcbce3278c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
-                alt="Photo Evidence" 
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div>
-              <h3 className="text-xl font-bold mb-2 text-firegauge-charcoal">Photo Evidence</h3>
-              <p className="text-gray-600">
-                Capture and store photos of damaged equipment directly in the app for better documentation and accountability.
-              </p>
-            </div>
-          </div>
-          
-          {/* Feature 4 - QuickBooks/Jobber Integration */}
-          <div className="flex flex-col md:flex-row gap-6 items-start animate-on-scroll">
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden w-full md:w-64 h-48 transform -rotate-2">
-              <img 
-                src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
-                alt="QuickBooks Integration" 
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div>
-              <h3 className="text-xl font-bold mb-2 text-firegauge-charcoal">QuickBooks/Jobber Integration</h3>
-              <p className="text-gray-600">
-                Seamlessly export test data for faster invoicing and project management with popular accounting software.
-              </p>
-            </div>
-          </div>
+          <Card className="overflow-hidden shadow-lg animate-on-scroll">
+            <CardContent className="p-0">
+              <div className="relative pb-[178%]">
+                <div className="absolute inset-0 bg-black rounded-t-lg">
+                  <img 
+                    src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                    alt="Failure analytics" 
+                    className="w-full h-full object-cover opacity-90"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                    <h3 className="text-white font-bold text-lg">Failure Analytics</h3>
+                    <p className="text-white/80 text-sm">Track trends and forecast replacement needs</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        
+        <div className="bg-white p-8 rounded-xl shadow-lg max-w-3xl mx-auto animate-on-scroll">
+          <h3 className="text-xl font-bold mb-4 text-center text-firegauge-charcoal">More Power, Less Paperwork</h3>
+          <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <li className="flex items-start">
+              <div className="bg-firegauge-red/10 rounded-full p-1 mr-2 mt-1">
+                <div className="w-2 h-2 bg-firegauge-red rounded-full"></div>
+              </div>
+              <span className="text-gray-700">Digital record keeping</span>
+            </li>
+            <li className="flex items-start">
+              <div className="bg-firegauge-red/10 rounded-full p-1 mr-2 mt-1">
+                <div className="w-2 h-2 bg-firegauge-red rounded-full"></div>
+              </div>
+              <span className="text-gray-700">E-signature capture</span>
+            </li>
+            <li className="flex items-start">
+              <div className="bg-firegauge-red/10 rounded-full p-1 mr-2 mt-1">
+                <div className="w-2 h-2 bg-firegauge-red rounded-full"></div>
+              </div>
+              <span className="text-gray-700">Full test history archives</span>
+            </li>
+            <li className="flex items-start">
+              <div className="bg-firegauge-red/10 rounded-full p-1 mr-2 mt-1">
+                <div className="w-2 h-2 bg-firegauge-red rounded-full"></div>
+              </div>
+              <span className="text-gray-700">Instant report generation</span>
+            </li>
+            <li className="flex items-start">
+              <div className="bg-firegauge-red/10 rounded-full p-1 mr-2 mt-1">
+                <div className="w-2 h-2 bg-firegauge-red rounded-full"></div>
+              </div>
+              <span className="text-gray-700">Multi-user collaboration</span>
+            </li>
+            <li className="flex items-start">
+              <div className="bg-firegauge-red/10 rounded-full p-1 mr-2 mt-1">
+                <div className="w-2 h-2 bg-firegauge-red rounded-full"></div>
+              </div>
+              <span className="text-gray-700">Automatic backups</span>
+            </li>
+          </ul>
         </div>
       </div>
     </section>

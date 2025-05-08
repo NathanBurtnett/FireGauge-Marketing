@@ -1,6 +1,6 @@
 
 import React, { useEffect, useRef } from 'react';
-import { Wifi, FileText, Calendar } from "lucide-react";
+import { Wifi, FileText, ShieldCheck } from "lucide-react";
 
 const Benefits = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -33,10 +33,10 @@ const Benefits = () => {
       <div className="container relative">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-firegauge-charcoal animate-on-scroll">
-            Why Fire Departments Trust FireGauge
+            3 Key Benefits for Fire Departments
           </h2>
           <p className="text-lg text-gray-700 max-w-3xl mx-auto animate-on-scroll">
-            Designed specifically for fire equipment testing professionals and fire departments to reduce paperwork and improve compliance.
+            Designed specifically for fire equipment testing professionals to reduce paperwork and improve compliance.
           </p>
         </div>
         
@@ -46,9 +46,9 @@ const Benefits = () => {
             <div className="bg-firegauge-red/10 p-4 rounded-full w-16 h-16 flex items-center justify-center mb-6">
               <Wifi className="text-firegauge-red w-8 h-8" />
             </div>
-            <h3 className="text-xl font-bold mb-4 text-firegauge-charcoal">Offline First</h3>
+            <h3 className="text-xl font-bold mb-4 text-firegauge-charcoal">Offline-First Capture</h3>
             <p className="text-gray-600">
-              Record tests anywhere with our offline-capable app, then auto-sync your data when you're back online. Never lose data due to spotty cell coverage again.
+              Scan barcode, record pass/fail anywhere in the field—even with no cell service. Data auto-syncs when you're back online.
             </p>
           </div>
           
@@ -57,20 +57,20 @@ const Benefits = () => {
             <div className="bg-firegauge-red/10 p-4 rounded-full w-16 h-16 flex items-center justify-center mb-6">
               <FileText className="text-firegauge-red w-8 h-8" />
             </div>
-            <h3 className="text-xl font-bold mb-4 text-firegauge-charcoal">Instant NFPA Reports</h3>
+            <h3 className="text-xl font-bold mb-4 text-firegauge-charcoal">Audit-Ready Reports</h3>
             <p className="text-gray-600">
-              Generate professional PDF & CSV exports with one tap. Complete with digital e-signatures and full compliance with NFPA 1962 requirements.
+              One-tap PDF & CSV exports with digital e-signatures. Have your documentation ready when inspectors arrive.
             </p>
           </div>
           
           {/* Benefit 3 */}
           <div className="bg-white p-8 rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl animate-on-scroll">
             <div className="bg-firegauge-red/10 p-4 rounded-full w-16 h-16 flex items-center justify-center mb-6">
-              <Calendar className="text-firegauge-red w-8 h-8" />
+              <ShieldCheck className="text-firegauge-red w-8 h-8" />
             </div>
-            <h3 className="text-xl font-bold mb-4 text-firegauge-charcoal">Season-Smart Pricing</h3>
+            <h3 className="text-xl font-bold mb-4 text-firegauge-charcoal">Built for Compliance</h3>
             <p className="text-gray-600">
-              Full app power during March–June testing season, then just $50 during off-season. Pay only for what you need when you need it.
+              NFPA 1962, 1911 & ISO 512C templates included. Meet all standard requirements with our purpose-built forms.
             </p>
           </div>
         </div>

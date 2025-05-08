@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Linkedin } from "lucide-react";
+import { Linkedin, CreditCard, ShieldCheck } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -12,7 +12,7 @@ const Footer = () => {
               <span className="text-firegauge-red font-poppins font-bold text-2xl">Fire<span className="text-firegauge-charcoal">Gauge</span></span>
             </a>
             <p className="text-gray-600 mb-6 max-w-xs">
-              Streamlining fire hose testing and NFPA compliance for fire departments and contractors across the Pacific Northwest.
+              Hose & gear testing—signed, synced, DONE. Streamlining NFPA compliance for fire departments nationwide.
             </p>
             <div className="flex items-center">
               <a 
@@ -48,27 +48,12 @@ const Footer = () => {
         {/* Trust badges */}
         <div className="flex flex-wrap justify-center gap-6 mb-8 pt-8 border-t border-gray-300">
           <div className="flex items-center text-sm text-gray-500">
-            <svg className="w-8 h-8 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M12 16V12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M12 8H12.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+            <CreditCard className="w-5 h-5 mr-2" />
             Stripe PCI-DSS Compliant
           </div>
           <div className="flex items-center text-sm text-gray-500">
-            <svg className="w-8 h-8 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M16 14L12 10L8 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+            <ShieldCheck className="w-5 h-5 mr-2" />
             AWS Secured Cloud
-          </div>
-          <div className="flex items-center text-sm text-gray-500">
-            <svg className="w-8 h-8 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9 12H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M12 9V15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M3 12C3 4.5885 4.5885 3 12 3C19.4115 3 21 4.5885 21 12C21 19.4115 19.4115 21 12 21C4.5885 21 3 19.4115 3 12Z" stroke="currentColor" strokeWidth="2"/>
-            </svg>
-            NFPA Referenced
           </div>
         </div>
         
@@ -76,8 +61,8 @@ const Footer = () => {
         <div className="text-center text-sm text-gray-500">
           <p>&copy; {new Date().getFullYear()} FireGauge. All rights reserved.</p>
           <p className="mt-2">
-            <a href="mailto:Support@FireGauge.com" className="hover:text-firegauge-red transition-colors">
-              Support@FireGauge.com
+            <a href="mailto:support@firegauge.com" className="hover:text-firegauge-red transition-colors">
+              support@firegauge.com
             </a>
           </p>
         </div>

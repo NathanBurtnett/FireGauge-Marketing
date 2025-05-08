@@ -14,7 +14,7 @@ const CTASection = () => {
             Ready to Lose the Clipboards?
           </h2>
           <p className="text-xl text-gray-300 mb-8">
-            Join fire departments across the Pacific Northwest who've upgraded to digital testing. Your 30-day free trial is just a click away.
+            Join fire departments across the country who've upgraded to digital testing. Your 30-day free trial is just a click away.
           </p>
           
           <div className="flex flex-col sm:flex-row justify-center gap-4">
@@ -30,7 +30,7 @@ const CTASection = () => {
               className="border-white text-white hover:bg-white/10 py-6 px-8 text-lg"
               onClick={() => navigate('/auth')}
             >
-              Start Free 30-Day Pilot
+              Start Free 30-Day Trial
             </Button>
           </div>
         </div>
