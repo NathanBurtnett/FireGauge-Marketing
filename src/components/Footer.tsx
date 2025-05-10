@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Linkedin, CreditCard, ShieldCheck } from "lucide-react";
 
@@ -46,14 +45,17 @@ const Footer = () => {
         </div>
         
         {/* Trust badges */}
-        <div className="flex flex-wrap justify-center gap-6 mb-8 pt-8 border-t border-gray-300">
+        <div className="flex flex-wrap justify-center items-center gap-x-6 gap-y-4 mb-8 pt-8 border-t border-gray-300">
           <div className="flex items-center text-sm text-gray-500">
-            <CreditCard className="w-5 h-5 mr-2" />
-            Stripe PCI-DSS Compliant
+            <CreditCard className="w-5 h-5 mr-2 text-gray-400" />
+            Stripe PCI-DSS Compliant Payments
           </div>
           <div className="flex items-center text-sm text-gray-500">
-            <ShieldCheck className="w-5 h-5 mr-2" />
-            AWS Secured Cloud
+            <ShieldCheck className="w-5 h-5 mr-2 text-gray-400" />
+            Backend Secured by Supabase
+          </div>
+          <div className="flex items-center text-sm text-gray-500">
+            Reliable Hosting on Render
           </div>
         </div>
         

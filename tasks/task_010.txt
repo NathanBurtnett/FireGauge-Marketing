@@ -1,0 +1,11 @@
+# Task ID: 10
+# Title: User Management Implementation
+# Status: pending
+# Dependencies: 7
+# Priority: medium
+# Description: Build the user management interface for admins to manage organization users
+# Details:
+Create interface for viewing list of users within the organization. Implement user invitation system via email. Add functionality to assign and change user roles (Operator, Admin). Create user deactivation/removal flow. Implement data fetching and mutation functions for user management in Supabase. Add pagination for user list. Implement search and filtering for user list.
+
+# Test Strategy:
+Test user invitation flow including email delivery. Verify role assignment works correctly. Test user deactivation and removal. Ensure pagination, search, and filtering work properly.

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -25,10 +24,10 @@ const Testimonials = () => {
       company: "Westlake Fire Department"
     },
     {
-      quote: "The seasonal pricing model saves us thousands. We get full functionality during our busy months and minimal costs the rest of the year. Brilliant business model.",
-      author: "Mike Peterson",
-      position: "Operations Manager",
-      company: "Pacific Hose Testing"
+      quote: "Generating NFPA-compliant reports used to be a nightmare. With FireGauge, it's one click. Our audit process is smoother than ever, and we have peace of mind knowing our records are always up-to-date.",
+      author: "David Miller",
+      position: "Battalion Chief",
+      company: "Metro City Fire Rescue"
     }
   ];
 

@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,6 +12,8 @@ import NotFound from "./pages/NotFound";
 import ScrollToTop from "./components/ScrollToTop";
 import { AuthProvider } from "./components/providers/AuthProvider";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import PricingPage from "./pages/PricingPage";
+import PasswordResetPage from "./pages/PasswordResetPage";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,8 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/reset-password" element={<PasswordResetPage />} />
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <Dashboard />

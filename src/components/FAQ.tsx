@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   Accordion,
@@ -19,25 +18,38 @@ const FAQ = () => {
       answer: "FireGauge is designed to work offline. All your data is stored locally on your device and will automatically sync when you regain connection. You can continue testing and recording results even in areas with no cell coverage or in deep basements with concrete walls."
     },
     {
-      question: "Can I import existing Excel logs?",
-      answer: "Yes! FireGauge supports importing your existing hose inventory and test records from Excel or CSV files. Our onboarding team will help you format and import your historical data to ensure a smooth transition."
-    },
-    {
-      question: "How fast is setup?",
-      answer: "Most departments are up and running in less than a day. The initial setup takes about 30 minutes, and our team provides free onboarding support to help you import your data and train your team. We also offer video tutorials and documentation to get you started quickly."
-    },
-    {
       question: "Is FireGauge NFPA 1962 compliant?",
       answer: "Absolutely. FireGauge was designed specifically to meet all NFPA 1962 requirements for fire hose testing and documentation. Our reports include all required fields and metrics, and we regularly update the platform to stay current with the latest NFPA standards."
     },
     {
-      question: "Do you support pressure testing for other equipment?",
-      answer: "Yes, besides fire hoses, FireGauge supports testing and documentation for ground ladders (NFPA 1932), fire pumps (NFPA 1911), and other fire equipment. All with the same easy-to-use interface and comprehensive reporting."
+      question: "Do you support testing for other equipment besides hoses?",
+      answer: "Yes! FireGauge is a modular platform. While the core is focused on hose testing (NFPA 1962), you can easily add modules for ground ladder inspections (NFPA 1932), fire pump testing (NFPA 1911), and other equipment. Each module provides the same intuitive interface and compliant reporting."
     },
     {
-      question: "What happens after the 30-day trial?",
-      answer: "After your 30-day trial, you can select one of our pricing plans based on your needs. There's no automatic billing—you'll have the opportunity to decide if FireGauge is right for you before making any payment."
-    }
+      question: "How does the pricing for add-on modules work?",
+      answer: "You can add the Ladder Inspection or Pump Testing modules to any of our core paid plans (Basic, Standard, or Professional) for an additional $50/month per module. This allows you to tailor the system to your specific needs and only pay for the functionalities you use."
+    },
+    {
+      question: "Can I import my existing equipment data?",
+      answer: "Yes! We understand you have existing records. FireGauge supports importing your current equipment inventory and test history from common formats like Excel or CSV files. Our onboarding team can assist you in formatting and importing your data for a smooth transition."
+    },
+    {
+      question: "How quickly can we get started with FireGauge?",
+      answer: "Most departments are up and running in less than a day. The initial account setup takes about 30 minutes. We provide free onboarding support for all plans to help you import data and train your team. We also offer comprehensive video tutorials and documentation."
+    },
+    {
+      question: "Can I manage multiple users and assign different roles?",
+      answer: "Yes. All our plans support multiple users. Our Standard, Professional, and Enterprise plans offer role-based access control, allowing you to define Administrators (who can manage settings, users, and billing) and Field Operators/Inspectors (who focus on testing and data entry)."
+    },
+    {
+      question: "What kind of customer support do you offer?",
+      answer: "We offer email support for all plans. The Standard plan includes priority email support, while the Professional plan adds phone support. Enterprise plans benefit from a dedicated account manager and custom support SLAs. Comprehensive documentation and video tutorials are also available 24/7."
+    },
+    {
+      question: "What happens after the 30-day free trial?",
+      answer: "Towards the end of your 30-day trial, you can choose to subscribe to one of our paid plans (Basic, Standard, or Professional) that best fits your needs. There is no automatic billing; you'll have the opportunity to make an informed decision. If you choose not to subscribe, your trial account will be deactivated, but you can inquire about data export options."
+    },
+    // Add more FAQs as needed
   ];
 
   return (

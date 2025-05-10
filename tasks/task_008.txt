@@ -1,0 +1,11 @@
+# Task ID: 8
+# Title: Account Management Implementation
+# Status: pending
+# Dependencies: 7
+# Priority: medium
+# Description: Build the account management section for user and company profile
+# Details:
+Create interface for viewing and updating company profile information. Implement form for updating personal profile (name, email). Add password change functionality. Implement form validation for all inputs. Create API functions for updating profile information in Supabase. Add success and error notifications for form submissions.
+
+# Test Strategy:
+Test form validation for all fields. Verify profile updates are saved correctly to Supabase. Test password change functionality. Ensure error handling works properly.

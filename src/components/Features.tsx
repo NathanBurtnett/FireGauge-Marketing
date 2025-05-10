@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -31,7 +30,7 @@ const Features = () => {
             Features Built for Fire Professionals
           </h2>
           <p className="text-lg text-gray-700 max-w-3xl mx-auto animate-on-scroll">
-            Streamlined workflows designed with input from real fire departments.
+            Streamlined workflows designed with input from real fire departments to ensure efficiency and compliance.
           </p>
         </div>
         
@@ -92,45 +91,47 @@ const Features = () => {
           </Card>
         </div>
         
+        <div className="bg-white p-8 rounded-xl shadow-lg max-w-4xl mx-auto mb-12 animate-on-scroll">
+          <h3 className="text-2xl font-bold mb-4 text-center text-firegauge-charcoal">Modular & Scalable: Grow With Your Needs</h3>
+          <p className="text-gray-700 mb-4 text-center">
+            FireGauge adapts to your operational scale and service offerings.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+            <div>
+              <h4 className="font-semibold text-firegauge-red mb-1">Core Hose Testing</h4>
+              <p className="text-sm text-gray-600">Comprehensive NFPA 1962 workflows out-of-the-box.</p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-firegauge-red mb-1">Add-On Modules</h4>
+              <p className="text-sm text-gray-600">Easily expand to ladder, pump testing, and more.</p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-firegauge-red mb-1">Multi-Tenant Ready</h4>
+              <p className="text-sm text-gray-600">Manage multiple clients or stations with role-based access.</p>
+            </div>
+          </div>
+        </div>
+        
         <div className="bg-white p-8 rounded-xl shadow-lg max-w-3xl mx-auto animate-on-scroll">
-          <h3 className="text-xl font-bold mb-4 text-center text-firegauge-charcoal">More Power, Less Paperwork</h3>
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <li className="flex items-start">
-              <div className="bg-firegauge-red/10 rounded-full p-1 mr-2 mt-1">
-                <div className="w-2 h-2 bg-firegauge-red rounded-full"></div>
-              </div>
-              <span className="text-gray-700">Digital record keeping</span>
-            </li>
-            <li className="flex items-start">
-              <div className="bg-firegauge-red/10 rounded-full p-1 mr-2 mt-1">
-                <div className="w-2 h-2 bg-firegauge-red rounded-full"></div>
-              </div>
-              <span className="text-gray-700">E-signature capture</span>
-            </li>
-            <li className="flex items-start">
-              <div className="bg-firegauge-red/10 rounded-full p-1 mr-2 mt-1">
-                <div className="w-2 h-2 bg-firegauge-red rounded-full"></div>
-              </div>
-              <span className="text-gray-700">Full test history archives</span>
-            </li>
-            <li className="flex items-start">
-              <div className="bg-firegauge-red/10 rounded-full p-1 mr-2 mt-1">
-                <div className="w-2 h-2 bg-firegauge-red rounded-full"></div>
-              </div>
-              <span className="text-gray-700">Instant report generation</span>
-            </li>
-            <li className="flex items-start">
-              <div className="bg-firegauge-red/10 rounded-full p-1 mr-2 mt-1">
-                <div className="w-2 h-2 bg-firegauge-red rounded-full"></div>
-              </div>
-              <span className="text-gray-700">Multi-user collaboration</span>
-            </li>
-            <li className="flex items-start">
-              <div className="bg-firegauge-red/10 rounded-full p-1 mr-2 mt-1">
-                <div className="w-2 h-2 bg-firegauge-red rounded-full"></div>
-              </div>
-              <span className="text-gray-700">Automatic backups</span>
-            </li>
+          <h3 className="text-xl font-bold mb-6 text-center text-firegauge-charcoal">More Power, Less Paperwork</h3>
+          <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+            {[
+              "Offline mode & auto-sync",
+              "Guided pass/fail tests (NFPA compliant)",
+              "Digital record keeping & e-signatures",
+              "Instant, audit-ready PDF reports",
+              "Automated email delivery of reports",
+              "Full test history archives",
+              "Multi-user collaboration",
+              "Secure automatic backups"
+            ].map((feature, index) => (
+              <li key={index} className="flex items-start">
+                <div className="bg-firegauge-red/10 rounded-full p-1 mr-3 mt-1 flex-shrink-0">
+                  <div className="w-2 h-2 bg-firegauge-red rounded-full"></div>
+                </div>
+                <span className="text-gray-700">{feature}</span>
+              </li>
+            ))}
           </ul>
         </div>
       </div>

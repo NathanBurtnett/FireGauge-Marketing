@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -17,20 +16,20 @@ const CTASection = () => {
             Join fire departments across the country who've upgraded to digital testing. Your 30-day free trial is just a click away.
           </p>
           
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6">
             <Button 
-              className="bg-firegauge-red hover:bg-firegauge-red/90 text-white py-6 px-8 text-lg"
-              onClick={() => window.open('https://calendly.com', '_blank')}
+              className="bg-firegauge-red hover:bg-firegauge-red/90 text-white py-3 px-8 text-lg w-full sm:w-auto order-1"
+              onClick={() => navigate('/auth')}
             >
-              Book a 15-Minute Call
+              Start Free 30-Day Trial
             </Button>
             
             <Button 
               variant="outline" 
-              className="border-white text-white hover:bg-white/10 py-6 px-8 text-lg"
-              onClick={() => navigate('/auth')}
+              className="border-white text-white hover:bg-white/10 py-3 px-8 text-lg w-full sm:w-auto order-2"
+              onClick={() => window.open('https://calendly.com/your-link', '_blank')}
             >
-              Start Free 30-Day Trial
+              Book a 15-Min Call
             </Button>
           </div>
         </div>
