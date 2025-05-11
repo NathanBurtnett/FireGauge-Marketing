@@ -1,11 +1,10 @@
-
 import React, { useEffect, useState } from 'react';
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, Info, AlertCircle, Loader2 } from "lucide-react";
+import { Calendar, Info, AlertCircle, Loader2, Check } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import DashboardSidebar from '@/components/dashboard/DashboardSidebar';
@@ -16,19 +15,35 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 
+// Define a mapping from Price ID to a user-friendly plan name and its properties
+// This should ideally match the structure in Pricing.tsx or be sourced from a shared config
+// For now, we'll manually define a simplified version here.
+// IMPORTANT: Keep these Price IDs consistent with your Stripe setup and Pricing.tsx
+const PLAN_DETAILS: { [key: string]: { name: string; monthlyPriceId: string; annualPriceId?: string; features: string[], priceDisplay: string } } = {
+  // Basic Plan
+  "price_1RNJhVP1sYOfvCvLsAvRxcqb": { name: "Basic", monthlyPriceId: "price_1RNJhVP1sYOfvCvLsAvRxcqb", annualPriceId: "price_1RNJqcP1sYOfvCvLEoaumdgs", priceDisplay: "$75/mo", features: ["Offline PWA or Mobile App", "PDF Reports"] },
+  "price_1RNJqcP1sYOfvCvLEoaumdgs": { name: "Basic (Annual)", monthlyPriceId: "price_1RNJhVP1sYOfvCvLsAvRxcqb", annualPriceId: "price_1RNJqcP1sYOfvCvLEoaumdgs", priceDisplay: "$765/yr", features: ["Offline PWA or Mobile App", "PDF Reports"] },
+  // Standard Plan
+  "price_1RNJrPP1sYOfvCvLdRBmGLrt": { name: "Standard", monthlyPriceId: "price_1RNJrPP1sYOfvCvLdRBmGLrt", annualPriceId: "price_1RNJrdP1sYOfvCvLmOcwLZes", priceDisplay: "$150/mo", features: ["Everything in Basic", "Audit Logs"] },
+  "price_1RNJrdP1sYOfvCvLmOcwLZes": { name: "Standard (Annual)", monthlyPriceId: "price_1RNJrPP1sYOfvCvLdRBmGLrt", annualPriceId: "price_1RNJrdP1sYOfvCvLmOcwLZes", priceDisplay: "$1530/yr", features: ["Everything in Basic", "Audit Logs"] },
+  // Professional Plan
+  "price_1RNJryP1sYOfvCvLSMsb5zqQ": { name: "Professional", monthlyPriceId: "price_1RNJryP1sYOfvCvLSMsb5zqQ", annualPriceId: "price_1RNJsAP1sYOfvCvL4sOrMFAT", priceDisplay: "$250/mo", features: ["Everything in Standard", "API Access"] },
+  "price_1RNJsAP1sYOfvCvL4sOrMFAT": { name: "Professional (Annual)", monthlyPriceId: "price_1RNJryP1sYOfvCvLSMsb5zqQ", annualPriceId: "price_1RNJsAP1sYOfvCvL4sOrMFAT", priceDisplay: "$2550/yr", features: ["Everything in Standard", "API Access"] },
+  // Enterprise (has a Price ID for contact, but not typical self-serve)
+  "price_1RNJsvP1sYOfvCvLpPjx4t8n": { name: "Enterprise", monthlyPriceId: "price_1RNJsvP1sYOfvCvLpPjx4t8n", priceDisplay: "Custom", features: ["Everything in Professional", "SSO/LDAP"] },
+};
+
 const Billing = () => {
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
-  const [isSeasonSwitchLoading, setIsSeasonSwitchLoading] = useState(false);
+  const [isPlanChangeLoading, setIsPlanChangeLoading] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
   const { 
     subscribed, 
-    subscription_tier, 
-    season_status,
+    subscription_tier,
     subscription_end, 
     isLoading, 
     error, 
@@ -37,21 +52,18 @@ const Billing = () => {
     openCustomerPortal
   } = useSubscription();
 
+  const activePlanDetails = subscription_tier ? PLAN_DETAILS[subscription_tier] : null;
+
   const currentPlan = {
-    name: subscription_tier || "No Plan",
+    name: activePlanDetails?.name || "No Plan",
     status: subscribed ? "Active" : "Inactive",
-    billingPeriod: "Monthly",
-    price: season_status === "in-season" ? 
-      (subscription_tier === "Growth" ? "$200" : 
-       subscription_tier === "Scale" ? "$300" : 
-       subscription_tier === "Starter" ? "$99" : "$0") :
-      "$50",
+    billingPeriod: activePlanDetails?.annualPriceId === subscription_tier ? "Annually" : "Monthly",
+    price: activePlanDetails?.priceDisplay || "$0",
     nextBillingDate: subscription_end ? new Date(subscription_end).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
     }) : "Not applicable",
-    season: season_status === "in-season" ? "In-Season" : "Off-Season"
   };
   
   const invoices = [
@@ -86,19 +98,26 @@ const Billing = () => {
     }
   }, [searchParams, checkSubscription]);
 
-  const handleSubscribe = async (plan: string) => {
-    setDialogOpen(true);
-    setSelectedPlan(plan);
-  };
+  const handlePlanAction = async (priceId: string, planName?: string) => {
+    setIsPlanChangeLoading(priceId);
+    
+    if (priceId === "price_1RNJsvP1sYOfvCvLpPjx4t8n") {
+      window.location.href = "mailto:sales@firegauge.app?subject=Enterprise%20Plan%20Inquiry";
+      setIsPlanChangeLoading(null);
+      return;
+    }
 
-  const handleConfirmSubscribe = async (seasonStatus: "in-season" | "off-season") => {
-    if (!selectedPlan) return;
-    
-    const checkoutUrl = await createCheckoutSession(selectedPlan, seasonStatus);
-    setDialogOpen(false);
-    
-    if (checkoutUrl) {
-      window.location.href = checkoutUrl;
+    try {
+      const checkoutUrl = await createCheckoutSession(priceId);
+      if (checkoutUrl) {
+        window.location.href = checkoutUrl;
+      } else {
+        toast.error("Could not initiate plan change.", { description: "Please try again or contact support."} );
+      }
+    } catch (error: any) {
+      toast.error("An unexpected error occurred.", { description: error.message });
+    } finally {
+      setIsPlanChangeLoading(null);
     }
   };
 
@@ -225,7 +244,7 @@ const Billing = () => {
                               <span className="text-sm font-normal text-gray-500">/month</span>
                             </div>
                             <div className="text-sm text-gray-500">
-                              During {currentPlan.season}
+                              {currentPlan.name === "Growth" ? "During In-Season" : "Not applicable"}
                             </div>
                           </div>
                         )}
@@ -237,17 +256,17 @@ const Billing = () => {
                           <div className="space-y-1">
                             <div className="text-sm text-gray-500">Stations</div>
                             <div className="font-medium">
-                              {subscription_tier === "Starter" ? "1-5 stations" :
-                               subscription_tier === "Growth" ? "6-15 stations" :
-                               subscription_tier === "Scale" ? "16+ stations" : "N/A"}
+                              {activePlanDetails?.features.length === 2 ? "1-5 stations" :
+                               activePlanDetails?.features.length === 5 ? "6-15 stations" :
+                               activePlanDetails?.features.length === 6 ? "16+ stations" : "N/A"}
                             </div>
                           </div>
                           <div className="space-y-1">
                             <div className="text-sm text-gray-500">Team Members</div>
                             <div className="font-medium">
-                              {subscription_tier === "Starter" ? "2 members" :
-                               subscription_tier === "Growth" ? "5 members" :
-                               subscription_tier === "Scale" ? "Unlimited" : "N/A"}
+                              {activePlanDetails?.features.length === 2 ? "2 members" :
+                               activePlanDetails?.features.length === 5 ? "5 members" :
+                               activePlanDetails?.features.length === 6 ? "Unlimited" : "N/A"}
                             </div>
                           </div>
                           <div className="space-y-1">
@@ -279,11 +298,8 @@ const Billing = () => {
                             </div>
                             <div>
                               <div className="flex items-center space-x-2">
-                                <div className={`px-3 py-1 rounded text-sm ${season_status === 'in-season' ? 'bg-firegauge-red/10 text-firegauge-red' : 'bg-gray-100'}`}>
-                                  In-Season: ${subscription_tier === "Growth" ? "200" : subscription_tier === "Scale" ? "300" : "99"}/mo
-                                </div>
-                                <div className={`px-3 py-1 rounded text-sm ${season_status === 'off-season' ? 'bg-firegauge-red/10 text-firegauge-red' : 'bg-gray-100'}`}>
-                                  Off-Season: $50/mo
+                                <div className={`px-3 py-1 rounded text-sm ${activePlanDetails?.annualPriceId === subscription_tier ? 'bg-firegauge-red/10 text-firegauge-red' : 'bg-gray-100'}`}>
+                                  {activePlanDetails?.name} Plan
                                 </div>
                               </div>
                             </div>
@@ -294,20 +310,17 @@ const Billing = () => {
                     <CardFooter className="flex justify-between">
                       {subscribed ? (
                         <>
-                          <Button variant="outline" onClick={() => handleSubscribe(subscription_tier || 'Growth')}>
-                            Change Plan
-                          </Button>
                           <Button 
                             className="bg-firegauge-charcoal hover:bg-firegauge-charcoal/90"
                             onClick={handleManageSubscription}
                           >
-                            Manage Subscription
+                            Manage Subscription (Portal)
                           </Button>
                         </>
                       ) : (
                         <Button 
                           className="bg-firegauge-red hover:bg-firegauge-red/90 w-full"
-                          onClick={() => handleSubscribe('Growth')}
+                          onClick={() => window.location.href = '/pricing'}
                         >
                           Subscribe Now
                         </Button>
@@ -317,155 +330,61 @@ const Billing = () => {
                   
                   {/* Plan comparison */}
                   {!subscribed && (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
-                      {[
-                        {
-                          name: "Starter", 
-                          inSeasonPrice: "$99",
-                          offSeasonPrice: "$50",
-                          stations: "1-5",
-                          users: "2",
-                          features: [
-                            "Offline data capture",
-                            "Basic NFPA reports",
-                            "Email support",
-                            "CSV exports",
-                            "90-day data retention"
-                          ]
-                        },
-                        {
-                          name: "Growth", 
-                          inSeasonPrice: "$200",
-                          offSeasonPrice: "$50",
-                          stations: "6-15",
-                          users: "5",
-                          features: [
-                            "Everything in Starter",
-                            "Advanced NFPA reports",
-                            "Priority email support",
-                            "QuickBooks integration",
-                            "1-year data retention",
-                            "Multi-user roles"
-                          ],
-                          recommended: true
-                        },
-                        {
-                          name: "Scale", 
-                          inSeasonPrice: "$300",
-                          offSeasonPrice: "$50",
-                          stations: "16+",
-                          users: "Unlimited",
-                          features: [
-                            "Everything in Growth",
-                            "Phone support",
-                            "Jobber integration",
-                            "Unlimited data storage",
-                            "Custom branding",
-                            "API access"
-                          ]
-                        },
-                      ].map((plan, index) => (
-                        <Card 
-                          key={index}
-                          className={`border ${plan.recommended ? 'border-2 border-firegauge-accent shadow-lg' : ''}`}
-                        >
-                          {plan.recommended && (
-                            <div className="bg-firegauge-accent text-white text-center py-1 font-medium text-sm">
-                              MOST POPULAR
-                            </div>
-                          )}
-                          <CardHeader>
-                            <CardTitle>{plan.name}</CardTitle>
-                            <div className="mt-4">
-                              <div className="text-3xl font-bold">
-                                {season_status === 'in-season' ? plan.inSeasonPrice : plan.offSeasonPrice}
+                    <div className="mt-8">
+                      <h3 className="text-xl font-semibold mb-4 text-center">Choose Your Plan</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {[
+                          { name: "Basic", monthlyPriceId: "price_1RNJhVP1sYOfvCvLsAvRxcqb", priceDisplay: "$75/mo", features: ["Up to 75 hoses", "PDF Reports"] },
+                          { name: "Standard", monthlyPriceId: "price_1RNJrPP1sYOfvCvLdRBmGLrt", priceDisplay: "$150/mo", features: ["Up to 500 hoses", "Audit Logs"], recommended: true },
+                          { name: "Professional", monthlyPriceId: "price_1RNJryP1sYOfvCvLSMsb5zqQ", priceDisplay: "$250/mo", features: ["Up to 2000 hoses", "API Access"] },
+                        ].map((plan) => (
+                          <Card key={plan.name} className={`flex flex-col ${plan.recommended ? 'border-2 border-firegauge-accent shadow-lg' : 'border'}`}>
+                            {plan.recommended && (
+                                <div className="bg-firegauge-accent text-white text-center py-1 font-medium text-sm">
+                                RECOMMENDED
+                                </div>
+                            )}
+                            <CardHeader>
+                              <CardTitle>{plan.name}</CardTitle>
+                              <div className="mt-2">
+                                <span className="text-3xl font-bold">{plan.priceDisplay.split('/')[0]}</span>
                                 <span className="text-base font-normal text-gray-500">/mo</span>
                               </div>
-                              <div className="text-sm text-gray-500 mt-1">
-                                {season_status === 'in-season' ? 'During Testing Season' : 'During Off-Season'}
-                              </div>
-                            </div>
-                          </CardHeader>
-                          <CardContent>
-                            <div className="space-y-4">
-                              <div>
-                                <div className="text-sm text-gray-500 mb-1">Stations</div>
-                                <div className="font-medium">{plan.stations}</div>
-                              </div>
-                              <div>
-                                <div className="text-sm text-gray-500 mb-1">Users</div>
-                                <div className="font-medium">{plan.users}</div>
-                              </div>
-                              <div>
-                                <div className="text-sm text-gray-500 mb-1">Features</div>
-                                <ul className="space-y-1">
-                                  {plan.features.map((feature, i) => (
-                                    <li key={i} className="flex items-start text-sm">
-                                      <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        className="h-5 w-5 text-firegauge-red mr-2 flex-shrink-0"
-                                        viewBox="0 0 20 20"
-                                        fill="currentColor"
-                                      >
-                                        <path
-                                          fillRule="evenodd"
-                                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                          clipRule="evenodd"
-                                        />
-                                      </svg>
-                                      <span>{feature}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            </div>
-                          </CardContent>
-                          <CardFooter>
-                            <Button 
-                              className={`w-full ${
-                                plan.recommended 
-                                  ? 'bg-firegauge-red hover:bg-firegauge-red/90' 
-                                  : 'bg-firegauge-charcoal hover:bg-firegauge-charcoal/90'
-                              }`}
-                              onClick={() => handleSubscribe(plan.name)}
-                            >
-                              Select {plan.name}
-                            </Button>
-                          </CardFooter>
-                        </Card>
-                      ))}
+                            </CardHeader>
+                            <CardContent className="flex-grow">
+                              <ul className="space-y-1">
+                                {plan.features.map((feature, i) => (
+                                  <li key={i} className="flex items-start text-sm">
+                                    <Check className="h-4 w-4 text-firegauge-red mr-2 mt-0.5 flex-shrink-0" />
+                                    {feature}
+                                  </li>
+                                ))}
+                              </ul>
+                            </CardContent>
+                            <CardFooter>
+                              <Button 
+                                className={`w-full ${plan.recommended ? 'bg-firegauge-red hover:bg-firegauge-red/90' : 'bg-firegauge-charcoal hover:bg-firegauge-charcoal/90'}`}
+                                onClick={() => handlePlanAction(plan.monthlyPriceId, plan.name)}
+                                disabled={isPlanChangeLoading === plan.monthlyPriceId}
+                              >
+                                {isPlanChangeLoading === plan.monthlyPriceId ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : `Choose ${plan.name}`}
+                              </Button>
+                            </CardFooter>
+                          </Card>
+                        ))}
+                      </div>
                     </div>
                   )}
                   
                   {/* Plan Features */}
-                  {subscribed && (
+                  {subscribed && activePlanDetails && (
                     <Card>
                       <CardHeader>
                         <CardTitle>Your Plan Features</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="grid gap-4 md:grid-cols-2">
-                          {subscription_tier === "Starter" ? [
-                            "Offline data capture",
-                            "Basic NFPA reports",
-                            "Email support",
-                            "CSV exports",
-                            "90-day data retention"
-                          ] : subscription_tier === "Growth" ? [
-                            "Everything in Starter",
-                            "Advanced NFPA reports",
-                            "Priority email support",
-                            "QuickBooks integration",
-                            "1-year data retention",
-                            "Multi-user roles"
-                          ] : [
-                            "Everything in Growth",
-                            "Phone support",
-                            "Jobber integration",
-                            "Unlimited data storage",
-                            "Custom branding",
-                            "API access"
-                          ].map((feature, i) => (
+                          {activePlanDetails.features.map((feature, i) => (
                             <div key={i} className="flex items-center">
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -539,7 +458,7 @@ const Billing = () => {
                             </p>
                             <Button 
                               className="bg-firegauge-red hover:bg-firegauge-red/90"
-                              onClick={() => handleSubscribe('Growth')}
+                              onClick={() => window.location.href = '/pricing'}
                             >
                               Subscribe Now
                             </Button>
@@ -640,74 +559,6 @@ const Billing = () => {
           </main>
         </div>
       </div>
-      
-      {/* Subscription Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Choose Billing Season</DialogTitle>
-            <DialogDescription>
-              FireGauge offers season-smart pricing. Select the current season to continue.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid grid-cols-2 gap-4 py-4">
-            <Button
-              variant="outline"
-              className={`flex flex-col items-center justify-center h-32 ${isSeasonSwitchLoading ? 'opacity-50' : ''}`}
-              onClick={() => handleConfirmSubscribe("off-season")}
-              disabled={isSeasonSwitchLoading}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-8 w-8 mb-2"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M20 12H4M12 20V4"
-                />
-              </svg>
-              <div className="font-medium">Off-Season</div>
-              <div className="text-sm text-gray-500">
-                $50/month
-              </div>
-            </Button>
-            <Button
-              variant="outline"
-              className={`flex flex-col items-center justify-center h-32 ${isSeasonSwitchLoading ? 'opacity-50' : ''}`}
-              onClick={() => handleConfirmSubscribe("in-season")}
-              disabled={isSeasonSwitchLoading}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-8 w-8 mb-2 text-firegauge-red"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 3v18m9-9H3"
-                />
-              </svg>
-              <div className="font-medium">In-Season</div>
-              <div className="text-sm text-gray-500">
-                {selectedPlan === "Growth" 
-                  ? "$200/month" 
-                  : selectedPlan === "Scale" 
-                    ? "$300/month" 
-                    : "$99/month"}
-              </div>
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </SidebarProvider>
   );
 };

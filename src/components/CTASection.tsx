@@ -26,7 +26,7 @@ const CTASection = () => {
             
             <Button 
               variant="outline" 
-              className="border-white text-white hover:bg-white/10 py-3 px-8 text-lg w-full sm:w-auto order-2"
+              className="border-white text-black hover:bg-white/10 py-3 px-8 text-lg w-full sm:w-auto order-2"
               onClick={() => window.open('https://calendly.com/your-link', '_blank')}
             >
               Book a 15-Min Call

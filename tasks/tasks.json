@@ -307,7 +307,7 @@
           "description": "Redesign the Dashboard.tsx component to serve as a simplified user portal with a clean layout structure",
           "dependencies": [],
           "details": "Implementation steps:\n1. Create a new Dashboard.tsx component or refactor the existing one\n2. Implement a responsive grid layout with a header, main content area, and optional sidebar\n3. Add a welcome section with user greeting (e.g., 'Welcome, {username}')\n4. Create placeholder card components for the main dashboard sections (subscription, quick stats, navigation)\n5. Style the layout using Tailwind CSS or your preferred styling approach\n6. Ensure the layout is responsive and works on mobile devices\n\nTesting approach:\n- Verify the layout renders correctly on different screen sizes\n- Check that placeholder components are positioned correctly\n- Ensure the component renders without errors",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 7
         },
         {
@@ -341,7 +341,7 @@
             1
           ],
           "details": "Implementation steps:\n1. Create a prominent 'Go to App' button/link that redirects to app.firegauge.app\n   - Style it to stand out visually on the dashboard\n   - Add hover and active states\n2. Implement navigation cards or links for:\n   - Account Management\n   - Billing Management\n   - User Management (conditionally shown for admin users)\n3. Add appropriate icons for each navigation option\n4. Implement conditional rendering for admin-only sections based on user role\n5. Add click handlers and routing for each navigation option\n\nTesting approach:\n- Verify all links point to the correct destinations\n- Test conditional rendering based on user roles\n- Check that the 'Go to App' button is prominently displayed\n- Ensure hover and active states work correctly",
-          "status": "pending",
+          "status": "done",
           "parentTaskId": 7
         },
         {

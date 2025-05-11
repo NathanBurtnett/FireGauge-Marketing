@@ -1,75 +1,86 @@
-
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/components/ui/sonner";
-import { useAuth } from "@/components/providers/AuthProvider";
+import { supabase } from "../../integrations/supabase/client";
+import { toast } from "../ui/sonner";
+import { useAuth } from "../providers/AuthProvider";
 
 export type SubscriptionStatus = {
   subscribed: boolean;
   subscription_tier: string | null;
-  season_status: "in-season" | "off-season" | null;
   subscription_end: string | null;
   isLoading: boolean;
   error: string | null;
 };
 
 export const useSubscription = () => {
-  const { user } = useAuth();
+  console.log("useSubscription: Hook initialized");
+  const { user, loading: authLoading } = useAuth();
   const [status, setStatus] = useState<SubscriptionStatus>({
     subscribed: false,
     subscription_tier: null,
-    season_status: null,
     subscription_end: null,
     isLoading: true,
     error: null,
   });
 
-  const checkSubscription = async () => {
-    try {
-      if (!user) {
-        setStatus(prev => ({
-          ...prev,
-          isLoading: false,
-          error: "User not authenticated"
-        }));
-        return;
-      }
+  console.log("useSubscription: Initial state - user:", user, "authLoading:", authLoading, "current status:", status);
 
-      setStatus(prev => ({ ...prev, isLoading: true, error: null }));
+  const checkSubscription = async () => {
+    console.log("useSubscription: checkSubscription() called. Current user:", user);
+    if (!user) {
+      console.log("useSubscription: checkSubscription - No user, setting status to not subscribed, loading false.");
+      setStatus({
+        subscribed: false,
+        subscription_tier: null,
+        subscription_end: null,
+        isLoading: false,
+        error: "User not authenticated for subscription check"
+      });
+      return;
+    }
+
+    console.log("useSubscription: checkSubscription - User exists, proceeding to invoke function.");
+    setStatus(prev => ({ ...prev, isLoading: true, error: null }));
+    
+    try {
+      console.log("useSubscription: checkSubscription - Invoking 'check-subscription' function...");
+      const { data, error: functionError } = await supabase.functions.invoke('check-subscription', {});
+      console.log("useSubscription: checkSubscription - 'check-subscription' function response:", { data, functionError });
       
-      const { data, error } = await supabase.functions.invoke('check-subscription', {});
-      
-      if (error) {
-        console.error("Error checking subscription status:", error);
-        setStatus(prev => ({
-          ...prev,
+      if (functionError) {
+        console.error("useSubscription: checkSubscription - Error from invoking function:", functionError);
+        setStatus({
+          subscribed: false,
+          subscription_tier: null,
+          subscription_end: null,
           isLoading: false,
-          error: error.message || "Failed to check subscription status",
-        }));
+          error: functionError.message || "Failed to check subscription status",
+        });
         return;
       }
       
+      console.log("useSubscription: checkSubscription - Success from function. Setting status with data:", data);
       setStatus({
         subscribed: data.subscribed,
         subscription_tier: data.subscription_tier,
-        season_status: data.season_status || "off-season",
         subscription_end: data.subscription_end,
         isLoading: false,
         error: null,
       });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred";
-      console.error("Error in useSubscription hook:", err);
-      
-      setStatus(prev => ({
-        ...prev,
+      console.error("useSubscription: checkSubscription - Caught error during function invocation:", err);
+      setStatus({
+        subscribed: false,
+        subscription_tier: null,
+        subscription_end: null,
         isLoading: false,
         error: errorMessage,
-      }));
+      });
     }
   };
 
-  const createCheckoutSession = async (plan: string, seasonStatus = "in-season") => {
+  const createCheckoutSession = async (priceId: string) => {
+    console.log("useSubscription: createCheckoutSession called for priceId:", priceId);
     try {
       if (!user) {
         toast.error("Authentication required", {
@@ -79,7 +90,7 @@ export const useSubscription = () => {
       }
 
       const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { plan, seasonStatus },
+        body: { priceId },
       });
 
       if (error) {
@@ -100,6 +111,7 @@ export const useSubscription = () => {
   };
 
   const openCustomerPortal = async () => {
+    console.log("useSubscription: openCustomerPortal called");
     try {
       if (!user) {
         toast.error("Authentication required", {
@@ -128,13 +140,25 @@ export const useSubscription = () => {
   };
 
   useEffect(() => {
-    if (user) {
+    console.log("useSubscription: useEffect triggered. User from useAuth:", user, "AuthLoading state:", authLoading);
+    if (!authLoading && user) {
+      console.log("useSubscription: useEffect - Auth is loaded and user exists. Calling checkSubscription.");
       checkSubscription();
-    } else {
-      setStatus(prev => ({ ...prev, isLoading: false }));
+    } else if (!authLoading && !user) {
+      console.log("useSubscription: useEffect - Auth is loaded but NO user. Setting subscription status to not subscribed, loading false.");
+      setStatus({
+        subscribed: false,
+        subscription_tier: null,
+        subscription_end: null,
+        isLoading: false, 
+        error: "User not authenticated"
+      });
+    } else if (authLoading) {
+        console.log("useSubscription: useEffect - Auth is still loading. Waiting for auth to complete before checking subscription.");
     }
-  }, [user]);
+  }, [user, authLoading]);
 
+  console.log("useSubscription: Returning status and functions:", { ...status, checkSubscription, createCheckoutSession, openCustomerPortal });
   return {
     ...status,
     checkSubscription,

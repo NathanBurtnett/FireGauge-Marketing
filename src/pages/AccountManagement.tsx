@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -9,14 +8,90 @@ import { Button } from "@/components/ui/button";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import DashboardSidebar from '@/components/dashboard/DashboardSidebar';
+import { supabase } from "@/integrations/supabase/client";
+import { User as SupabaseUser } from '@supabase/supabase-js';
 
 const AccountManagement = () => {
-  const [firstName, setFirstName] = useState('John');
-  const [lastName, setLastName] = useState('Doe');
-  const [email, setEmail] = useState('john.doe@firegauge.com');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('(555) 123-4567');
   const [notifications, setNotifications] = useState(true);
   
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const { data: { user: supabaseUser }, error: authError } = await supabase.auth.getUser();
+        if (authError) {
+          throw authError;
+        }
+
+        if (supabaseUser) {
+          const userEmail = supabaseUser.email || '';
+          let userFirstName = '';
+          let userLastName = '';
+
+          if (supabaseUser.user_metadata?.full_name) {
+            const nameParts = supabaseUser.user_metadata.full_name.split(' ');
+            userFirstName = nameParts[0] || '';
+            userLastName = nameParts.slice(1).join(' ') || '';
+          } else if (userEmail) {
+            userFirstName = userEmail.split('@')[0] || '';
+          }
+          
+          setFirstName(userFirstName);
+          setLastName(userLastName);
+          setEmail(userEmail);
+        } else {
+          setError("No user session found. Please log in.");
+        }
+      } catch (e: any) {
+        console.error("Error fetching user data for account management:", e);
+        setError(e.message || "Failed to fetch user data.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUserData();
+  }, []);
+  
+  if (loading) {
+    return (
+      <SidebarProvider>
+        <div className="min-h-screen flex flex-col bg-gray-50">
+          <DashboardHeader />
+          <div className="flex flex-1 overflow-hidden">
+            <DashboardSidebar />
+            <main className="flex-1 overflow-y-auto p-6 flex items-center justify-center">
+              <p>Loading account data...</p>
+            </main>
+          </div>
+        </div>
+      </SidebarProvider>
+    );
+  }
+
+  if (error) {
+    return (
+      <SidebarProvider>
+        <div className="min-h-screen flex flex-col bg-gray-50">
+          <DashboardHeader />
+          <div className="flex flex-1 overflow-hidden">
+            <DashboardSidebar />
+            <main className="flex-1 overflow-y-auto p-6 flex flex-col items-center justify-center">
+              <p className="text-red-600">Error: {error}</p>
+            </main>
+          </div>
+        </div>
+      </SidebarProvider>
+    );
+  }
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex flex-col bg-gray-50">

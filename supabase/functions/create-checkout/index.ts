@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0";
 
@@ -24,10 +23,12 @@ serve(async (req) => {
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
     logStep("Stripe key verified");
     
-    const { plan, seasonStatus = "in-season" } = await req.json();
-    logStep("Request data", { plan, seasonStatus });
+    const { priceId } = await req.json();
+    logStep("Request data", { priceId });
     
-    if (!plan) throw new Error("Plan is required");
+    if (!priceId) {
+      throw new Error("priceId is required");
+    }
     
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) throw new Error("No authorization header provided");
@@ -40,84 +41,84 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_ANON_KEY") as string;
     const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2.45.0");
     
-    const supabase = createClient(supabaseUrl, supabaseKey);
-    const { data: userData, error: userError } = await supabase.auth.getUser(token);
+    const supabase = createClient(supabaseUrl, supabaseKey, {
+      global: { headers: { Authorization: `Bearer ${token}` } },
+    });
+    
+    // Fetch user details, including user_metadata
+    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
     
     if (userError) throw new Error(`Authentication error: ${userError.message}`);
-    const user = userData.user;
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
     
-    // Initialize Stripe
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
     
-    // Check if customer exists
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
-    let customerId: string;
+    let customerId = user.user_metadata?.stripe_customer_id as string | undefined;
     
-    if (customers.data.length > 0) {
-      customerId = customers.data[0].id;
-      logStep("Found existing customer", { customerId });
-    } else {
-      // Create new customer
-      const customer = await stripe.customers.create({
-        email: user.email,
-        metadata: {
-          user_id: user.id,
-        },
-      });
-      customerId = customer.id;
-      logStep("Created new customer", { customerId });
+    if (customerId) {
+      logStep("Found existing Stripe customer ID in user metadata", { customerId });
+      // Optional: Verify customer exists in Stripe to prevent issues if metadata is stale
+      try {
+        const customerFromStripe = await stripe.customers.retrieve(customerId);
+        if (customerFromStripe.deleted) {
+          logStep("Customer was deleted in Stripe, will create a new one.", { customerId });
+          customerId = undefined; // Treat as if not found
+        }
+      } catch (stripeError) {
+        logStep("Failed to retrieve customer from Stripe, will create a new one.", { customerId, error: stripeError.message });
+        customerId = undefined; // Treat as if not found
+      }
     }
-    
-    // Define plan prices based on the season status and plan
-    const prices: Record<string, Record<string, { priceId: string; amount: number }>> = {
-      "in-season": {
-        "starter": { priceId: "price_in_season_starter", amount: 9900 }, // $99
-        "growth": { priceId: "price_in_season_growth", amount: 20000 }, // $200
-        "scale": { priceId: "price_in_season_scale", amount: 30000 }, // $300
-      },
-      "off-season": {
-        "starter": { priceId: "price_off_season_starter", amount: 5000 }, // $50
-        "growth": { priceId: "price_off_season_growth", amount: 5000 }, // $50
-        "scale": { priceId: "price_off_season_scale", amount: 5000 }, // $50
-      },
-    };
-    
-    // Get the pricing for the selected plan and season
-    const pricing = prices[seasonStatus][plan.toLowerCase()];
-    if (!pricing) throw new Error(`Invalid plan or season status: ${plan}, ${seasonStatus}`);
+
+    if (!customerId) {
+      const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+      if (customers.data.length > 0) {
+        customerId = customers.data[0].id;
+        logStep("Found existing customer by email in Stripe", { customerId });
+      } else {
+        const customer = await stripe.customers.create({
+          email: user.email,
+          metadata: {
+            supabase_user_id: user.id, // Use supabase_user_id for clarity
+          },
+        });
+        customerId = customer.id;
+        logStep("Created new customer in Stripe", { customerId });
+      }
+      
+      // Save the Stripe customer ID to Supabase user_metadata
+      const { error: updateError } = await supabase.auth.updateUser({
+        data: { stripe_customer_id: customerId },
+      });
+      if (updateError) {
+        logStep("Error updating user metadata with Stripe customer ID", { error: updateError.message });
+        // Non-fatal for checkout creation, but log it.
+      } else {
+        logStep("Successfully updated user metadata with Stripe customer ID", { customerId });
+      }
+    }
     
     const origin = req.headers.get("origin") || "http://localhost:5173";
     
-    // Create checkout session
+    const sessionMetadata: { [key: string]: string | number } = {
+      supabase_user_id: user.id, // Use supabase_user_id
+      stripe_price_id: priceId, // Store the chosen Stripe Price ID
+    };
+    
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       payment_method_types: ["card"],
       line_items: [
         {
-          price_data: {
-            currency: "usd",
-            product_data: {
-              name: `FireGauge ${plan} Plan - ${seasonStatus === "in-season" ? "In-Season" : "Off-Season"}`,
-              description: `Subscription to FireGauge ${plan} plan during ${seasonStatus === "in-season" ? "testing season" : "off-season"}`,
-            },
-            unit_amount: pricing.amount, // amount in cents
-            recurring: {
-              interval: "month",
-            },
-          },
+          price: priceId,
           quantity: 1,
         },
       ],
       mode: "subscription",
       success_url: `${origin}/billing?success=true`,
       cancel_url: `${origin}/billing?canceled=true`,
-      metadata: {
-        user_id: user.id,
-        plan,
-        season_status: seasonStatus,
-      },
+      metadata: sessionMetadata,
     });
     
     logStep("Created checkout session", { sessionId: session.id, url: session.url });

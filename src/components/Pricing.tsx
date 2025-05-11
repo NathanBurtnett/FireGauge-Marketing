@@ -1,12 +1,19 @@
-import React from 'react';
-import { Check } from "lucide-react";
+import React, { useState } from 'react';
+import { Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from "@/components/ui/sonner";
+import { loadStripe } from '@stripe/stripe-js';
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 interface PricingPlan {
   name: string;
   priceDisplay: string;
   priceAnnotation: string;
+  monthlyPriceId: string;
+  annualPriceId?: string;
   annualPrice?: string;
   description: string;
   userCount: string;
@@ -14,19 +21,22 @@ interface PricingPlan {
   coreModules: string;
   features: string[];
   ctaText: string;
-  ctaNavPath?: string; // To allow different navigation for 'Contact Sales'
+  ctaNavPath?: string;
   recommended?: boolean;
   isEnterprise?: boolean;
 }
 
 const Pricing = () => {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState<string | null>(null);
 
   const plans: PricingPlan[] = [
     {
       name: "Basic",
       priceDisplay: "$75",
       priceAnnotation: "/mo",
+      monthlyPriceId: "price_1RNJhVP1sYOfvCvLsAvRxcqb",
+      annualPriceId: "price_1RNJqcP1sYOfvCvLEoaumdgs",
       annualPrice: "$765/yr (Save ≈15%)",
       description: "Ideal for small departments or those new to digital testing.",
       userCount: "1 Admin + 1 Inspector",
@@ -45,6 +55,8 @@ const Pricing = () => {
       name: "Standard",
       priceDisplay: "$150",
       priceAnnotation: "/mo",
+      monthlyPriceId: "price_1RNJrPP1sYOfvCvLdRBmGLrt",
+      annualPriceId: "price_1RNJrdP1sYOfvCvLmOcwLZes",
       annualPrice: "$1,530/yr (Save ≈15%)",
       description: "Best for growing departments needing more capacity and features.",
       userCount: "2 Admins + 5 Inspectors",
@@ -64,6 +76,8 @@ const Pricing = () => {
       name: "Professional",
       priceDisplay: "$250",
       priceAnnotation: "/mo",
+      monthlyPriceId: "price_1RNJryP1sYOfvCvLSMsb5zqQ",
+      annualPriceId: "price_1RNJsAP1sYOfvCvL4sOrMFAT",
       annualPrice: "$2,550/yr (Save ≈15%)",
       description: "For established departments requiring advanced features and support.",
       userCount: "3 Admins + 10 Inspectors",
@@ -82,6 +96,7 @@ const Pricing = () => {
       name: "Enterprise",
       priceDisplay: "Custom",
       priceAnnotation: "Tailored to your needs",
+      monthlyPriceId: "price_1RNJsvP1sYOfvCvLpPjx4t8n",
       description: "For large organizations with unique requirements, advanced security, and dedicated support.",
       userCount: "Unlimited Users & Assets",
       coreModules: "All Modules + Custom Development",
@@ -98,18 +113,68 @@ const Pricing = () => {
   ];
 
   const addOns = [
-    { name: "Ladder Inspections Module", price: "+$50/mo per module" },
-    { name: "Pump Testing Module", price: "+$50/mo per module" },
+    { name: "Ladder Inspections Module", price: "+$50/mo per module", id: "price_1RNJtXP1sYOfvCvL8Ovg4wJG" },
+    { name: "Pump Testing Module", price: "+$50/mo per module", id: "price_1RNJtmP1sYOfvCvLgKCVp5vT" },
   ];
 
-  const handleCtaClick = (plan: PricingPlan) => {
+  const handleCtaClick = async (plan: PricingPlan) => {
+    setIsLoading(plan.name);
+
     if (plan.isEnterprise) {
       window.location.href = "mailto:sales@firegauge.app?subject=Enterprise%20Plan%20Inquiry";
-    } else if (plan.ctaNavPath) {
-      navigate(plan.ctaNavPath);
-    } else {
-      console.log(`CTA clicked for ${plan.name}, but no navigation path set.`);
-      navigate("/auth");
+      setIsLoading(null);
+      return;
+    }
+
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+    if (sessionError || !session) {
+      toast.info("Please sign in or create an account to subscribe.", {
+        action: {
+          label: "Sign In",
+          onClick: () => navigate("/auth"),
+        },
+      });
+      setIsLoading(null);
+      if(plan.ctaNavPath && !session) navigate(plan.ctaNavPath);
+      return;
+    }
+    
+    const selectedPriceId = plan.monthlyPriceId; 
+    if (!selectedPriceId) {
+        toast.error("This plan does not have a configured monthly price ID.");
+        setIsLoading(null);
+        return;
+    }
+
+    try {
+      const { data: checkoutResponse, error: checkoutError } = await supabase.functions.invoke('create-checkout', {
+        body: { priceId: selectedPriceId },
+      });
+
+      if (checkoutError) {
+        throw new Error(`Checkout function error: ${checkoutError.message}`);
+      }
+
+      if (checkoutResponse && checkoutResponse.url) {
+        const stripe = await stripePromise;
+        if (!stripe) {
+          toast.error("Stripe.js failed to load.");
+          setIsLoading(null);
+          return;
+        }
+        const { error: stripeError } = await stripe.redirectToCheckout({ sessionId: checkoutResponse.sessionId || checkoutResponse.url });
+        if (stripeError) {
+          toast.error(`Stripe redirect error: ${stripeError.message}`);
+        }
+      } else {
+        toast.error("Failed to create checkout session. No URL returned.");
+      }
+    } catch (error: any) {
+      toast.error(`Subscription error: ${error.message}`);
+      console.error("Subscription process error:", error);
+    } finally {
+      setIsLoading(null);
     }
   };
 
@@ -168,12 +233,17 @@ const Pricing = () => {
                 
                 <Button 
                   onClick={() => handleCtaClick(plan)}
+                  disabled={isLoading === plan.name}
                   className={`w-full mt-6 py-3 text-lg font-semibold rounded-md transition-colors duration-300 ease-in-out 
                     ${plan.recommended ? 'bg-firegauge-red text-white hover:bg-firegauge-red/90' : 'bg-firegauge-charcoal text-white hover:bg-black'}
                     ${plan.isEnterprise ? 'bg-firegauge-blue text-white hover:bg-firegauge-blue/90' : ''}
                   `}
                 >
-                  {plan.ctaText}
+                  {isLoading === plan.name ? (
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  ) : (
+                    plan.ctaText
+                  )}
                 </Button>
               </div>
             </div>

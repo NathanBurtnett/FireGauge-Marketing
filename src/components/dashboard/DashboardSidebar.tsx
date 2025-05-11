@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { Building, TestTube, Archive, FileText, Settings } from "lucide-react";
+import { Building, FileText, Settings } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -11,11 +10,9 @@ import {
 } from "@/components/ui/sidebar";
 
 const navItems = [
-  { title: "Stations", icon: Building, url: "#stations" },
-  { title: "Tests", icon: TestTube, url: "#tests" },
-  { title: "Assets", icon: Archive, url: "#assets" },
-  { title: "Reports", icon: FileText, url: "#reports" },
-  { title: "Settings", icon: Settings, url: "#settings" }
+  { title: "Stations", icon: Building, url: "/dashboard/stations" },
+  { title: "Reports", icon: FileText, url: "/dashboard/reports" },
+  { title: "Settings", icon: Settings, url: "/account" }
 ];
 
 const DashboardSidebar = () => {

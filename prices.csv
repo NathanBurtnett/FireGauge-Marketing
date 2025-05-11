@@ -1,0 +1,10 @@
+Price ID,Product ID,Product Name,Product Statement Descriptor,Product Tax Code,Description,Created (UTC),Amount,Currency,Interval,Interval Count,Usage Type,Aggregate Usage,Billing Scheme,Trial Period Days,Tax Behavior
+price_1RNJtmP1sYOfvCvLgKCVp5vT,prod_SHthKgfqhgcYAL,FireGauge Pump Testing Module,,,,2025-05-10 20:21,50.00,usd,month,1,licensed,,per_unit,,unspecified
+price_1RNJtXP1sYOfvCvL8Ovg4wJG,prod_SHtgmaneypnjM9,FireGauge Ladder Inspections Module,,,,2025-05-10 20:21,50.00,usd,month,1,licensed,,per_unit,,unspecified
+price_1RNJsvP1sYOfvCvLpPjx4t8n,prod_SHtgzmHiwOwHOs,FireGauge Enterprise Plan,,,,2025-05-10 20:20,1000.00,usd,,,,,per_unit,,unspecified
+price_1RNJsAP1sYOfvCvL4sOrMFAT,prod_SHtfQTJ31mJKwJ,FireGauge Professional Plan,,,,2025-05-10 20:19,2550.00,usd,year,1,licensed,,per_unit,,unspecified
+price_1RNJryP1sYOfvCvLSMsb5zqQ,prod_SHtfQTJ31mJKwJ,FireGauge Professional Plan,,,,2025-05-10 20:19,250.00,usd,month,1,licensed,,per_unit,,unspecified
+price_1RNJrdP1sYOfvCvLmOcwLZes,prod_SHterp2PRkeint,FireGauge Standard Plan,,,,2025-05-10 20:19,1530.00,usd,year,1,licensed,,per_unit,,unspecified
+price_1RNJrPP1sYOfvCvLdRBmGLrt,prod_SHterp2PRkeint,FireGauge Standard Plan,,,,2025-05-10 20:19,150.00,usd,month,1,licensed,,per_unit,,unspecified
+price_1RNJqcP1sYOfvCvLEoaumdgs,prod_SHtUFu6JUhgnwK,FireGauge Starter Plan,,,,2025-05-10 20:18,765.00,usd,year,1,licensed,,per_unit,,unspecified
+price_1RNJhVP1sYOfvCvLsAvRxcqb,prod_SHtUFu6JUhgnwK,FireGauge Starter Plan,,,,2025-05-10 20:08,74.99,usd,month,1,licensed,,per_unit,,unspecified

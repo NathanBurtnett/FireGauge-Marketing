@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Play } from "lucide-react";
@@ -37,13 +36,6 @@ const Hero = () => {
               onClick={() => navigate('/auth')}
             >
               Start Your Free 30-Day Pilot
-            </Button>
-            
-            <Button 
-              variant="outline" 
-              className="border-white text-white hover:bg-white/10 py-6 px-8 text-lg flex items-center gap-2"
-            >
-              <Play size={18} className="fill-white" /> Watch 90-sec Demo
             </Button>
           </div>
         </div>

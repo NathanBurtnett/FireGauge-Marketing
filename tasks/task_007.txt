@@ -11,7 +11,7 @@ Design and implement dashboard layout with welcome message and summary sections.
 Verify dashboard displays correct user and subscription information. Test navigation to other portal sections. Ensure 'Go to App' button redirects correctly. Test responsive behavior on different screen sizes.
 
 # Subtasks:
-## 1. Create Dashboard Layout Structure [pending]
+## 1. Create Dashboard Layout Structure [done]
 ### Dependencies: None
 ### Description: Redesign the Dashboard.tsx component to serve as a simplified user portal with a clean layout structure
 ### Details:
@@ -68,7 +68,7 @@ Testing approach:
 - Check that components handle missing or null data gracefully
 - Ensure responsive design works on different screen sizes
 
-## 4. Implement 'Go to App' Button and Navigation Links [pending]
+## 4. Implement 'Go to App' Button and Navigation Links [done]
 ### Dependencies: 7.1
 ### Description: Add a prominent 'Go to App' button and navigation links/cards to other portal sections
 ### Details:

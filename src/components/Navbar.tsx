@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -57,11 +56,11 @@ const Navbar = () => {
           {isHome ? (
             // Marketing page navigation
             <>
-              <a href="#benefits" className="text-firegauge-charcoal hover:text-firegauge-red transition-colors duration-300">Benefits</a>
-              <a href="#features" className="text-firegauge-charcoal hover:text-firegauge-red transition-colors duration-300">Features</a>
-              <a href="#testimonials" className="text-firegauge-charcoal hover:text-firegauge-red transition-colors duration-300">Testimonials</a>
-              <a href="#pricing" className="text-firegauge-charcoal hover:text-firegauge-red transition-colors duration-300">Pricing</a>
-              <a href="#faq" className="text-firegauge-charcoal hover:text-firegauge-red transition-colors duration-300">FAQ</a>
+              <a href="#benefits" className={`${isScrolled || !isHome ? 'text-firegauge-charcoal' : 'text-white'} hover:text-firegauge-red transition-colors duration-300`}>Benefits</a>
+              <a href="#features" className={`${isScrolled || !isHome ? 'text-firegauge-charcoal' : 'text-white'} hover:text-firegauge-red transition-colors duration-300`}>Features</a>
+              <a href="#testimonials" className={`${isScrolled || !isHome ? 'text-firegauge-charcoal' : 'text-white'} hover:text-firegauge-red transition-colors duration-300`}>Testimonials</a>
+              <a href="#pricing" className={`${isScrolled || !isHome ? 'text-firegauge-charcoal' : 'text-white'} hover:text-firegauge-red transition-colors duration-300`}>Pricing</a>
+              <a href="#faq" className={`${isScrolled || !isHome ? 'text-firegauge-charcoal' : 'text-white'} hover:text-firegauge-red transition-colors duration-300`}>FAQ</a>
               
               {isAuthenticated ? (
                 // User is authenticated, show dashboard button
@@ -85,15 +84,15 @@ const Navbar = () => {
             // App navigation (for logged-in users)
             isAuthenticated && (
               <>
-                <Link to="/dashboard" className="text-firegauge-charcoal hover:text-firegauge-red transition-colors duration-300">
-                  Dashboard
-                </Link>
-                <Link to="/account" className="text-firegauge-charcoal hover:text-firegauge-red transition-colors duration-300">
-                  Account
-                </Link>
-                <Link to="/billing" className="text-firegauge-charcoal hover:text-firegauge-red transition-colors duration-300">
-                  Billing
-                </Link>
+                <Button variant="ghost" asChild className="text-firegauge-charcoal hover:text-firegauge-red hover:bg-firegauge-red/10">
+                  <Link to="/dashboard">Dashboard</Link>
+                </Button>
+                <Button variant="ghost" asChild className="text-firegauge-charcoal hover:text-firegauge-red hover:bg-firegauge-red/10">
+                  <Link to="/account">Account</Link>
+                </Button>
+                <Button variant="ghost" asChild className="text-firegauge-charcoal hover:text-firegauge-red hover:bg-firegauge-red/10">
+                  <Link to="/billing">Billing</Link>
+                </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon" className="rounded-full">

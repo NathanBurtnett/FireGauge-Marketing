@@ -15,7 +15,8 @@ const Footer = () => {
             </p>
             <div className="flex items-center">
               <a 
-                href="#" 
+                href="https://www.linkedin.com/in/nathan-burtnett/" 
+                target="_blank" rel="noopener noreferrer"
                 className="bg-firegauge-charcoal text-white p-2 rounded-full hover:bg-firegauge-red transition-colors"
               >
                 <Linkedin size={18} />
@@ -24,22 +25,12 @@ const Footer = () => {
           </div>
           
           <div>
-            <h4 className="text-firegauge-charcoal font-semibold mb-4">Resources</h4>
-            <ul className="space-y-2">
-              <li><a href="#" className="text-gray-600 hover:text-firegauge-red transition-colors">Documentation</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-firegauge-red transition-colors">NFPA Guidelines</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-firegauge-red transition-colors">Help Center</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-firegauge-red transition-colors">Blog</a></li>
-            </ul>
-          </div>
-          
-          <div>
             <h4 className="text-firegauge-charcoal font-semibold mb-4">Company</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-600 hover:text-firegauge-red transition-colors">About Us</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-firegauge-red transition-colors">Contact</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-firegauge-red transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-firegauge-red transition-colors">Terms of Service</a></li>
+              <li><a href="/about" className="text-gray-600 hover:text-firegauge-red transition-colors">About Us</a></li>
+              <li><a href="/contact" className="text-gray-600 hover:text-firegauge-red transition-colors">Contact</a></li>
+              <li><a href="/legal#privacy" className="text-gray-600 hover:text-firegauge-red transition-colors">Privacy Policy</a></li>
+              <li><a href="/legal#terms" className="text-gray-600 hover:text-firegauge-red transition-colors">Terms of Service</a></li>
             </ul>
           </div>
         </div>
