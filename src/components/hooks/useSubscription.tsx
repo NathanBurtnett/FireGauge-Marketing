@@ -23,8 +23,6 @@ export const useSubscription = () => {
     error: null,
   });
 
-  console.log("useSubscription: Initial state - user:", user, "authLoading:", authLoading, "current status:", status);
-
   const checkSubscription = async () => {
     console.log("useSubscription: checkSubscription() called. Current user:", user);
     if (!user) {
@@ -34,7 +32,7 @@ export const useSubscription = () => {
         subscription_tier: null,
         subscription_end: null,
         isLoading: false,
-        error: "User not authenticated for subscription check"
+        error: null
       });
       return;
     }
@@ -152,14 +150,11 @@ export const useSubscription = () => {
         subscription_tier: null,
         subscription_end: null,
         isLoading: false, 
-        error: "User not authenticated"
+        error: null
       });
-    } else if (authLoading) {
-        console.log("useSubscription: useEffect - Auth is still loading. Waiting for auth to complete before checking subscription.");
     }
   }, [user, authLoading]);
 
-  console.log("useSubscription: Returning status and functions:", { ...status, checkSubscription, createCheckoutSession, openCustomerPortal });
   return {
     ...status,
     checkSubscription,
