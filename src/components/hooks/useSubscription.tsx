@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "../../integrations/supabase/client";
 import { toast } from "../ui/sonner";
@@ -61,8 +62,8 @@ export const useSubscription = () => {
       console.log("useSubscription: checkSubscription - Success from function. Setting status with data:", data);
       setStatus({
         subscribed: data.subscribed,
-        subscription_tier: data.subscription_tier,
-        subscription_end: data.subscription_end,
+        subscription_tier: data.subscription_tier || data.plan_id,
+        subscription_end: data.subscription_end || data.current_period_end,
         isLoading: false,
         error: null,
       });

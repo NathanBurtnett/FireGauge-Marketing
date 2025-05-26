@@ -1,25 +1,25 @@
+
 import React from 'react';
 import { Button } from "../components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../components/ui/card";
 import { Link as RouterLink } from 'react-router-dom';
-import { ExternalLink, User, CreditCard, Users, Settings, Loader2 } from 'lucide-react';
-import { supabase } from "../integrations/supabase/client";
+import { ExternalLink, User, CreditCard, Loader2, Settings } from 'lucide-react';
 import { SidebarProvider } from "../components/ui/sidebar";
 import DashboardHeader from '../components/dashboard/DashboardHeader';
 import DashboardSidebar from '../components/dashboard/DashboardSidebar';
 import { useSubscription } from '../components/hooks/useSubscription';
 import { useAuth } from '../components/providers/AuthProvider';
 
-// Re-using PLAN_DETAILS mapping, ensure consistency or centralize this
-// This is a simplified version for display here.
+// Updated PLAN_DETAILS mapping with your actual Stripe price IDs
 const PLAN_DETAILS: { [key: string]: { name: string; priceDisplay: string } } = {
-  "price_1RNJhVP1sYOfvCvLsAvRxcqb": { name: "Basic", priceDisplay: "$75/mo" },
-  "price_1RNJqcP1sYOfvCvLEoaumdgs": { name: "Basic (Annual)", priceDisplay: "$765/yr" },
-  "price_1RNJrPP1sYOfvCvLdRBmGLrt": { name: "Standard", priceDisplay: "$150/mo" },
-  "price_1RNJrdP1sYOfvCvLmOcwLZes": { name: "Standard (Annual)", priceDisplay: "$1530/yr" },
-  "price_1RNJryP1sYOfvCvLSMsb5zqQ": { name: "Professional", priceDisplay: "$250/mo" },
-  "price_1RNJsAP1sYOfvCvL4sOrMFAT": { name: "Professional (Annual)", priceDisplay: "$2550/yr" },
-  "price_1RNJsvP1sYOfvCvLpPjx4t8n": { name: "Enterprise", priceDisplay: "Custom" },
+  "price_1RSqV400HE2ZS1pmK1uKuTCe": { name: "Pilot 90", priceDisplay: "Free" },
+  "price_1RSqVe00HE2ZS1pmDEo9KWsH": { name: "Essential", priceDisplay: "$39/mo" },
+  "price_1RSqW500HE2ZS1pmn2qPRJ16": { name: "Essential (Annual)", priceDisplay: "$399/yr" },
+  "price_1RSqWZ00HE2ZS1pmcp0iWhqg": { name: "Pro", priceDisplay: "$99/mo" },
+  "price_1RSqWs00HE2ZS1pmkDdtxYdV": { name: "Pro (Annual)", priceDisplay: "$999/yr" },
+  "price_1RSqXb00HE2ZS1pmNY4PlTA5": { name: "Contractor", priceDisplay: "$279/mo" },
+  "price_1RSqY000HE2ZS1pmKSzq7p3i": { name: "Contractor (Annual)", priceDisplay: "$2,999/yr" },
+  "price_1RSqYn00HE2ZS1pmrIORlH1Q": { name: "Enterprise", priceDisplay: "Custom" },
 };
 
 const Dashboard = () => {
@@ -47,7 +47,6 @@ const Dashboard = () => {
     fullName: authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || 'User',
   } : null;
 
-  const isAdmin = true;
   const isLoading = authLoading || subscriptionLoading;
   const displayError = authContextError?.message || subscriptionError;
 
@@ -55,7 +54,7 @@ const Dashboard = () => {
 
   const currentPlanName = subscription_tier && PLAN_DETAILS[subscription_tier]?.name 
                           ? PLAN_DETAILS[subscription_tier].name 
-                          : (subscribed ? "Active Plan" : "N/A");
+                          : (subscribed ? "Active Plan" : "No Plan");
                           
   const nextBillingDateFormatted = subscription_end 
     ? new Date(subscription_end).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
@@ -130,10 +129,10 @@ const Dashboard = () => {
           <DashboardSidebar />
           
           <main className="flex-1 overflow-y-auto p-6">
-            <div className="max-w-7xl mx-auto">
+            <div className="max-w-5xl mx-auto">
               <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-800">Welcome, {displayUser.fullName || 'User'}!</h1>
-                <p className="text-gray-600">Manage your FireGauge account and services.</p>
+                <h1 className="text-3xl font-bold text-gray-800">Welcome to FireGauge, {displayUser.fullName}!</h1>
+                <p className="text-gray-600">Manage your subscription and account settings.</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -145,7 +144,7 @@ const Dashboard = () => {
                   </CardHeader>
                   <CardContent>
                     <p className="mb-4 text-gray-100">
-                      Dive into your full FireGauge experience for equipment testing, reporting, and compliance management.
+                      Ready to start testing? Access your full FireGauge application for equipment testing, reporting, and compliance management.
                     </p>
                     <Button 
                       size="lg"
@@ -160,18 +159,30 @@ const Dashboard = () => {
                 <Card className="shadow-md hover:shadow-lg transition-shadow">
                   <CardHeader>
                     <CardTitle className="flex items-center text-xl text-firegauge-charcoal">
-                      <Settings className="mr-2 h-5 w-5" /> Subscription Plan
+                      <Settings className="mr-2 h-5 w-5" /> Current Subscription
                     </CardTitle>
-                    <CardDescription>Your current plan details.</CardDescription>
+                    <CardDescription>Your plan and billing details</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-gray-700">
-                      Current Plan: <span className="font-semibold">{currentPlanName}</span>
-                    </p>
-                    <p className="text-sm text-gray-500 mt-2">
-                      {subscribed && subscription_end ? `Renews on: ${nextBillingDateFormatted}` : subscribed ? `Status: Active` : "No active subscription"}
-                    </p>
-                    <Button variant="outline" className="mt-4 w-full sm:w-auto" asChild>
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-sm text-gray-500">Current Plan</p>
+                        <p className="font-semibold text-lg">{currentPlanName}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500">Status</p>
+                        <p className={`font-medium ${subscribed ? 'text-green-600' : 'text-gray-500'}`}>
+                          {subscribed ? 'Active' : 'No Active Subscription'}
+                        </p>
+                      </div>
+                      {subscribed && subscription_end && (
+                        <div>
+                          <p className="text-sm text-gray-500">Next Billing</p>
+                          <p className="font-medium">{nextBillingDateFormatted}</p>
+                        </div>
+                      )}
+                    </div>
+                    <Button variant="outline" className="mt-4 w-full" asChild>
                       <RouterLink to="/billing">Manage Subscription</RouterLink>
                     </Button>
                   </CardContent>
@@ -182,11 +193,17 @@ const Dashboard = () => {
                     <CardTitle className="flex items-center text-xl text-firegauge-charcoal">
                         <User className="mr-2 h-5 w-5" /> Account Settings
                     </CardTitle>
-                    <CardDescription>Update your profile and security.</CardDescription>
+                    <CardDescription>Profile and security settings</CardDescription>
                   </CardHeader>
                   <CardContent>
+                    <div className="space-y-2 mb-4">
+                      <div>
+                        <p className="text-sm text-gray-500">Email</p>
+                        <p className="font-medium">{displayUser.email}</p>
+                      </div>
+                    </div>
                     <Button variant="outline" className="w-full" asChild>
-                      <RouterLink to="/account">Go to Account Settings</RouterLink>
+                      <RouterLink to="/account">Update Account</RouterLink>
                     </Button>
                   </CardContent>
                 </Card>
@@ -194,29 +211,35 @@ const Dashboard = () => {
                 <Card className="shadow-md hover:shadow-lg transition-shadow">
                   <CardHeader>
                     <CardTitle className="flex items-center text-xl text-firegauge-charcoal">
-                      <CreditCard className="mr-2 h-5 w-5" /> Billing Details
+                      <CreditCard className="mr-2 h-5 w-5" /> Billing & Invoices
                     </CardTitle>
-                    <CardDescription>View invoices and payment methods.</CardDescription>
+                    <CardDescription>Payment methods and history</CardDescription>
                   </CardHeader>
                   <CardContent>
+                    <p className="text-sm text-gray-600 mb-4">
+                      View invoices, update payment methods, and manage your billing information.
+                    </p>
                     <Button variant="outline" className="w-full" asChild>
-                      <RouterLink to="/billing">Go to Billing</RouterLink>
+                      <RouterLink to="/billing">View Billing</RouterLink>
                     </Button>
                   </CardContent>
                 </Card>
 
-                {isAdmin && (
-                  <Card className="shadow-md hover:shadow-lg transition-shadow">
+                {!subscribed && (
+                  <Card className="col-span-1 md:col-span-2 lg:col-span-3 border-2 border-firegauge-accent bg-gradient-to-r from-firegauge-accent/5 to-firegauge-red/5">
                     <CardHeader>
-                      <CardTitle className="flex items-center text-xl text-firegauge-charcoal">
-                        <Users className="mr-2 h-5 w-5" /> Manage Users
-                      </CardTitle>
-                      <CardDescription>Invite and manage team members.</CardDescription>
+                      <CardTitle className="text-xl text-firegauge-charcoal">Get Started with FireGauge</CardTitle>
+                      <CardDescription>Choose a plan to start managing your equipment testing and compliance.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <Button variant="outline" className="w-full" asChild>
-                        <RouterLink to="/team-management">Manage Team Users</RouterLink>
-                      </Button>
+                      <div className="flex flex-col sm:flex-row gap-4">
+                        <Button className="bg-firegauge-red hover:bg-firegauge-red/90" onClick={() => window.location.href = '/pricing'}>
+                          View Pricing Plans
+                        </Button>
+                        <Button variant="outline" onClick={() => window.location.href = 'mailto:sales@firegauge.app'}>
+                          Contact Sales
+                        </Button>
+                      </div>
                     </CardContent>
                   </Card>
                 )}
