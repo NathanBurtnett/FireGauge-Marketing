@@ -41,17 +41,19 @@ serve(async (req) => {
     if (!authUser?.id) throw new Error("User not authenticated or ID not available");
     logStep("User authenticated via Supabase Auth", { userId: authUser.id });
 
-    const { data: publicUserData, error: publicUserError } = await supabase
+    // Get user profile to find tenant_id
+    const { data: userProfile, error: userError } = await supabase
       .from('user')
       .select('tenant_id, role')
       .eq('supabase_auth_user_id', authUser.id)
-      .single();
+      .maybeSingle();
 
-    if (publicUserError) {
-      logStep("Error fetching user from public.user table", { error: publicUserError.message });
-      throw new Error(`Could not retrieve user details: ${publicUserError.message}`);
+    if (userError) {
+      logStep("Error fetching user from public.user table", { error: userError.message });
+      throw new Error(`Could not retrieve user details: ${userError.message}`);
     }
-    if (!publicUserData || publicUserData.tenant_id === null || publicUserData.tenant_id === undefined) {
+    
+    if (!userProfile || userProfile.tenant_id === null || userProfile.tenant_id === undefined) {
       logStep("User not found in public.user table or tenant_id is missing", { supabase_auth_user_id: authUser.id });
       return new Response(JSON.stringify({ subscribed: false, error: "User not associated with a tenant." }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -59,9 +61,10 @@ serve(async (req) => {
       });
     }
     
-    const tenantId = publicUserData.tenant_id;
+    const tenantId = userProfile.tenant_id;
     logStep("Fetched tenant_id for user", { userId: authUser.id, tenantId });
 
+    // Check for active subscriptions
     const activeSubscriptionStatuses = ['active', 'trialing']; 
 
     const { data: subscriptionData, error: subscriptionError } = await supabase

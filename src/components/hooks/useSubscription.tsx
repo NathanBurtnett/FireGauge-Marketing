@@ -59,9 +59,9 @@ export const useSubscription = () => {
       
       console.log("useSubscription: checkSubscription - Success from function. Setting status with data:", data);
       setStatus({
-        subscribed: data.subscribed,
-        subscription_tier: data.subscription_tier || data.plan_id,
-        subscription_end: data.subscription_end || data.current_period_end,
+        subscribed: data.subscribed || false,
+        subscription_tier: data.subscription_tier || data.plan_id || null,
+        subscription_end: data.subscription_end || data.current_period_end || null,
         isLoading: false,
         error: null,
       });
@@ -140,18 +140,20 @@ export const useSubscription = () => {
 
   useEffect(() => {
     console.log("useSubscription: useEffect triggered. User from useAuth:", user, "AuthLoading state:", authLoading);
-    if (!authLoading && user) {
-      console.log("useSubscription: useEffect - Auth is loaded and user exists. Calling checkSubscription.");
-      checkSubscription();
-    } else if (!authLoading && !user) {
-      console.log("useSubscription: useEffect - Auth is loaded but NO user. Setting subscription status to not subscribed, loading false.");
-      setStatus({
-        subscribed: false,
-        subscription_tier: null,
-        subscription_end: null,
-        isLoading: false, 
-        error: null
-      });
+    if (!authLoading) {
+      if (user) {
+        console.log("useSubscription: useEffect - Auth is loaded and user exists. Calling checkSubscription.");
+        checkSubscription();
+      } else {
+        console.log("useSubscription: useEffect - Auth is loaded but NO user. Setting subscription status to not subscribed, loading false.");
+        setStatus({
+          subscribed: false,
+          subscription_tier: null,
+          subscription_end: null,
+          isLoading: false, 
+          error: null
+        });
+      }
     }
   }, [user, authLoading]);
 
