@@ -1,113 +1,32 @@
 # Task ID: 7
-# Title: Dashboard Implementation
+# Title: About Us and Contact Pages
 # Status: pending
-# Dependencies: 2, 5, 6
+# Dependencies: 3
 # Priority: medium
-# Description: Create the main dashboard for authenticated users
+# Description: Create the About Us page with company information and a Contact page with form submission functionality.
 # Details:
-Design and implement dashboard layout with welcome message and summary sections. Create components for displaying current subscription plan. Implement quick stats section showing number of active stations and users. Add navigation to other portal sections (Account, Billing, User Management). Create prominent 'Go to App' button redirecting to app.firegauge.app. Implement data fetching from Supabase for user and subscription information.
+1. About Us page:
+   - Company mission and vision
+   - Team section (placeholder for future content)
+   - Company history/story
+   - Values and approach
+2. Contact page:
+   - Contact form with fields for:
+     - Name
+     - Email
+     - Company/Department
+     - Message
+     - Reason for contact (dropdown)
+   - Form validation
+   - Submission handling (store in Supabase or send via email API)
+   - Success/error messaging
+3. Add contact information:
+   - Email address
+   - Phone number (if applicable)
+   - Physical address (if applicable)
+4. Implement Google reCAPTCHA to prevent spam
+5. Add FAQ section or link to support resources
+6. Ensure responsive design for both pages
 
 # Test Strategy:
-Verify dashboard displays correct user and subscription information. Test navigation to other portal sections. Ensure 'Go to App' button redirects correctly. Test responsive behavior on different screen sizes.
-
-# Subtasks:
-## 1. Create Dashboard Layout Structure [done]
-### Dependencies: None
-### Description: Redesign the Dashboard.tsx component to serve as a simplified user portal with a clean layout structure
-### Details:
-Implementation steps:
-1. Create a new Dashboard.tsx component or refactor the existing one
-2. Implement a responsive grid layout with a header, main content area, and optional sidebar
-3. Add a welcome section with user greeting (e.g., 'Welcome, {username}')
-4. Create placeholder card components for the main dashboard sections (subscription, quick stats, navigation)
-5. Style the layout using Tailwind CSS or your preferred styling approach
-6. Ensure the layout is responsive and works on mobile devices
-
-Testing approach:
-- Verify the layout renders correctly on different screen sizes
-- Check that placeholder components are positioned correctly
-- Ensure the component renders without errors
-
-## 2. Implement User Data Fetching from Supabase [pending]
-### Dependencies: 7.1
-### Description: Set up data fetching from Supabase to retrieve authenticated user information and subscription details
-### Details:
-Implementation steps:
-1. Create a custom hook (e.g., useUserData) to fetch user data from Supabase
-2. Implement authentication state checking to ensure the user is logged in
-3. Query Supabase for user profile information (name, email, etc.)
-4. Add functionality to fetch subscription plan details from the appropriate Supabase table
-5. Implement loading states and error handling for data fetching
-6. Create a context provider if needed to share user data across dashboard components
-
-Testing approach:
-- Test the hook with mock Supabase responses
-- Verify error handling works correctly
-- Check that loading states are properly displayed
-- Ensure user data is correctly passed to child components
-
-## 3. Create Subscription Plan and Quick Stats Components [pending]
-### Dependencies: 7.1, 7.2
-### Description: Implement components to display the user's current subscription plan and quick statistics about their account
-### Details:
-Implementation steps:
-1. Create a SubscriptionPlan component that displays the current plan details
-   - Show plan name, status, renewal date, and features
-   - Add styling to highlight the current plan
-2. Implement a QuickStats component showing:
-   - Number of active stations (if applicable)
-   - Number of users on the account
-   - Any other relevant metrics
-3. Add loading skeletons for when data is being fetched
-4. Style both components to match the dashboard design
-5. Connect components to the user data from subtask 2
-
-Testing approach:
-- Test components with various subscription plans and stats data
-- Verify loading states display correctly
-- Check that components handle missing or null data gracefully
-- Ensure responsive design works on different screen sizes
-
-## 4. Implement 'Go to App' Button and Navigation Links [done]
-### Dependencies: 7.1
-### Description: Add a prominent 'Go to App' button and navigation links/cards to other portal sections
-### Details:
-Implementation steps:
-1. Create a prominent 'Go to App' button/link that redirects to app.firegauge.app
-   - Style it to stand out visually on the dashboard
-   - Add hover and active states
-2. Implement navigation cards or links for:
-   - Account Management
-   - Billing Management
-   - User Management (conditionally shown for admin users)
-3. Add appropriate icons for each navigation option
-4. Implement conditional rendering for admin-only sections based on user role
-5. Add click handlers and routing for each navigation option
-
-Testing approach:
-- Verify all links point to the correct destinations
-- Test conditional rendering based on user roles
-- Check that the 'Go to App' button is prominently displayed
-- Ensure hover and active states work correctly
-
-## 5. Integrate and Test Complete Dashboard [pending]
-### Dependencies: 7.2, 7.3, 7.4
-### Description: Connect all components together, implement final styling, and perform comprehensive testing
-### Details:
-Implementation steps:
-1. Integrate all previously created components into the main Dashboard component
-2. Implement any remaining data connections between components
-3. Add final styling touches and ensure consistent design across all elements
-4. Implement any missing loading states or error handling
-5. Add analytics tracking for dashboard usage if required
-6. Perform code cleanup and optimization
-7. Add comprehensive comments and documentation
-
-Testing approach:
-- End-to-end testing of the complete dashboard
-- Verify all data is correctly displayed from Supabase
-- Test user interactions with all buttons and navigation elements
-- Check responsive behavior across different devices
-- Verify loading states and error handling in various scenarios
-- Test with different user roles and subscription plans
-
+Test contact form submission and validation. Verify reCAPTCHA integration. Test form error states and success messages. Check responsive layout on various devices. Verify all links work correctly.

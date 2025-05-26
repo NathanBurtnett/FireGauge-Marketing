@@ -1,73 +1,28 @@
 # Task ID: 3
-# Title: Public Homepage Implementation
-# Status: done
+# Title: Public Site Layout and Navigation
+# Status: pending
 # Dependencies: 1
 # Priority: high
-# Description: Create the main landing page with value propositions and CTAs
+# Description: Develop the layout and navigation structure for the public-facing marketing site, including responsive design for all device sizes.
 # Details:
-Design and implement the homepage with compelling headline and sub-headline. Create sections for key value propositions: Purpose-Built NFPA Compliance, Field-First Mobile Experience, Instant Reporting, Lean UI, Modular Platform, and ROI & Risk Reduction. Add prominent CTAs for signup and pricing. Implement responsive design for all screen sizes. Include placeholder sections for testimonials and social proof.
+1. Create main layout components:
+   - Header with navigation menu
+   - Footer with links and copyright
+   - Main content container
+2. Implement responsive navigation:
+   - Desktop: Horizontal menu
+   - Mobile: Hamburger menu with slide-out drawer
+3. Design and implement navigation links for:
+   - Home
+   - Features
+   - Pricing
+   - About Us/Contact
+   - Login/Sign Up buttons
+4. Add FireGauge logo placeholder (to be replaced with final logo)
+5. Implement scroll behavior and active link indicators
+6. Ensure responsive design works on mobile, tablet, and desktop viewports
+7. Add SEO meta tags structure
+8. Implement basic animations for menu transitions
 
 # Test Strategy:
-Verify that all content displays correctly on different screen sizes. Ensure CTAs are prominent and functional. Test navigation to other pages. Validate against design mockups.
-
-# Subtasks:
-## 1. Review and Update Footer Component [done]
-### Dependencies: None
-### Description: Ensure Footer contains relevant links (e.g., Terms, Privacy, Contact) and copyright information, aligning with PRD.
-### Details:
-
-
-## 2. Review and Update CTASection Component [done]
-### Dependencies: None
-### Description: Ensure the main call to action section is compelling and directs users appropriately (e.g., to signup or pricing), as per PRD.
-### Details:
-
-
-## 3. Review and Update FAQ Component [done]
-### Dependencies: None
-### Description: Review and update FAQ content to address common questions, aligning with PRD information.
-### Details:
-
-
-## 4. Review and Update Pricing Component (Homepage Section) [done]
-### Dependencies: None
-### Description: Update the Pricing section on the homepage to accurately reflect the tiers and CTAs defined in the PRD.
-### Details:
-
-
-## 5. Review and Update Testimonials Component [done]
-### Dependencies: None
-### Description: Review and update Testimonials section. Add placeholder if no real testimonials yet. Ensure it aligns with PRD messaging.
-### Details:
-
-
-## 6. Review and Update Features Component [done]
-### Dependencies: None
-### Description: Update Features section to clearly articulate what FireGauge does, aligning with PRD value propositions.
-### Details:
-
-
-## 7. Review and Update ROIBanner Component [done]
-### Dependencies: None
-### Description: Ensure ROIBanner reinforces the value proposition of FireGauge, as per PRD.
-### Details:
-
-
-## 8. Review and Update Benefits Component [done]
-### Dependencies: None
-### Description: Align Benefits component with the core value propositions outlined in the PRD.
-### Details:
-
-
-## 9. Review and Update Hero Component [done]
-### Dependencies: None
-### Description: Update Hero section with compelling headline, sub-headline, overview, and primary CTA, as per PRD.
-### Details:
-
-
-## 10. Review and Update Navbar Component [done]
-### Dependencies: None
-### Description: Ensure Navbar has correct branding (logo placeholder), navigation links (e.g., Features, Pricing, Auth/Dashboard), and responsive behavior, as per PRD.
-### Details:
-
-
+Test responsive behavior across different device sizes. Verify navigation links work correctly. Test hamburger menu on mobile devices. Verify smooth scrolling behavior. Conduct accessibility testing for navigation elements.

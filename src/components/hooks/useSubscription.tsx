@@ -21,10 +21,16 @@ export const useSubscription = () => {
     isLoading: true,
     error: null,
   });
+  const [isCheckingInternal, setIsCheckingInternal] = useState(false);
 
   console.log("useSubscription: Initial state - user:", user, "authLoading:", authLoading, "current status:", status);
 
   const checkSubscription = async () => {
+    if (isCheckingInternal) {
+      console.log("useSubscription: checkSubscription - Already checking, skipping.");
+      return;
+    }
+    setIsCheckingInternal(true);
     console.log("useSubscription: checkSubscription() called. Current user:", user);
     if (!user) {
       console.log("useSubscription: checkSubscription - No user, setting status to not subscribed, loading false.");
@@ -35,6 +41,7 @@ export const useSubscription = () => {
         isLoading: false,
         error: "User not authenticated for subscription check"
       });
+      setIsCheckingInternal(false);
       return;
     }
 
@@ -76,6 +83,8 @@ export const useSubscription = () => {
         isLoading: false,
         error: errorMessage,
       });
+    } finally {
+      setIsCheckingInternal(false);
     }
   };
 

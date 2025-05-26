@@ -169,47 +169,47 @@ export type Database = {
       }
       subscriptions: {
         Row: {
-          cancel_at_period_end: boolean | null
-          created_at: string | null
+          cancel_at_period_end: boolean
+          created_at: string
           current_period_end: string
           current_period_start: string
           id: string
-          status: Database["public"]["Enums"]["subscription_status_enum"]
           stripe_customer_id: string
           stripe_price_id: string
           stripe_subscription_id: string
+          subscription_status_enum: Database["public"]["Enums"]["subscription_status_enum"]
           tenant_id: number
-          updated_at: string | null
+          updated_at: string
         }
         Insert: {
-          cancel_at_period_end?: boolean | null
-          created_at?: string | null
+          cancel_at_period_end?: boolean
+          created_at?: string
           current_period_end: string
           current_period_start: string
           id?: string
-          status: Database["public"]["Enums"]["subscription_status_enum"]
           stripe_customer_id: string
           stripe_price_id: string
           stripe_subscription_id: string
+          subscription_status_enum: Database["public"]["Enums"]["subscription_status_enum"]
           tenant_id: number
-          updated_at?: string | null
+          updated_at?: string
         }
         Update: {
-          cancel_at_period_end?: boolean | null
-          created_at?: string | null
+          cancel_at_period_end?: boolean
+          created_at?: string
           current_period_end?: string
           current_period_start?: string
           id?: string
-          status?: Database["public"]["Enums"]["subscription_status_enum"]
           stripe_customer_id?: string
           stripe_price_id?: string
           stripe_subscription_id?: string
+          subscription_status_enum?: Database["public"]["Enums"]["subscription_status_enum"]
           tenant_id?: number
-          updated_at?: string | null
+          updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "fk_subscriptions_tenant"
+            foreignKeyName: "subscriptions_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenant"
@@ -219,34 +219,34 @@ export type Database = {
       }
       tenant: {
         Row: {
-          created_at: string | null
+          created_at: string
           id: number
           is_active: boolean
           name: string
           plan: string | null
           stripe_customer_id: string | null
           supabase_auth_user_id: string | null
-          updated_at: string | null
+          updated_at: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           id?: number
           is_active?: boolean
           name: string
           plan?: string | null
           stripe_customer_id?: string | null
           supabase_auth_user_id?: string | null
-          updated_at?: string | null
+          updated_at?: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           id?: number
           is_active?: boolean
           name?: string
           plan?: string | null
           stripe_customer_id?: string | null
           supabase_auth_user_id?: string | null
-          updated_at?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -348,6 +348,7 @@ export type Database = {
           created_at: string
           id: number
           is_active: boolean
+          password_hash: string | null
           role: string
           supabase_auth_user_id: string | null
           tenant_id: number
@@ -358,6 +359,7 @@ export type Database = {
           created_at?: string
           id?: number
           is_active?: boolean
+          password_hash?: string | null
           role: string
           supabase_auth_user_id?: string | null
           tenant_id: number
@@ -368,6 +370,7 @@ export type Database = {
           created_at?: string
           id?: number
           is_active?: boolean
+          password_hash?: string | null
           role?: string
           supabase_auth_user_id?: string | null
           tenant_id?: number
@@ -390,7 +393,7 @@ export type Database = {
     }
     Functions: {
       is_super_admin: {
-        Args: { user_uid: string }
+        Args: Record<PropertyKey, never> | { user_uid: string }
         Returns: boolean
       }
     }

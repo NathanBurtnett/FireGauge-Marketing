@@ -1,11 +1,31 @@
 # Task ID: 6
-# Title: Stripe Integration for Payments
+# Title: Pricing Page with Stripe Integration
 # Status: pending
-# Dependencies: 2
+# Dependencies: 2, 3
 # Priority: high
-# Description: Integrate Stripe for subscription management and payment processing
+# Description: Develop the pricing page with clear plan comparisons and integrate Stripe Checkout for subscription sign-ups.
 # Details:
-Set up Stripe account and configure products/prices for subscription tiers. Implement Stripe.js for secure payment form handling. Create serverless functions for Stripe API interactions (create customer, create subscription, update payment method). Set up webhook handling for subscription events. Implement subscription status tracking in Supabase. Create utility functions for Stripe operations.
+1. Design pricing table with the following tiers:
+   - Basic: $75-$100/mo
+   - Standard: $150-$200/mo
+   - Professional: $250-$350/mo
+   - Enterprise: Custom pricing
+2. For each tier, display:
+   - Monthly and annual pricing options (with discount)
+   - Feature list with checkmarks
+   - Limitations (e.g., number of hoses, users)
+   - Prominent 'Select Plan' CTA
+3. Add section for Add-On Modules:
+   - Ladder inspections: +$50/mo
+   - Pump testing: +$50/mo
+4. Integrate Stripe Checkout:
+   - Install Stripe.js
+   - Create checkout session with proper plan IDs
+   - Handle successful payment redirects
+   - Implement error handling
+5. Add FAQ section addressing common pricing questions
+6. Implement toggle for monthly/annual billing display
+7. Add enterprise contact form for custom quotes
 
 # Test Strategy:
-Test subscription creation with test cards. Verify webhook handling for subscription updates. Test payment method updates. Ensure subscription data is correctly stored in Supabase.
+Test plan selection and Stripe Checkout flow in test mode. Verify monthly/annual toggle works correctly. Test responsive design of pricing tables. Ensure enterprise contact form submits correctly. Verify Stripe integration with test transactions.

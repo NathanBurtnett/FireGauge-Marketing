@@ -1,11 +1,98 @@
 # Task ID: 9
-# Title: Billing Management Implementation
-# Status: pending
-# Dependencies: 6, 7
-# Priority: medium
-# Description: Create the billing management interface for subscription and payment handling
+# Title: Authenticated Portal Dashboard
+# Status: in-progress
+# Dependencies: 2, 8
+# Priority: high
+# Description: Create the authenticated user portal dashboard for account management at www.firegauge.app, showing account overview, subscription status, and quick links to management features.
 # Details:
-Implement interface for viewing current subscription details. Create subscription upgrade/downgrade functionality. Add payment method management (add, update, remove). Implement billing history and invoice download. Create subscription cancellation flow with confirmation. Integrate with Stripe Customer Portal or build custom UI using Stripe API. Implement data fetching from Stripe for billing information.
+1. Design authenticated portal layout with:
+   - Sidebar navigation
+   - Header with user info and logout
+   - Main content area
+2. Implement account management dashboard with:
+   - Account Overview: Subscription status, billing info, account health
+   - User Management: Invite users, manage roles, view team members
+   - Subscription Management: Current plan, billing history, change plans
+   - Quick Links: Links to main app (app.firegauge.app), support, documentation
+   - Account Settings: Organization profile, preferences, integrations
+3. Create API service to fetch tenant account data from main application
+4. Implement data fetching with Tanstack Query and loading states
+5. Add notifications area for important account alerts
+6. Create responsive design for dashboard
+7. Implement role-based dashboard variations if needed
+8. IMPORTANT: Remove all operational fire department content (Portland fire stations, test results, equipment data) from current dashboard implementation
+9. Ensure clear separation between marketing portal (www.firegauge.app) account management and operational features (app.firegauge.app)
+10. Integrate Stripe Customer Portal for self-serve billing management
+11. Fix AccountManagement.tsx to properly display subscription details
+12. Ensure Billing.tsx connects to the actual Stripe billing system
 
 # Test Strategy:
-Test subscription upgrade and downgrade flows. Verify payment method management works correctly. Test invoice download functionality. Ensure subscription cancellation works properly with confirmation.
+Test dashboard data loading and display. Verify API integration for account management data. Test responsive layout on different devices. Verify authentication state persistence. Test quick action buttons functionality. Verify no operational fire department data appears in the marketing portal dashboard. Test Stripe Customer Portal integration for billing management. Verify user management interface for inviting and managing tenant users. Test subscription status display and plan management features.
+
+# Subtasks:
+## 9.1. Remove operational fire department content [pending]
+### Dependencies: None
+### Description: Remove all hardcoded fire station operational data (Portland fire stations, test results, equipment data) from DashboardContent.tsx as this belongs in app.firegauge.app, not the marketing portal.
+### Details:
+
+
+## 9.2. Implement Account Overview section [pending]
+### Dependencies: None
+### Description: Create component to display subscription status, billing information, and account health metrics.
+### Details:
+
+
+## 9.3. Implement User Management section [pending]
+### Dependencies: None
+### Description: Create interface for inviting users, managing roles, and viewing team members within the organization.
+### Details:
+
+
+## 9.4. Implement Subscription Management section [pending]
+### Dependencies: None
+### Description: Create component to display current plan details, billing history, and options to change subscription plans.
+### Details:
+
+
+## 9.5. Implement Quick Links section [pending]
+### Dependencies: None
+### Description: Add links to main application (app.firegauge.app), support resources, and documentation.
+### Details:
+
+
+## 9.6. Implement Account Settings section [pending]
+### Dependencies: None
+### Description: Create interface for managing organization profile, preferences, and integrations.
+### Details:
+
+
+## 9.7. Create API services for account management data [pending]
+### Dependencies: None
+### Description: Implement services to fetch account, subscription, billing, and user management data.
+### Details:
+
+
+## 9.8. Integrate Stripe Customer Portal [pending]
+### Dependencies: None
+### Description: Implement Stripe Customer Portal integration for self-serve billing management as required by the PRD.
+### Details:
+
+
+## 9.9. Update AccountManagement.tsx [pending]
+### Dependencies: None
+### Description: Fix AccountManagement.tsx to properly display subscription status, billing history, and plan management features.
+### Details:
+
+
+## 9.10. Connect Billing.tsx to Stripe [pending]
+### Dependencies: None
+### Description: Update Billing.tsx to connect with the actual Stripe billing system instead of being a basic placeholder.
+### Details:
+
+
+## 9.11. Create comprehensive User Management interface [pending]
+### Dependencies: None
+### Description: Develop a complete user management interface for inviting and managing tenant users with role assignments as required by the PRD.
+### Details:
+
+

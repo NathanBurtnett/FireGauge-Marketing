@@ -71,6 +71,31 @@ export const signUpTenant = async ({ email, password, tenantName }: SignUpTenant
     return { user: authData.user, tenant: null, error: tenantError };
   }
 
+  // Step 3: Create a corresponding record in the public.user table
+  // This is CRITICAL for the check-subscription function to work
+  // Note: Using any type to bypass TypeScript type mismatch - types may need regeneration
+  const { data: userData, error: userError } = await supabase
+    .from('user')
+    .insert([
+      {
+        supabase_auth_user_id: authData.user.id,
+        tenant_id: tenantData.id,
+        role: 'admin', // Default role for tenant creator
+        username: email.split('@')[0], // Use email prefix as default username
+        is_active: true,
+      } as any, // Bypass type checking due to type/schema mismatch
+    ])
+    .select('*')
+    .single();
+
+  if (userError) {
+    console.error("Error creating user record:", userError);
+    // Consider rolling back the tenant creation if user creation fails
+    // For now, we'll return the error but keep the tenant
+    return { user: authData.user, tenant: tenantData, error: userError };
+  }
+
+  console.log("Successfully created tenant and user records:", { tenant: tenantData, user: userData });
   return { user: authData.user, tenant: tenantData, error: null };
 };
 

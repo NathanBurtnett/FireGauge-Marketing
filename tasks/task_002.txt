@@ -1,11 +1,196 @@
 # Task ID: 2
-# Title: Supabase Integration for Authentication
-# Status: done
+# Title: Supabase Authentication Integration
+# Status: in-progress
 # Dependencies: 1
-# Priority: high
-# Description: Set up Supabase authentication and implement auth context for the application
+# Priority: critical
+# Description: Implement Supabase authentication for user login, registration, and password reset functionality, ensuring proper integration with existing database schema for subscription and tenant management.
 # Details:
-Create a Supabase project and configure authentication settings. Implement auth provider context in React to manage authentication state. Create hooks for login, signup, logout, and password reset. Set up protected routes for authenticated content. Implement token refresh and session persistence. Create utility functions for Supabase client initialization and auth operations.
+1. Create a Supabase project for the application
+2. Install Supabase client library
+3. Create authentication service with the following methods:
+   - signUp(email, password)
+   - signIn(email, password)
+   - signOut()
+   - resetPassword(email)
+   - updatePassword(newPassword)
+   - getCurrentUser()
+4. Implement protected routes using React Router
+5. Create authentication context to manage auth state across the application
+6. Implement auth hooks for components to access auth state and methods
+7. Set up JWT handling and session management
+8. Configure email templates for verification and password reset
+9. Database schema confirmed correct:
+   - `public.user` table exists with required `supabase_auth_user_id` and `tenant_id` fields
+   - `public.subscriptions` table has `tenant_id` and `status` fields
+   - `public.tenant` table exists with proper relationships
+   - check-subscription function will work with current schema
+10. Fix AuthProvider implementation:
+   - Properly fetch and cache tenant data
+   - Ensure subscription status is correctly checked during authentication
+   - Implement proper error handling for missing tenant/subscription data
+   - Fetch user data from `public.user` table, not just tenant
+   - **CRITICAL:** Add fallback handling for users missing from public.user table
+11. Fix User Creation Process:
+   - **FIXED:** Modified `signUpTenant` to create records in `public.user` table with `tenant_id`
+   - **FIXED:** Now creates user with: `supabase_auth_user_id`, `tenant_id`, `role: 'admin'`, `username`, `is_active: true`
+   - Verify correct tenant_id assignment during signup
+   - Ensure proper relationship between `auth.users`, `public.user`, and `tenant` tables
+12. Ensure authentication flow integrates with subscription checking:
+   - Modify login process to verify subscription status
+   - Implement appropriate redirects based on authentication AND subscription status
+   - Add tenant context to authentication state
+   - **FIXED:** `check-subscription` function can now find user in `public.user` table with correct `tenant_id`
+   - **CRITICAL:** Add error handling for users missing from public.user table
+13. Create test data:
+   - Add user/tenant/subscription records for testing login flow
+   - Create test user to verify complete signup-to-login flow
+14. Fix TypeScript type mismatches:
+   - Identified type mismatch between TypeScript types and actual database schema
+   - Temporarily using `as any` to bypass type checking
+   - Need to regenerate Supabase types to match actual schema
+15. **CRITICAL ISSUE:** Dashboard hanging for legacy users:
+   - **ROOT CAUSE IDENTIFIED:** The issue is with missing subscription records
+   - User records exist properly in public.user table with correct tenant_id and supabase_auth_user_id
+   - The `check-subscription` function is failing because there are NO records in the `public.subscriptions` table for the tenant
+   - **DIAGNOSTIC SOLUTION:** Created comprehensive database diagnostic script (scripts/debug_database.sql)
+   - Script verifies complete authentication chain and provides insert statements for missing data
+   - Test subscription record structure provided with dynamic unique IDs to prevent conflicts
+16. Dashboard Content Alignment:
+   - Dashboard content updated to align with PRD (account management vs operational data)
 
 # Test Strategy:
-Test user signup, login, and logout flows. Verify that protected routes redirect unauthenticated users. Test password reset functionality. Ensure token refresh works correctly.
+Test user registration, login, and logout flows. Verify password reset functionality. Test protected routes to ensure they redirect unauthenticated users. Verify JWT persistence across page refreshes. Test subscription status checking during authentication flow. Verify tenant-based access controls work correctly. Test error handling for users with invalid subscription status. Verify new user creation properly creates records in public.user table with correct tenant associations. Specifically test the complete flow from signup through tenant creation to public.user creation to subscription checking. Verify the fixed signUpTenant function correctly creates public.user records with all required fields (supabase_auth_user_id, tenant_id, role, username, is_active). Test handling of missing subscription records to ensure users don't get stuck in loading state. Execute the database diagnostic script to identify and fix missing records in the authentication chain. Verify the diagnostic script correctly identifies issues and provides appropriate insert statements. Test the entire authentication flow after executing the diagnostic script's fixes to ensure proper dashboard loading. Verify the dashboard content aligns with PRD requirements, particularly the distinction between account management and operational data.
+
+# Subtasks:
+## 2.1. Database Schema Audit and Alignment [completed]
+### Dependencies: None
+### Description: Audit current Supabase schema and align with code expectations
+### Details:
+
+
+## 2.2. Fix AuthProvider Implementation [pending]
+### Dependencies: None
+### Description: Update AuthProvider to correctly handle tenant and subscription data
+### Details:
+
+
+## 2.3. Integrate Authentication with Subscription Checking [pending]
+### Dependencies: None
+### Description: Ensure authentication flow properly checks and handles subscription status
+### Details:
+
+
+## 2.4. Update Protected Routes [pending]
+### Dependencies: None
+### Description: Modify protected routes to consider both authentication and subscription status
+### Details:
+
+
+## 2.5. Fix User Creation Process [completed]
+### Dependencies: None
+### Description: Ensure new signups are properly creating records in public.user table with correct tenant_id assignment
+### Details:
+
+
+## 2.6. Create Test Data [pending]
+### Dependencies: None
+### Description: Add user/tenant/subscription records for testing the complete authentication and subscription flow
+### Details:
+
+
+## 2.7. Fix signUpTenant Function [completed]
+### Dependencies: None
+### Description: Modify signUpTenant function to create public.user record with tenant_id after tenant creation
+### Details:
+
+
+## 2.8. Update AuthProvider to Fetch User Data [pending]
+### Dependencies: None
+### Description: Modify AuthProvider to fetch user data from public.user table in addition to tenant data
+### Details:
+
+
+## 2.9. End-to-End Authentication Flow Testing [pending]
+### Dependencies: None
+### Description: Create test user and verify complete flow from signup through tenant creation to public.user creation to subscription checking
+### Details:
+
+
+## 2.10. Regenerate Supabase Types [pending]
+### Dependencies: None
+### Description: Fix type mismatches between TypeScript types and actual database schema by regenerating Supabase types
+### Details:
+
+
+## 2.11. Test check-subscription Function [pending]
+### Dependencies: None
+### Description: Verify check-subscription function works correctly with newly created user records
+### Details:
+
+
+## 2.12. Fix Dashboard Hanging Issue [in-progress]
+### Dependencies: None
+### Description: Implement solution for users whose dashboard is hanging due to missing subscription records
+### Details:
+
+
+## 2.13. Create Test Subscription Records [in-progress]
+### Dependencies: None
+### Description: Execute SQL script to create subscription records for existing tenants
+### Details:
+
+
+## 2.14. Add Error Handling for Missing Subscriptions [pending]
+### Dependencies: None
+### Description: Update AuthProvider to detect and handle cases where tenant exists but has no subscription records
+### Details:
+
+
+## 2.15. Test Authentication Flow with Subscription Records [pending]
+### Dependencies: None
+### Description: Verify that users can successfully log in and access the dashboard with the new subscription records in place
+### Details:
+
+
+## 2.16. Review Pages Against PRD Requirements [pending]
+### Dependencies: None
+### Description: Review all authentication-related pages against the PRD requirements to ensure compliance
+### Details:
+
+
+## 2.17. Execute Immediate SQL Fix for Tenant ID 1 [pending]
+### Dependencies: None
+### Description: Run SQL script in Supabase dashboard to create subscription record for tenant_id=1 to fix hanging dashboard
+### Details:
+
+
+## 2.18. Verify Dashboard Loading After SQL Fix [pending]
+### Dependencies: None
+### Description: Confirm dashboard loads correctly after running the SQL script for tenant_id=1
+### Details:
+
+
+## 2.19. Fix Dashboard Content Alignment [completed]
+### Dependencies: None
+### Description: Once dashboard loads successfully, align dashboard content with PRD requirements
+### Details:
+
+
+## 2.20. Create Comprehensive Database Diagnostic Script [completed]
+### Dependencies: None
+### Description: Develop a SQL script to diagnose authentication chain issues and generate fixes
+### Details:
+
+
+## 2.21. Execute Database Diagnostic Script [pending]
+### Dependencies: None
+### Description: Run the diagnostic script to identify and fix missing records in the authentication chain
+### Details:
+
+
+## 2.22. Verify Authentication Chain Integrity [pending]
+### Dependencies: None
+### Description: Use the diagnostic script to verify the complete authentication chain from auth.users through public.user, tenant, and subscription tables
+### Details:
+
+

@@ -1,11 +1,22 @@
 # Task ID: 10
-# Title: User Management Implementation
+# Title: Account Management Interface
 # Status: pending
-# Dependencies: 7
+# Dependencies: 2, 9
 # Priority: medium
-# Description: Build the user management interface for admins to manage organization users
+# Description: Develop the account management section allowing users to update their profile information and manage account settings.
 # Details:
-Create interface for viewing list of users within the organization. Implement user invitation system via email. Add functionality to assign and change user roles (Operator, Admin). Create user deactivation/removal flow. Implement data fetching and mutation functions for user management in Supabase. Add pagination for user list. Implement search and filtering for user list.
+1. Create account settings page with:
+   - Profile information form (name, email, etc.)
+   - Password change functionality
+   - Notification preferences
+   - Account deletion option
+2. Implement form validation for all inputs
+3. Create service to update user data in Supabase
+4. Add success/error notifications for all actions
+5. Implement confirmation modals for sensitive actions
+6. Add profile image upload functionality (if required)
+7. Ensure all changes sync with Supabase Auth
+8. Create API service to sync relevant changes with main application
 
 # Test Strategy:
-Test user invitation flow including email delivery. Verify role assignment works correctly. Test user deactivation and removal. Ensure pagination, search, and filtering work properly.
+Test all form submissions and validations. Verify profile updates are saved correctly in Supabase. Test password change functionality. Verify confirmation flows for sensitive actions. Test synchronization with the main application.

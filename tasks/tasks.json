@@ -3,481 +3,428 @@
     {
       "id": 1,
       "title": "Project Setup and Configuration",
-      "description": "Initialize the project with the required tech stack and configure basic project structure",
-      "status": "done",
-      "dependencies": [],
+      "description": "Initialize the project repository with Vite, React, TypeScript, and Tailwind CSS. Set up the basic project structure and configure essential development tools.",
+      "details": "1. Create a new Vite project with React and TypeScript template\n2. Install and configure Tailwind CSS\n3. Set up ESLint and Prettier for code quality\n4. Configure React Router for navigation\n5. Install Tanstack Query for data fetching\n6. Set up project directory structure:\n   - src/\n     - components/\n       - ui/ (for Shadcn/ui components)\n       - layout/\n     - pages/\n     - hooks/\n     - utils/\n     - services/\n     - types/\n     - assets/\n7. Configure build and deployment scripts for Render\n8. Set up environment variables configuration",
+      "testStrategy": "Verify that the development server starts correctly. Ensure all configurations work as expected by creating a simple test component. Run linting to confirm ESLint and Prettier are working properly.",
       "priority": "high",
-      "details": "Create a new Vite project with React and TypeScript. Set up Tailwind CSS for styling. Configure ESLint and Prettier for code quality. Initialize Git repository. Set up folder structure for components, pages, hooks, and utilities. Install required dependencies including React Router for routing and Tanstack Query for data fetching. Import and configure existing UI components from Shadcn/ui.",
-      "testStrategy": "Verify that the project builds successfully without errors. Ensure all dependencies are correctly installed and configured. Test basic component rendering."
+      "dependencies": [],
+      "status": "done",
+      "subtasks": []
     },
     {
       "id": 2,
-      "title": "Supabase Integration for Authentication",
-      "description": "Set up Supabase authentication and implement auth context for the application",
-      "status": "done",
+      "title": "Supabase Authentication Integration",
+      "description": "Implement Supabase authentication for user login, registration, and password reset functionality, ensuring proper integration with existing database schema for subscription and tenant management.",
+      "status": "in-progress",
       "dependencies": [
         1
       ],
-      "priority": "high",
-      "details": "Create a Supabase project and configure authentication settings. Implement auth provider context in React to manage authentication state. Create hooks for login, signup, logout, and password reset. Set up protected routes for authenticated content. Implement token refresh and session persistence. Create utility functions for Supabase client initialization and auth operations.",
-      "testStrategy": "Test user signup, login, and logout flows. Verify that protected routes redirect unauthenticated users. Test password reset functionality. Ensure token refresh works correctly."
+      "priority": "critical",
+      "details": "1. Create a Supabase project for the application\n2. Install Supabase client library\n3. Create authentication service with the following methods:\n   - signUp(email, password)\n   - signIn(email, password)\n   - signOut()\n   - resetPassword(email)\n   - updatePassword(newPassword)\n   - getCurrentUser()\n4. Implement protected routes using React Router\n5. Create authentication context to manage auth state across the application\n6. Implement auth hooks for components to access auth state and methods\n7. Set up JWT handling and session management\n8. Configure email templates for verification and password reset\n9. Database schema confirmed correct:\n   - `public.user` table exists with required `supabase_auth_user_id` and `tenant_id` fields\n   - `public.subscriptions` table has `tenant_id` and `status` fields\n   - `public.tenant` table exists with proper relationships\n   - check-subscription function will work with current schema\n10. Fix AuthProvider implementation:\n   - Properly fetch and cache tenant data\n   - Ensure subscription status is correctly checked during authentication\n   - Implement proper error handling for missing tenant/subscription data\n   - Fetch user data from `public.user` table, not just tenant\n   - **CRITICAL:** Add fallback handling for users missing from public.user table\n11. Fix User Creation Process:\n   - **FIXED:** Modified `signUpTenant` to create records in `public.user` table with `tenant_id`\n   - **FIXED:** Now creates user with: `supabase_auth_user_id`, `tenant_id`, `role: 'admin'`, `username`, `is_active: true`\n   - Verify correct tenant_id assignment during signup\n   - Ensure proper relationship between `auth.users`, `public.user`, and `tenant` tables\n12. Ensure authentication flow integrates with subscription checking:\n   - Modify login process to verify subscription status\n   - Implement appropriate redirects based on authentication AND subscription status\n   - Add tenant context to authentication state\n   - **FIXED:** `check-subscription` function can now find user in `public.user` table with correct `tenant_id`\n   - **CRITICAL:** Add error handling for users missing from public.user table\n13. Create test data:\n   - Add user/tenant/subscription records for testing login flow\n   - Create test user to verify complete signup-to-login flow\n14. Fix TypeScript type mismatches:\n   - Identified type mismatch between TypeScript types and actual database schema\n   - Temporarily using `as any` to bypass type checking\n   - Need to regenerate Supabase types to match actual schema\n15. **CRITICAL ISSUE:** Dashboard hanging for legacy users:\n   - **ROOT CAUSE IDENTIFIED:** The issue is with missing subscription records\n   - User records exist properly in public.user table with correct tenant_id and supabase_auth_user_id\n   - The `check-subscription` function is failing because there are NO records in the `public.subscriptions` table for the tenant\n   - **DIAGNOSTIC SOLUTION:** Created comprehensive database diagnostic script (scripts/debug_database.sql)\n   - Script verifies complete authentication chain and provides insert statements for missing data\n   - Test subscription record structure provided with dynamic unique IDs to prevent conflicts\n16. Dashboard Content Alignment:\n   - Dashboard content updated to align with PRD (account management vs operational data)",
+      "testStrategy": "Test user registration, login, and logout flows. Verify password reset functionality. Test protected routes to ensure they redirect unauthenticated users. Verify JWT persistence across page refreshes. Test subscription status checking during authentication flow. Verify tenant-based access controls work correctly. Test error handling for users with invalid subscription status. Verify new user creation properly creates records in public.user table with correct tenant associations. Specifically test the complete flow from signup through tenant creation to public.user creation to subscription checking. Verify the fixed signUpTenant function correctly creates public.user records with all required fields (supabase_auth_user_id, tenant_id, role, username, is_active). Test handling of missing subscription records to ensure users don't get stuck in loading state. Execute the database diagnostic script to identify and fix missing records in the authentication chain. Verify the diagnostic script correctly identifies issues and provides appropriate insert statements. Test the entire authentication flow after executing the diagnostic script's fixes to ensure proper dashboard loading. Verify the dashboard content aligns with PRD requirements, particularly the distinction between account management and operational data.",
+      "subtasks": [
+        {
+          "id": "2.1",
+          "title": "Database Schema Audit and Alignment",
+          "description": "Audit current Supabase schema and align with code expectations",
+          "status": "completed",
+          "notes": "Schema analysis complete - database schema is correctly aligned with application needs. No schema changes needed."
+        },
+        {
+          "id": "2.2",
+          "title": "Fix AuthProvider Implementation",
+          "description": "Update AuthProvider to correctly handle tenant and subscription data",
+          "status": "pending"
+        },
+        {
+          "id": "2.3",
+          "title": "Integrate Authentication with Subscription Checking",
+          "description": "Ensure authentication flow properly checks and handles subscription status",
+          "status": "pending"
+        },
+        {
+          "id": "2.4",
+          "title": "Update Protected Routes",
+          "description": "Modify protected routes to consider both authentication and subscription status",
+          "status": "pending"
+        },
+        {
+          "id": "2.5",
+          "title": "Fix User Creation Process",
+          "description": "Ensure new signups are properly creating records in public.user table with correct tenant_id assignment",
+          "status": "completed",
+          "notes": "Fixed signUpTenant function to create public.user record with tenant_id, role, username, and is_active flag after tenant creation. Authentication flow now complete from signup through user creation."
+        },
+        {
+          "id": "2.6",
+          "title": "Create Test Data",
+          "description": "Add user/tenant/subscription records for testing the complete authentication and subscription flow",
+          "status": "pending"
+        },
+        {
+          "id": "2.7",
+          "title": "Fix signUpTenant Function",
+          "description": "Modify signUpTenant function to create public.user record with tenant_id after tenant creation",
+          "status": "completed",
+          "priority": "critical",
+          "notes": "Successfully implemented fix. Function now creates public.user record with supabase_auth_user_id, tenant_id, role: 'admin', username, and is_active: true."
+        },
+        {
+          "id": "2.8",
+          "title": "Update AuthProvider to Fetch User Data",
+          "description": "Modify AuthProvider to fetch user data from public.user table in addition to tenant data",
+          "status": "pending",
+          "priority": "high"
+        },
+        {
+          "id": "2.9",
+          "title": "End-to-End Authentication Flow Testing",
+          "description": "Create test user and verify complete flow from signup through tenant creation to public.user creation to subscription checking",
+          "status": "pending"
+        },
+        {
+          "id": "2.10",
+          "title": "Regenerate Supabase Types",
+          "description": "Fix type mismatches between TypeScript types and actual database schema by regenerating Supabase types",
+          "status": "pending",
+          "priority": "high"
+        },
+        {
+          "id": "2.11",
+          "title": "Test check-subscription Function",
+          "description": "Verify check-subscription function works correctly with newly created user records",
+          "status": "pending"
+        },
+        {
+          "id": "2.12",
+          "title": "Fix Dashboard Hanging Issue",
+          "description": "Implement solution for users whose dashboard is hanging due to missing subscription records",
+          "status": "in-progress",
+          "priority": "critical"
+        },
+        {
+          "id": "2.13",
+          "title": "Create Test Subscription Records",
+          "description": "Execute SQL script to create subscription records for existing tenants",
+          "status": "in-progress",
+          "priority": "critical",
+          "notes": "SQL script created to insert test subscription record for tenant_id=1 with active status and test Stripe IDs."
+        },
+        {
+          "id": "2.14",
+          "title": "Add Error Handling for Missing Subscriptions",
+          "description": "Update AuthProvider to detect and handle cases where tenant exists but has no subscription records",
+          "status": "pending",
+          "priority": "high"
+        },
+        {
+          "id": "2.15",
+          "title": "Test Authentication Flow with Subscription Records",
+          "description": "Verify that users can successfully log in and access the dashboard with the new subscription records in place",
+          "status": "pending",
+          "priority": "high"
+        },
+        {
+          "id": "2.16",
+          "title": "Review Pages Against PRD Requirements",
+          "description": "Review all authentication-related pages against the PRD requirements to ensure compliance",
+          "status": "pending",
+          "priority": "medium"
+        },
+        {
+          "id": "2.17",
+          "title": "Execute Immediate SQL Fix for Tenant ID 1",
+          "description": "Run SQL script in Supabase dashboard to create subscription record for tenant_id=1 to fix hanging dashboard",
+          "status": "pending",
+          "priority": "critical"
+        },
+        {
+          "id": "2.18",
+          "title": "Verify Dashboard Loading After SQL Fix",
+          "description": "Confirm dashboard loads correctly after running the SQL script for tenant_id=1",
+          "status": "pending",
+          "priority": "critical"
+        },
+        {
+          "id": "2.19",
+          "title": "Fix Dashboard Content Alignment",
+          "description": "Once dashboard loads successfully, align dashboard content with PRD requirements",
+          "status": "completed",
+          "priority": "high",
+          "notes": "Dashboard content updated to align with PRD requirements, properly distinguishing between account management and operational data."
+        },
+        {
+          "id": "2.20",
+          "title": "Create Comprehensive Database Diagnostic Script",
+          "description": "Develop a SQL script to diagnose authentication chain issues and generate fixes",
+          "status": "completed",
+          "priority": "critical",
+          "notes": "Created scripts/debug_database.sql with complete authentication chain verification, table structure analysis, status summary, and insert statements for missing test data."
+        },
+        {
+          "id": "2.21",
+          "title": "Execute Database Diagnostic Script",
+          "description": "Run the diagnostic script to identify and fix missing records in the authentication chain",
+          "status": "pending",
+          "priority": "critical"
+        },
+        {
+          "id": "2.22",
+          "title": "Verify Authentication Chain Integrity",
+          "description": "Use the diagnostic script to verify the complete authentication chain from auth.users through public.user, tenant, and subscription tables",
+          "status": "pending",
+          "priority": "high"
+        }
+      ]
     },
     {
       "id": 3,
-      "title": "Public Homepage Implementation",
-      "description": "Create the main landing page with value propositions and CTAs",
-      "status": "done",
+      "title": "Public Site Layout and Navigation",
+      "description": "Develop the layout and navigation structure for the public-facing marketing site, including responsive design for all device sizes.",
+      "details": "1. Create main layout components:\n   - Header with navigation menu\n   - Footer with links and copyright\n   - Main content container\n2. Implement responsive navigation:\n   - Desktop: Horizontal menu\n   - Mobile: Hamburger menu with slide-out drawer\n3. Design and implement navigation links for:\n   - Home\n   - Features\n   - Pricing\n   - About Us/Contact\n   - Login/Sign Up buttons\n4. Add FireGauge logo placeholder (to be replaced with final logo)\n5. Implement scroll behavior and active link indicators\n6. Ensure responsive design works on mobile, tablet, and desktop viewports\n7. Add SEO meta tags structure\n8. Implement basic animations for menu transitions",
+      "testStrategy": "Test responsive behavior across different device sizes. Verify navigation links work correctly. Test hamburger menu on mobile devices. Verify smooth scrolling behavior. Conduct accessibility testing for navigation elements.",
+      "priority": "high",
       "dependencies": [
         1
       ],
-      "priority": "high",
-      "details": "Design and implement the homepage with compelling headline and sub-headline. Create sections for key value propositions: Purpose-Built NFPA Compliance, Field-First Mobile Experience, Instant Reporting, Lean UI, Modular Platform, and ROI & Risk Reduction. Add prominent CTAs for signup and pricing. Implement responsive design for all screen sizes. Include placeholder sections for testimonials and social proof.",
-      "testStrategy": "Verify that all content displays correctly on different screen sizes. Ensure CTAs are prominent and functional. Test navigation to other pages. Validate against design mockups.",
-      "subtasks": [
-        {
-          "id": 1,
-          "title": "Review and Update Footer Component",
-          "description": "Ensure Footer contains relevant links (e.g., Terms, Privacy, Contact) and copyright information, aligning with PRD.",
-          "details": "",
-          "status": "done",
-          "dependencies": [],
-          "parentTaskId": 3
-        },
-        {
-          "id": 2,
-          "title": "Review and Update CTASection Component",
-          "description": "Ensure the main call to action section is compelling and directs users appropriately (e.g., to signup or pricing), as per PRD.",
-          "details": "",
-          "status": "done",
-          "dependencies": [],
-          "parentTaskId": 3
-        },
-        {
-          "id": 3,
-          "title": "Review and Update FAQ Component",
-          "description": "Review and update FAQ content to address common questions, aligning with PRD information.",
-          "details": "",
-          "status": "done",
-          "dependencies": [],
-          "parentTaskId": 3
-        },
-        {
-          "id": 4,
-          "title": "Review and Update Pricing Component (Homepage Section)",
-          "description": "Update the Pricing section on the homepage to accurately reflect the tiers and CTAs defined in the PRD.",
-          "details": "",
-          "status": "done",
-          "dependencies": [],
-          "parentTaskId": 3
-        },
-        {
-          "id": 5,
-          "title": "Review and Update Testimonials Component",
-          "description": "Review and update Testimonials section. Add placeholder if no real testimonials yet. Ensure it aligns with PRD messaging.",
-          "details": "",
-          "status": "done",
-          "dependencies": [],
-          "parentTaskId": 3
-        },
-        {
-          "id": 6,
-          "title": "Review and Update Features Component",
-          "description": "Update Features section to clearly articulate what FireGauge does, aligning with PRD value propositions.",
-          "details": "",
-          "status": "done",
-          "dependencies": [],
-          "parentTaskId": 3
-        },
-        {
-          "id": 7,
-          "title": "Review and Update ROIBanner Component",
-          "description": "Ensure ROIBanner reinforces the value proposition of FireGauge, as per PRD.",
-          "details": "",
-          "status": "done",
-          "dependencies": [],
-          "parentTaskId": 3
-        },
-        {
-          "id": 8,
-          "title": "Review and Update Benefits Component",
-          "description": "Align Benefits component with the core value propositions outlined in the PRD.",
-          "details": "",
-          "status": "done",
-          "dependencies": [],
-          "parentTaskId": 3
-        },
-        {
-          "id": 9,
-          "title": "Review and Update Hero Component",
-          "description": "Update Hero section with compelling headline, sub-headline, overview, and primary CTA, as per PRD.",
-          "details": "",
-          "status": "done",
-          "dependencies": [],
-          "parentTaskId": 3
-        },
-        {
-          "id": 10,
-          "title": "Review and Update Navbar Component",
-          "description": "Ensure Navbar has correct branding (logo placeholder), navigation links (e.g., Features, Pricing, Auth/Dashboard), and responsive behavior, as per PRD.",
-          "details": "",
-          "status": "done",
-          "dependencies": [],
-          "parentTaskId": 3
-        }
-      ]
+      "status": "pending",
+      "subtasks": []
     },
     {
       "id": 4,
-      "title": "Pricing Page Development",
-      "description": "Build the pricing page with subscription tiers and feature comparison",
-      "status": "done",
-      "dependencies": [
-        1
-      ],
+      "title": "Homepage Implementation",
+      "description": "Design and implement the homepage with hero section, value propositions, feature highlights, and call-to-action elements.",
+      "details": "1. Create hero section with:\n   - Compelling headline highlighting FireGauge's value\n   - Subheadline explaining the product\n   - Primary CTA button for sign-up\n   - Secondary CTA for more information\n   - Hero image or illustration\n2. Implement value proposition section featuring:\n   - Purpose-Built NFPA Compliance\n   - Field-First Mobile Experience\n   - Instant, Insurance-Grade Reporting\n   - Lean, Intuitive UI\n   - Modular, Scalable Platform\n   - ROI & Risk Reduction\n3. Add feature highlights section with icons and brief descriptions\n4. Implement testimonials section (placeholder for future content)\n5. Add final CTA section encouraging sign-up\n6. Ensure all sections are responsive and visually appealing\n7. Optimize content for SEO with proper heading structure\n8. Implement lazy loading for images",
+      "testStrategy": "Test responsive layout on various screen sizes. Verify all CTAs link to appropriate destinations. Check image loading performance. Validate HTML structure for SEO and accessibility. Test with screen readers to ensure accessibility compliance.",
       "priority": "high",
-      "details": "Create a pricing page layout with cards for each subscription tier (Basic, Standard, Professional, Enterprise). Implement feature comparison table between tiers. Add CTAs for each plan that direct to signup. Include section for add-on modules (Ladder and Pump testing). Create FAQ section related to pricing and plans. Ensure responsive design for all pricing components.",
-      "testStrategy": "Verify all pricing information is accurate and clearly presented. Test CTAs to ensure they direct to the correct signup flow. Check responsive behavior on different screen sizes.",
-      "subtasks": [
-        {
-          "id": 1,
-          "title": "Create Pricing Page Layout Structure",
-          "description": "Develop the base layout structure for the pricing page including header, main content areas, and footer",
-          "dependencies": [],
-          "details": "Implementation details:\n1. Create a new pricing page component with responsive grid layout\n2. Design the page header with title and subtitle\n3. Define placeholder sections for subscription tiers, feature comparison, add-ons, and FAQ\n4. Implement navigation breadcrumbs\n5. Set up basic styling with CSS variables for consistent theming\n6. Add page metadata for SEO\n\nTesting approach:\n- Verify layout renders correctly on desktop, tablet, and mobile viewports\n- Check that all placeholder sections are properly positioned\n- Validate HTML structure and accessibility",
-          "status": "done",
-          "parentTaskId": 4
-        },
-        {
-          "id": 2,
-          "title": "Implement Subscription Tier Cards",
-          "description": "Build the subscription tier cards for Basic, Standard, Professional, and Enterprise plans with pricing details",
-          "dependencies": [
-            1
-          ],
-          "details": "Implementation details:\n1. Create a reusable card component for subscription tiers\n2. Implement styling for cards with hover effects and highlighted recommended plan\n3. Add tier names, monthly/annual pricing options with toggle\n4. Include brief description for each tier\n5. Add placeholder CTA buttons (to be fully implemented in subtask 4)\n6. Ensure consistent spacing and alignment between cards\n\nTesting approach:\n- Verify all four tier cards display correctly with proper information\n- Test pricing toggle between monthly/annual options\n- Check responsive behavior of cards on different screen sizes\n- Validate that the recommended plan highlight stands out visually",
-          "status": "done",
-          "parentTaskId": 4
-        },
-        {
-          "id": 3,
-          "title": "Develop Feature Comparison Table",
-          "description": "Create an interactive feature comparison table showing differences between subscription tiers",
-          "dependencies": [
-            1,
-            2
-          ],
-          "details": "Implementation details:\n1. Design table structure with features as rows and subscription tiers as columns\n2. Implement responsive table that converts to cards on mobile\n3. Add feature categories with collapsible sections\n4. Include checkmarks, x-marks, or specific values for each feature per tier\n5. Add tooltips for features that need additional explanation\n6. Implement sticky header for table when scrolling\n\nTesting approach:\n- Verify all features display correctly for each subscription tier\n- Test collapsible sections open/close properly\n- Check tooltips appear on hover/tap\n- Validate responsive behavior converts to appropriate format on mobile\n- Test sticky header functionality when scrolling",
-          "status": "done",
-          "parentTaskId": 4
-        },
-        {
-          "id": 4,
-          "title": "Implement CTAs and Add-on Module Section",
-          "description": "Add call-to-action buttons for each plan and create the add-on modules section for Ladder and Pump testing",
-          "dependencies": [
-            2
-          ],
-          "details": "Implementation details:\n1. Complete CTA buttons on subscription tier cards with proper styling\n2. Link CTAs to signup page with plan information passed as parameters\n3. Create add-on module section with cards for Ladder and Pump testing\n4. Design add-on cards with images, descriptions, and pricing\n5. Add toggle or checkbox to select add-ons\n6. Implement logic to update total price when add-ons are selected\n\nTesting approach:\n- Verify CTAs link to correct signup page with proper parameters\n- Test add-on selection functionality\n- Check price calculation updates correctly when add-ons are selected\n- Validate responsive design of add-on section\n- Test keyboard navigation for accessibility",
-          "status": "done",
-          "parentTaskId": 4
-        },
-        {
-          "id": 5,
-          "title": "Create FAQ Section and Finalize Responsive Design",
-          "description": "Implement the pricing FAQ section with expandable questions and answers, and finalize responsive behavior across all devices",
-          "dependencies": [
-            1,
-            3,
-            4
-          ],
-          "details": "Implementation details:\n1. Create expandable FAQ component with questions related to pricing and plans\n2. Implement accordion behavior for questions/answers\n3. Add search functionality for FAQs\n4. Conduct comprehensive responsive testing across all page components\n5. Fix any responsive issues in subscription cards, feature table, and add-on section\n6. Implement final polish with animations and transitions\n7. Add contact CTA for enterprise customers with special needs\n\nTesting approach:\n- Verify FAQ accordion expands/collapses correctly\n- Test FAQ search functionality\n- Conduct comprehensive testing on multiple devices and screen sizes\n- Validate all interactive elements are accessible via keyboard\n- Test page load performance and optimize if necessary\n- Verify all animations and transitions work smoothly",
-          "status": "done",
-          "parentTaskId": 4
-        }
-      ]
-    },
-    {
-      "id": 5,
-      "title": "Authentication UI Implementation",
-      "description": "Create signup, login, and password reset interfaces",
-      "status": "done",
-      "dependencies": [
-        2
-      ],
-      "priority": "high",
-      "details": "Design and implement signup form collecting name, email, password, and company name. Create login form with email and password fields. Implement password reset request and confirmation flows. Add form validation for all inputs. Include links to Terms of Service and Privacy Policy. Connect forms to Supabase auth functions from task #2. Implement error handling and success messages.",
-      "testStrategy": "Test form validation for all fields. Verify error messages display correctly. Test successful signup, login, and password reset flows. Ensure redirects work properly after authentication.",
-      "subtasks": [
-        {
-          "id": 1,
-          "title": "Create Signup Form UI Component",
-          "description": "Design and implement the signup form UI component with fields for name, email, password, and company name",
-          "dependencies": [],
-          "details": "Implementation details:\n1. Create a new React component called SignupForm\n2. Add form fields for name, email, password, password confirmation, and company name\n3. Style the form according to design guidelines\n4. Add a submit button\n5. Create initial state management for form fields\n6. Add placeholder text and appropriate input types\n7. Implement basic form structure without validation or submission logic\n8. Test the component renders correctly with all required fields",
-          "status": "done",
-          "parentTaskId": 5
-        },
-        {
-          "id": 2,
-          "title": "Create Login Form UI Component",
-          "description": "Design and implement the login form UI component with fields for email and password",
-          "dependencies": [],
-          "details": "Implementation details:\n1. Create a new React component called LoginForm\n2. Add form fields for email and password\n3. Style the form according to design guidelines\n4. Add a submit button and 'Forgot Password' link\n5. Create initial state management for form fields\n6. Add placeholder text and appropriate input types\n7. Implement basic form structure without validation or submission logic\n8. Test the component renders correctly with all required fields",
-          "status": "done",
-          "parentTaskId": 5
-        },
-        {
-          "id": 3,
-          "title": "Implement Password Reset Flow UI",
-          "description": "Create the password reset request and confirmation UI components",
-          "dependencies": [],
-          "details": "Implementation details:\n1. Create a PasswordResetRequest component with email input field\n2. Create a PasswordResetConfirmation component with new password and confirm password fields\n3. Style both components according to design guidelines\n4. Add submit buttons to both forms\n5. Create state management for form fields\n6. Add appropriate routing between these components\n7. Implement basic form structure without validation or submission logic\n8. Test that both components render correctly and navigation between them works",
-          "status": "done",
-          "parentTaskId": 5
-        },
-        {
-          "id": 4,
-          "title": "Add Form Validation to Authentication Forms",
-          "description": "Implement client-side validation for all authentication form inputs",
-          "dependencies": [
-            1,
-            2,
-            3
-          ],
-          "details": "Implementation details:\n1. Add validation rules for each form field:\n   - Name: required, minimum length\n   - Email: required, valid email format\n   - Password: required, minimum length, complexity requirements\n   - Company name: required\n2. Implement real-time validation feedback\n3. Add error messages for invalid inputs\n4. Disable submit buttons until form is valid\n5. Add visual indicators for valid/invalid fields\n6. Test validation logic with various input scenarios\n7. Ensure validation is consistent across all authentication forms",
-          "status": "done",
-          "parentTaskId": 5
-        },
-        {
-          "id": 5,
-          "title": "Connect Authentication Forms to Supabase",
-          "description": "Integrate the authentication UI components with Supabase authentication functions",
-          "dependencies": [
-            1,
-            2,
-            3,
-            4
-          ],
-          "details": "Implementation details:\n1. Import Supabase auth functions from task #2\n2. Connect signup form submit handler to Supabase signUp function\n3. Connect login form submit handler to Supabase signIn function\n4. Connect password reset request to Supabase resetPasswordForEmail function\n5. Connect password reset confirmation to Supabase updateUser function\n6. Add loading states during authentication operations\n7. Implement redirect logic after successful authentication\n8. Test the complete authentication flow with Supabase integration",
-          "status": "done",
-          "parentTaskId": 5
-        },
-        {
-          "id": 6,
-          "title": "Implement Error Handling and Success Messages",
-          "description": "Add user feedback for authentication actions including error handling, success messages, and Terms/Privacy links",
-          "dependencies": [
-            5
-          ],
-          "details": "Implementation details:\n1. Create reusable components for error and success messages\n2. Add error handling for all Supabase authentication API calls\n3. Display appropriate error messages for different failure scenarios\n4. Show success messages after successful operations\n5. Add Terms of Service and Privacy Policy links to the signup form\n6. Ensure links open in a new tab\n7. Add checkbox for agreeing to Terms and Privacy Policy\n8. Test error scenarios (invalid credentials, network issues, etc.)\n9. Verify success paths and appropriate messaging",
-          "status": "done",
-          "parentTaskId": 5
-        }
-      ]
-    },
-    {
-      "id": 6,
-      "title": "Stripe Integration for Payments",
-      "description": "Integrate Stripe for subscription management and payment processing",
-      "status": "pending",
-      "dependencies": [
-        2
-      ],
-      "priority": "high",
-      "details": "Set up Stripe account and configure products/prices for subscription tiers. Implement Stripe.js for secure payment form handling. Create serverless functions for Stripe API interactions (create customer, create subscription, update payment method). Set up webhook handling for subscription events. Implement subscription status tracking in Supabase. Create utility functions for Stripe operations.",
-      "testStrategy": "Test subscription creation with test cards. Verify webhook handling for subscription updates. Test payment method updates. Ensure subscription data is correctly stored in Supabase."
-    },
-    {
-      "id": 7,
-      "title": "Dashboard Implementation",
-      "description": "Create the main dashboard for authenticated users",
-      "status": "pending",
-      "dependencies": [
-        2,
-        5,
-        6
-      ],
-      "priority": "medium",
-      "details": "Design and implement dashboard layout with welcome message and summary sections. Create components for displaying current subscription plan. Implement quick stats section showing number of active stations and users. Add navigation to other portal sections (Account, Billing, User Management). Create prominent 'Go to App' button redirecting to app.firegauge.app. Implement data fetching from Supabase for user and subscription information.",
-      "testStrategy": "Verify dashboard displays correct user and subscription information. Test navigation to other portal sections. Ensure 'Go to App' button redirects correctly. Test responsive behavior on different screen sizes.",
-      "subtasks": [
-        {
-          "id": 1,
-          "title": "Create Dashboard Layout Structure",
-          "description": "Redesign the Dashboard.tsx component to serve as a simplified user portal with a clean layout structure",
-          "dependencies": [],
-          "details": "Implementation steps:\n1. Create a new Dashboard.tsx component or refactor the existing one\n2. Implement a responsive grid layout with a header, main content area, and optional sidebar\n3. Add a welcome section with user greeting (e.g., 'Welcome, {username}')\n4. Create placeholder card components for the main dashboard sections (subscription, quick stats, navigation)\n5. Style the layout using Tailwind CSS or your preferred styling approach\n6. Ensure the layout is responsive and works on mobile devices\n\nTesting approach:\n- Verify the layout renders correctly on different screen sizes\n- Check that placeholder components are positioned correctly\n- Ensure the component renders without errors",
-          "status": "done",
-          "parentTaskId": 7
-        },
-        {
-          "id": 2,
-          "title": "Implement User Data Fetching from Supabase",
-          "description": "Set up data fetching from Supabase to retrieve authenticated user information and subscription details",
-          "dependencies": [
-            1
-          ],
-          "details": "Implementation steps:\n1. Create a custom hook (e.g., useUserData) to fetch user data from Supabase\n2. Implement authentication state checking to ensure the user is logged in\n3. Query Supabase for user profile information (name, email, etc.)\n4. Add functionality to fetch subscription plan details from the appropriate Supabase table\n5. Implement loading states and error handling for data fetching\n6. Create a context provider if needed to share user data across dashboard components\n\nTesting approach:\n- Test the hook with mock Supabase responses\n- Verify error handling works correctly\n- Check that loading states are properly displayed\n- Ensure user data is correctly passed to child components",
-          "status": "pending",
-          "parentTaskId": 7
-        },
-        {
-          "id": 3,
-          "title": "Create Subscription Plan and Quick Stats Components",
-          "description": "Implement components to display the user's current subscription plan and quick statistics about their account",
-          "dependencies": [
-            1,
-            2
-          ],
-          "details": "Implementation steps:\n1. Create a SubscriptionPlan component that displays the current plan details\n   - Show plan name, status, renewal date, and features\n   - Add styling to highlight the current plan\n2. Implement a QuickStats component showing:\n   - Number of active stations (if applicable)\n   - Number of users on the account\n   - Any other relevant metrics\n3. Add loading skeletons for when data is being fetched\n4. Style both components to match the dashboard design\n5. Connect components to the user data from subtask 2\n\nTesting approach:\n- Test components with various subscription plans and stats data\n- Verify loading states display correctly\n- Check that components handle missing or null data gracefully\n- Ensure responsive design works on different screen sizes",
-          "status": "pending",
-          "parentTaskId": 7
-        },
-        {
-          "id": 4,
-          "title": "Implement 'Go to App' Button and Navigation Links",
-          "description": "Add a prominent 'Go to App' button and navigation links/cards to other portal sections",
-          "dependencies": [
-            1
-          ],
-          "details": "Implementation steps:\n1. Create a prominent 'Go to App' button/link that redirects to app.firegauge.app\n   - Style it to stand out visually on the dashboard\n   - Add hover and active states\n2. Implement navigation cards or links for:\n   - Account Management\n   - Billing Management\n   - User Management (conditionally shown for admin users)\n3. Add appropriate icons for each navigation option\n4. Implement conditional rendering for admin-only sections based on user role\n5. Add click handlers and routing for each navigation option\n\nTesting approach:\n- Verify all links point to the correct destinations\n- Test conditional rendering based on user roles\n- Check that the 'Go to App' button is prominently displayed\n- Ensure hover and active states work correctly",
-          "status": "done",
-          "parentTaskId": 7
-        },
-        {
-          "id": 5,
-          "title": "Integrate and Test Complete Dashboard",
-          "description": "Connect all components together, implement final styling, and perform comprehensive testing",
-          "dependencies": [
-            2,
-            3,
-            4
-          ],
-          "details": "Implementation steps:\n1. Integrate all previously created components into the main Dashboard component\n2. Implement any remaining data connections between components\n3. Add final styling touches and ensure consistent design across all elements\n4. Implement any missing loading states or error handling\n5. Add analytics tracking for dashboard usage if required\n6. Perform code cleanup and optimization\n7. Add comprehensive comments and documentation\n\nTesting approach:\n- End-to-end testing of the complete dashboard\n- Verify all data is correctly displayed from Supabase\n- Test user interactions with all buttons and navigation elements\n- Check responsive behavior across different devices\n- Verify loading states and error handling in various scenarios\n- Test with different user roles and subscription plans",
-          "status": "pending",
-          "parentTaskId": 7
-        }
-      ]
-    },
-    {
-      "id": 8,
-      "title": "Account Management Implementation",
-      "description": "Build the account management section for user and company profile",
-      "status": "pending",
-      "dependencies": [
-        7
-      ],
-      "priority": "medium",
-      "details": "Create interface for viewing and updating company profile information. Implement form for updating personal profile (name, email). Add password change functionality. Implement form validation for all inputs. Create API functions for updating profile information in Supabase. Add success and error notifications for form submissions.",
-      "testStrategy": "Test form validation for all fields. Verify profile updates are saved correctly to Supabase. Test password change functionality. Ensure error handling works properly."
-    },
-    {
-      "id": 9,
-      "title": "Billing Management Implementation",
-      "description": "Create the billing management interface for subscription and payment handling",
-      "status": "pending",
-      "dependencies": [
-        6,
-        7
-      ],
-      "priority": "medium",
-      "details": "Implement interface for viewing current subscription details. Create subscription upgrade/downgrade functionality. Add payment method management (add, update, remove). Implement billing history and invoice download. Create subscription cancellation flow with confirmation. Integrate with Stripe Customer Portal or build custom UI using Stripe API. Implement data fetching from Stripe for billing information.",
-      "testStrategy": "Test subscription upgrade and downgrade flows. Verify payment method management works correctly. Test invoice download functionality. Ensure subscription cancellation works properly with confirmation."
-    },
-    {
-      "id": 10,
-      "title": "User Management Implementation",
-      "description": "Build the user management interface for admins to manage organization users",
-      "status": "pending",
-      "dependencies": [
-        7
-      ],
-      "priority": "medium",
-      "details": "Create interface for viewing list of users within the organization. Implement user invitation system via email. Add functionality to assign and change user roles (Operator, Admin). Create user deactivation/removal flow. Implement data fetching and mutation functions for user management in Supabase. Add pagination for user list. Implement search and filtering for user list.",
-      "testStrategy": "Test user invitation flow including email delivery. Verify role assignment works correctly. Test user deactivation and removal. Ensure pagination, search, and filtering work properly."
-    },
-    {
-      "id": 11,
-      "title": "Station Overview Implementation",
-      "description": "Create the station overview interface for high-level station management",
-      "status": "pending",
-      "dependencies": [
-        7
-      ],
-      "priority": "medium",
-      "details": "Implement interface for viewing list of company testing stations. Create components for displaying high-level station status (last test date, number of assets). Implement data fetching from Supabase or main app API for station information. Add pagination for station list. Implement search and filtering for station list. Create loading and error states for data fetching.",
-      "testStrategy": "Verify station list displays correctly with accurate information. Test pagination, search, and filtering functionality. Ensure loading and error states display appropriately."
-    },
-    {
-      "id": 12,
-      "title": "Features Page Implementation",
-      "description": "Build the optional features page with detailed breakdown of FireGauge capabilities",
-      "status": "pending",
       "dependencies": [
         3
       ],
-      "priority": "low",
-      "details": "Design and implement features page layout. Create sections for each core feature and module (Hose, Ladder, Pump testing). Add detailed descriptions of use cases and benefits for each feature. Include visual elements (icons, illustrations) to enhance presentation. Ensure responsive design for all screen sizes. Add CTAs directing to signup or pricing page.",
-      "testStrategy": "Verify all feature content displays correctly. Test responsive behavior on different screen sizes. Ensure CTAs function properly. Validate against design mockups."
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 5,
+      "title": "Features Pages Development",
+      "description": "Create detailed feature pages that explain core FireGauge functionalities including Equipment Testing, ISO Dashboard, and Reporting.",
+      "details": "1. Create a template for feature pages with consistent layout\n2. Implement the following feature pages:\n   - Equipment Testing page highlighting NFPA-1962 workflows\n   - ISO Dashboard page showing compliance tracking\n   - Reporting page showcasing PDF generation capabilities\n3. For each page, include:\n   - Feature headline and description\n   - Key benefits and use cases\n   - Visual elements (screenshots/illustrations)\n   - Technical specifications where relevant\n   - CTAs to sign up or learn more\n4. Implement responsive layouts for all pages\n5. Add breadcrumb navigation\n6. Optimize content for SEO with proper heading structure and meta tags\n7. Include schema markup for better search engine visibility",
+      "testStrategy": "Verify all pages render correctly across devices. Test navigation between feature pages. Validate image loading and optimization. Check SEO elements and schema markup. Test accessibility of all content and interactive elements.",
+      "priority": "medium",
+      "dependencies": [
+        3
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 6,
+      "title": "Pricing Page with Stripe Integration",
+      "description": "Develop the pricing page with clear plan comparisons and integrate Stripe Checkout for subscription sign-ups.",
+      "details": "1. Design pricing table with the following tiers:\n   - Basic: $75-$100/mo\n   - Standard: $150-$200/mo\n   - Professional: $250-$350/mo\n   - Enterprise: Custom pricing\n2. For each tier, display:\n   - Monthly and annual pricing options (with discount)\n   - Feature list with checkmarks\n   - Limitations (e.g., number of hoses, users)\n   - Prominent 'Select Plan' CTA\n3. Add section for Add-On Modules:\n   - Ladder inspections: +$50/mo\n   - Pump testing: +$50/mo\n4. Integrate Stripe Checkout:\n   - Install Stripe.js\n   - Create checkout session with proper plan IDs\n   - Handle successful payment redirects\n   - Implement error handling\n5. Add FAQ section addressing common pricing questions\n6. Implement toggle for monthly/annual billing display\n7. Add enterprise contact form for custom quotes",
+      "testStrategy": "Test plan selection and Stripe Checkout flow in test mode. Verify monthly/annual toggle works correctly. Test responsive design of pricing tables. Ensure enterprise contact form submits correctly. Verify Stripe integration with test transactions.",
+      "priority": "high",
+      "dependencies": [
+        2,
+        3
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 7,
+      "title": "About Us and Contact Pages",
+      "description": "Create the About Us page with company information and a Contact page with form submission functionality.",
+      "details": "1. About Us page:\n   - Company mission and vision\n   - Team section (placeholder for future content)\n   - Company history/story\n   - Values and approach\n2. Contact page:\n   - Contact form with fields for:\n     - Name\n     - Email\n     - Company/Department\n     - Message\n     - Reason for contact (dropdown)\n   - Form validation\n   - Submission handling (store in Supabase or send via email API)\n   - Success/error messaging\n3. Add contact information:\n   - Email address\n   - Phone number (if applicable)\n   - Physical address (if applicable)\n4. Implement Google reCAPTCHA to prevent spam\n5. Add FAQ section or link to support resources\n6. Ensure responsive design for both pages",
+      "testStrategy": "Test contact form submission and validation. Verify reCAPTCHA integration. Test form error states and success messages. Check responsive layout on various devices. Verify all links work correctly.",
+      "priority": "medium",
+      "dependencies": [
+        3
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 8,
+      "title": "Sign-up Flow Implementation",
+      "description": "Develop the complete sign-up flow from plan selection to account creation, including Stripe Checkout integration and user onboarding.",
+      "details": "1. Create sign-up flow sequence:\n   - Plan selection on pricing page\n   - Basic information collection (name, email, password)\n   - Redirect to Stripe Checkout\n   - Success page after payment\n   - Redirect to onboarding or authenticated portal\n2. Implement Stripe webhook endpoint to:\n   - Receive successful payment notifications\n   - Create new tenant and user in database\n   - Assign appropriate subscription plan\n3. Create API service to communicate with app.firegauge.app:\n   - Send new user/tenant data\n   - Receive confirmation of account creation\n4. Implement error handling for failed payments or account creation\n5. Add progress indicator for multi-step process\n6. Create success page with next steps guidance\n7. Implement email notifications for successful sign-up",
+      "testStrategy": "Test complete sign-up flow with Stripe test mode. Verify webhook handling and database updates. Test error scenarios and recovery paths. Verify email notifications are sent correctly. Test the flow on different devices and browsers.",
+      "priority": "high",
+      "dependencies": [
+        2,
+        6
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 9,
+      "title": "Authenticated Portal Dashboard",
+      "description": "Create the authenticated user portal dashboard for account management at www.firegauge.app, showing account overview, subscription status, and quick links to management features.",
+      "status": "in-progress",
+      "dependencies": [
+        2,
+        8
+      ],
+      "priority": "high",
+      "details": "1. Design authenticated portal layout with:\n   - Sidebar navigation\n   - Header with user info and logout\n   - Main content area\n2. Implement account management dashboard with:\n   - Account Overview: Subscription status, billing info, account health\n   - User Management: Invite users, manage roles, view team members\n   - Subscription Management: Current plan, billing history, change plans\n   - Quick Links: Links to main app (app.firegauge.app), support, documentation\n   - Account Settings: Organization profile, preferences, integrations\n3. Create API service to fetch tenant account data from main application\n4. Implement data fetching with Tanstack Query and loading states\n5. Add notifications area for important account alerts\n6. Create responsive design for dashboard\n7. Implement role-based dashboard variations if needed\n8. IMPORTANT: Remove all operational fire department content (Portland fire stations, test results, equipment data) from current dashboard implementation\n9. Ensure clear separation between marketing portal (www.firegauge.app) account management and operational features (app.firegauge.app)\n10. Integrate Stripe Customer Portal for self-serve billing management\n11. Fix AccountManagement.tsx to properly display subscription details\n12. Ensure Billing.tsx connects to the actual Stripe billing system",
+      "testStrategy": "Test dashboard data loading and display. Verify API integration for account management data. Test responsive layout on different devices. Verify authentication state persistence. Test quick action buttons functionality. Verify no operational fire department data appears in the marketing portal dashboard. Test Stripe Customer Portal integration for billing management. Verify user management interface for inviting and managing tenant users. Test subscription status display and plan management features.",
+      "subtasks": [
+        {
+          "id": "9.1",
+          "title": "Remove operational fire department content",
+          "description": "Remove all hardcoded fire station operational data (Portland fire stations, test results, equipment data) from DashboardContent.tsx as this belongs in app.firegauge.app, not the marketing portal.",
+          "status": "pending"
+        },
+        {
+          "id": "9.2",
+          "title": "Implement Account Overview section",
+          "description": "Create component to display subscription status, billing information, and account health metrics.",
+          "status": "pending"
+        },
+        {
+          "id": "9.3",
+          "title": "Implement User Management section",
+          "description": "Create interface for inviting users, managing roles, and viewing team members within the organization.",
+          "status": "pending"
+        },
+        {
+          "id": "9.4",
+          "title": "Implement Subscription Management section",
+          "description": "Create component to display current plan details, billing history, and options to change subscription plans.",
+          "status": "pending"
+        },
+        {
+          "id": "9.5",
+          "title": "Implement Quick Links section",
+          "description": "Add links to main application (app.firegauge.app), support resources, and documentation.",
+          "status": "pending"
+        },
+        {
+          "id": "9.6",
+          "title": "Implement Account Settings section",
+          "description": "Create interface for managing organization profile, preferences, and integrations.",
+          "status": "pending"
+        },
+        {
+          "id": "9.7",
+          "title": "Create API services for account management data",
+          "description": "Implement services to fetch account, subscription, billing, and user management data.",
+          "status": "pending"
+        },
+        {
+          "id": "9.8",
+          "title": "Integrate Stripe Customer Portal",
+          "description": "Implement Stripe Customer Portal integration for self-serve billing management as required by the PRD.",
+          "status": "pending"
+        },
+        {
+          "id": "9.9",
+          "title": "Update AccountManagement.tsx",
+          "description": "Fix AccountManagement.tsx to properly display subscription status, billing history, and plan management features.",
+          "status": "pending"
+        },
+        {
+          "id": "9.10",
+          "title": "Connect Billing.tsx to Stripe",
+          "description": "Update Billing.tsx to connect with the actual Stripe billing system instead of being a basic placeholder.",
+          "status": "pending"
+        },
+        {
+          "id": "9.11",
+          "title": "Create comprehensive User Management interface",
+          "description": "Develop a complete user management interface for inviting and managing tenant users with role assignments as required by the PRD.",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "title": "Account Management Interface",
+      "description": "Develop the account management section allowing users to update their profile information and manage account settings.",
+      "details": "1. Create account settings page with:\n   - Profile information form (name, email, etc.)\n   - Password change functionality\n   - Notification preferences\n   - Account deletion option\n2. Implement form validation for all inputs\n3. Create service to update user data in Supabase\n4. Add success/error notifications for all actions\n5. Implement confirmation modals for sensitive actions\n6. Add profile image upload functionality (if required)\n7. Ensure all changes sync with Supabase Auth\n8. Create API service to sync relevant changes with main application",
+      "testStrategy": "Test all form submissions and validations. Verify profile updates are saved correctly in Supabase. Test password change functionality. Verify confirmation flows for sensitive actions. Test synchronization with the main application.",
+      "priority": "medium",
+      "dependencies": [
+        2,
+        9
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 11,
+      "title": "Stripe Customer Portal Integration",
+      "description": "Integrate Stripe Customer Portal for self-service subscription and billing management.",
+      "details": "1. Set up Stripe Customer Portal in Stripe Dashboard:\n   - Configure branding and appearance\n   - Set up available payment methods\n   - Configure allowed customer actions\n2. Implement Stripe Customer Portal link generation:\n   - Create secure endpoint to generate session URLs\n   - Handle authentication and customer ID mapping\n3. Create billing management page with:\n   - Current plan display\n   - Payment method information\n   - Invoice history\n   - 'Manage Billing' button that redirects to Stripe Portal\n4. Implement webhook handling for subscription changes:\n   - Plan upgrades/downgrades\n   - Subscription cancellations\n   - Payment method updates\n5. Add logic to update local database when subscription changes\n6. Implement API calls to sync subscription changes with main application\n7. Add notifications for important billing events",
+      "testStrategy": "Test Stripe Customer Portal integration with test accounts. Verify session creation and redirection. Test webhook handling for subscription changes. Verify database updates after subscription changes. Test synchronization with the main application.",
+      "priority": "high",
+      "dependencies": [
+        6,
+        9
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 12,
+      "title": "User Management Interface",
+      "description": "Create the user management interface for tenant administrators to invite, manage, and assign roles to users within their organization.",
+      "details": "1. Design user management interface with:\n   - User listing table with search and filters\n   - User detail view/edit modal\n   - Invite new user form\n   - Role assignment controls\n2. Implement user invitation flow:\n   - Email input form with role selection\n   - Generate and send invitation emails\n   - Track invitation status\n   - Handle invitation acceptance\n3. Create API service to:\n   - Fetch users from main application\n   - Create new user invitations\n   - Update user roles and permissions\n   - Deactivate/remove users\n4. Implement role management with predefined roles:\n   - Admin\n   - Operator\n   - Other roles as defined in the main application\n5. Add bulk actions for user management\n6. Implement pagination for large user lists\n7. Add audit logging for user management actions",
+      "testStrategy": "Test user invitation flow end-to-end. Verify email delivery and invitation acceptance. Test role assignment and permission changes. Verify API integration with the main application. Test pagination and search functionality. Verify audit logging for administrative actions.",
+      "priority": "high",
+      "dependencies": [
+        9
+      ],
+      "status": "pending",
+      "subtasks": []
     },
     {
       "id": 13,
-      "title": "SEO and Accessibility Implementation",
-      "description": "Optimize the site for search engines and ensure accessibility compliance",
-      "status": "pending",
-      "dependencies": [
-        3,
-        4,
-        12
-      ],
+      "title": "Help and Support Section",
+      "description": "Develop the help and support section with FAQs, documentation links, and support request functionality.",
+      "details": "1. Create help and support page with:\n   - Frequently Asked Questions section\n   - Searchable knowledge base (or links to external KB)\n   - Support contact form\n   - Documentation links\n2. Implement FAQ accordion component with categories:\n   - Account & Billing\n   - Features & Usage\n   - Technical Issues\n   - Getting Started\n3. Create support ticket submission form:\n   - Issue category selection\n   - Description field\n   - Attachment option\n   - Priority selection\n4. Implement form validation and submission handling\n5. Add confirmation and tracking for support requests\n6. Create responsive design for all support components\n7. Implement search functionality for FAQs",
+      "testStrategy": "Test FAQ accordion functionality. Verify support form submission and validation. Test responsive design on various devices. Verify all documentation links work correctly. Test search functionality for FAQs.",
       "priority": "medium",
-      "details": "Implement SEO best practices including meta tags, semantic HTML, and structured data. Create sitemap.xml and robots.txt files. Optimize page titles and descriptions with target keywords. Implement accessibility features to meet WCAG 2.1 Level AA compliance. Add proper ARIA attributes where needed. Ensure sufficient color contrast and keyboard navigation. Test with screen readers and accessibility tools.",
-      "testStrategy": "Run Lighthouse audits for SEO and accessibility scores. Test with screen readers to ensure content is accessible. Verify keyboard navigation works properly. Check color contrast ratios meet WCAG requirements."
+      "dependencies": [
+        3
+      ],
+      "status": "pending",
+      "subtasks": []
     },
     {
       "id": 14,
-      "title": "Responsive Design and UI Polish",
-      "description": "Ensure responsive behavior and apply final UI polish across the application",
-      "status": "pending",
-      "dependencies": [
-        3,
-        4,
-        5,
-        7,
-        8,
-        9,
-        10,
-        11,
-        12
-      ],
+      "title": "SEO and Analytics Implementation",
+      "description": "Implement SEO optimizations and analytics tracking to measure site performance and user engagement.",
+      "details": "1. Implement SEO optimizations:\n   - Create sitemap.xml generator\n   - Configure robots.txt\n   - Add structured data (JSON-LD) for key pages\n   - Optimize meta titles and descriptions\n   - Implement canonical URLs\n   - Add Open Graph and Twitter card meta tags\n2. Set up analytics tracking:\n   - Install Google Analytics or similar tool\n   - Configure event tracking for key user actions\n   - Set up conversion tracking for sign-ups\n   - Create custom dimensions for user segments\n3. Implement performance monitoring:\n   - Core Web Vitals tracking\n   - Page load time measurement\n   - Error tracking\n4. Create SEO-friendly URL structure\n5. Implement basic keyword optimization for content\n6. Add alt text to all images\n7. Configure analytics dashboards for key metrics",
+      "testStrategy": "Validate structured data using Google's testing tools. Verify analytics tracking is working correctly. Test sitemap.xml and robots.txt. Check page speed using Lighthouse. Verify all meta tags are correctly implemented. Test Open Graph previews using social media debugging tools.",
       "priority": "medium",
-      "details": "Review and refine responsive behavior across all pages and components. Implement consistent spacing, typography, and color usage. Add transitions and animations for improved user experience. Optimize loading performance. Ensure consistent error and success messaging. Implement skeleton loaders for data fetching states. Create empty states for lists and data displays.",
-      "testStrategy": "Test on various devices and screen sizes to verify responsive behavior. Verify consistent styling across the application. Check loading, error, and empty states display correctly. Validate against design mockups."
-    },
-    {
-      "id": 15,
-      "title": "Deployment Configuration and Testing",
-      "description": "Configure deployment to Render and perform final testing",
-      "status": "pending",
       "dependencies": [
-        1,
-        2,
-        3,
         4,
         5,
         6,
-        7,
+        7
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 15,
+      "title": "Deployment and Integration Testing",
+      "description": "Configure deployment pipeline to Render and perform comprehensive integration testing between the marketing portal and the main application.",
+      "details": "1. Set up Render deployment configuration:\n   - Configure build settings\n   - Set up environment variables\n   - Configure custom domain (www.firegauge.app)\n   - Set up SSL certificate\n2. Implement CI/CD pipeline:\n   - Configure automated testing\n   - Set up staging environment\n   - Create deployment workflow\n3. Perform integration testing with app.firegauge.app:\n   - Test user creation and synchronization\n   - Verify role assignment propagation\n   - Test subscription changes reflection\n   - Verify authentication sharing/JWT handling\n4. Implement health checks and monitoring\n5. Create backup and recovery procedures\n6. Perform security testing:\n   - Vulnerability scanning\n   - Authentication security testing\n   - API security review\n7. Document deployment and maintenance procedures",
+      "testStrategy": "Perform end-to-end testing of the complete application flow. Test integration points with the main application. Verify deployment process to staging and production environments. Conduct security testing and vulnerability assessment. Test backup and recovery procedures. Verify monitoring and alerting functionality.",
+      "priority": "high",
+      "dependencies": [
+        1,
+        2,
         8,
         9,
-        10,
         11,
-        12,
-        13,
-        14
+        12
       ],
-      "priority": "high",
-      "details": "Set up Render project for hosting the application. Configure environment variables for production. Implement build optimization for production deployment. Set up continuous deployment from repository. Configure custom domain and SSL. Perform comprehensive testing of all features in the production environment. Set up monitoring and error tracking. Create documentation for maintenance and future development.",
-      "testStrategy": "Verify successful deployment to Render. Test all features in the production environment. Check performance metrics in production. Ensure proper SSL configuration and domain setup. Verify monitoring and error tracking are functioning."
+      "status": "pending",
+      "subtasks": []
     }
   ]
 }
