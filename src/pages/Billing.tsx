@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,33 +10,19 @@ import { toast } from "@/components/ui/sonner";
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import DashboardSidebar from '@/components/dashboard/DashboardSidebar';
 import { useSubscription } from '@/components/hooks/useSubscription';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 
-// Define a mapping from Price ID to a user-friendly plan name and its properties
-// This should ideally match the structure in Pricing.tsx or be sourced from a shared config
-// For now, we'll manually define a simplified version here.
-// IMPORTANT: Keep these Price IDs consistent with your Stripe setup and Pricing.tsx
+// Updated PLAN_DETAILS mapping with your actual Stripe price IDs
 const PLAN_DETAILS: { [key: string]: { name: string; monthlyPriceId: string; annualPriceId?: string; features: string[], priceDisplay: string } } = {
-  // Basic Plan
-  "price_1RNJhVP1sYOfvCvLsAvRxcqb": { name: "Basic", monthlyPriceId: "price_1RNJhVP1sYOfvCvLsAvRxcqb", annualPriceId: "price_1RNJqcP1sYOfvCvLEoaumdgs", priceDisplay: "$75/mo", features: ["Offline PWA or Mobile App", "PDF Reports"] },
-  "price_1RNJqcP1sYOfvCvLEoaumdgs": { name: "Basic (Annual)", monthlyPriceId: "price_1RNJhVP1sYOfvCvLsAvRxcqb", annualPriceId: "price_1RNJqcP1sYOfvCvLEoaumdgs", priceDisplay: "$765/yr", features: ["Offline PWA or Mobile App", "PDF Reports"] },
-  // Standard Plan
-  "price_1RNJrPP1sYOfvCvLdRBmGLrt": { name: "Standard", monthlyPriceId: "price_1RNJrPP1sYOfvCvLdRBmGLrt", annualPriceId: "price_1RNJrdP1sYOfvCvLmOcwLZes", priceDisplay: "$150/mo", features: ["Everything in Basic", "Audit Logs"] },
-  "price_1RNJrdP1sYOfvCvLmOcwLZes": { name: "Standard (Annual)", monthlyPriceId: "price_1RNJrPP1sYOfvCvLdRBmGLrt", annualPriceId: "price_1RNJrdP1sYOfvCvLmOcwLZes", priceDisplay: "$1530/yr", features: ["Everything in Basic", "Audit Logs"] },
-  // Professional Plan
-  "price_1RNJryP1sYOfvCvLSMsb5zqQ": { name: "Professional", monthlyPriceId: "price_1RNJryP1sYOfvCvLSMsb5zqQ", annualPriceId: "price_1RNJsAP1sYOfvCvL4sOrMFAT", priceDisplay: "$250/mo", features: ["Everything in Standard", "API Access"] },
-  "price_1RNJsAP1sYOfvCvL4sOrMFAT": { name: "Professional (Annual)", monthlyPriceId: "price_1RNJryP1sYOfvCvLSMsb5zqQ", annualPriceId: "price_1RNJsAP1sYOfvCvL4sOrMFAT", priceDisplay: "$2550/yr", features: ["Everything in Standard", "API Access"] },
-  // Enterprise (has a Price ID for contact, but not typical self-serve)
-  "price_1RNJsvP1sYOfvCvLpPjx4t8n": { name: "Enterprise", monthlyPriceId: "price_1RNJsvP1sYOfvCvLpPjx4t8n", priceDisplay: "Custom", features: ["Everything in Professional", "SSO/LDAP"] },
+  "price_1RSqV400HE2ZS1pmK1uKuTCe": { name: "Pilot 90", monthlyPriceId: "price_1RSqV400HE2ZS1pmK1uKuTCe", priceDisplay: "Free", features: ["Up to 100 assets", "1 Admin + 1 Inspector"] },
+  "price_1RSqVe00HE2ZS1pmDEo9KWsH": { name: "Essential", monthlyPriceId: "price_1RSqVe00HE2ZS1pmDEo9KWsH", annualPriceId: "price_1RSqW500HE2ZS1pmn2qPRJ16", priceDisplay: "$39/mo", features: ["Up to 300 assets", "1 Admin + 2 Inspectors"] },
+  "price_1RSqW500HE2ZS1pmn2qPRJ16": { name: "Essential (Annual)", monthlyPriceId: "price_1RSqVe00HE2ZS1pmDEo9KWsH", annualPriceId: "price_1RSqW500HE2ZS1pmn2qPRJ16", priceDisplay: "$399/yr", features: ["Up to 300 assets", "1 Admin + 2 Inspectors"] },
+  "price_1RSqWZ00HE2ZS1pmcp0iWhqg": { name: "Pro", monthlyPriceId: "price_1RSqWZ00HE2ZS1pmcp0iWhqg", annualPriceId: "price_1RSqWs00HE2ZS1pmkDdtxYdV", priceDisplay: "$99/mo", features: ["Up to 1,500 assets", "3 Admins + 5 Inspectors"] },
+  "price_1RSqWs00HE2ZS1pmkDdtxYdV": { name: "Pro (Annual)", monthlyPriceId: "price_1RSqWZ00HE2ZS1pmcp0iWhqg", annualPriceId: "price_1RSqWs00HE2ZS1pmkDdtxYdV", priceDisplay: "$999/yr", features: ["Up to 1,500 assets", "3 Admins + 5 Inspectors"] },
+  "price_1RSqXb00HE2ZS1pmNY4PlTA5": { name: "Contractor", monthlyPriceId: "price_1RSqXb00HE2ZS1pmNY4PlTA5", annualPriceId: "price_1RSqY000HE2ZS1pmKSzq7p3i", priceDisplay: "$279/mo", features: ["Unlimited assets", "Unlimited users"] },
+  "price_1RSqY000HE2ZS1pmKSzq7p3i": { name: "Contractor (Annual)", monthlyPriceId: "price_1RSqXb00HE2ZS1pmNY4PlTA5", annualPriceId: "price_1RSqY000HE2ZS1pmKSzq7p3i", priceDisplay: "$2,999/yr", features: ["Unlimited assets", "Unlimited users"] },
+  "price_1RSqYn00HE2ZS1pmrIORlH1Q": { name: "Enterprise", monthlyPriceId: "price_1RSqYn00HE2ZS1pmrIORlH1Q", priceDisplay: "Custom", features: ["Everything in Contractor", "SSO/LDAP"] },
 };
 
 const Billing = () => {
@@ -65,13 +52,6 @@ const Billing = () => {
       day: 'numeric'
     }) : "Not applicable",
   };
-  
-  const invoices = [
-    { id: "INV-001", date: "Apr 15, 2025", amount: "$200.00", status: "Paid" },
-    { id: "INV-002", date: "Mar 15, 2025", amount: "$200.00", status: "Paid" },
-    { id: "INV-003", date: "Feb 15, 2025", amount: "$50.00", status: "Paid" },
-    { id: "INV-004", date: "Jan 15, 2025", amount: "$50.00", status: "Paid" },
-  ];
 
   useEffect(() => {
     if (!isLoading && error) {
@@ -89,7 +69,6 @@ const Billing = () => {
       toast.success("Subscription successful!", {
         description: "Your subscription has been processed successfully."
       });
-      // Refresh subscription status
       checkSubscription();
     } else if (canceled === 'true') {
       toast.info("Subscription canceled", {
@@ -101,7 +80,7 @@ const Billing = () => {
   const handlePlanAction = async (priceId: string, planName?: string) => {
     setIsPlanChangeLoading(priceId);
     
-    if (priceId === "price_1RNJsvP1sYOfvCvLpPjx4t8n") {
+    if (priceId === "price_1RSqYn00HE2ZS1pmrIORlH1Q") {
       window.location.href = "mailto:sales@firegauge.app?subject=Enterprise%20Plan%20Inquiry";
       setIsPlanChangeLoading(null);
       return;
@@ -128,7 +107,6 @@ const Billing = () => {
     }
   };
 
-  // Check if user is authenticated
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -136,7 +114,6 @@ const Billing = () => {
       const { data } = await supabase.auth.getSession();
       setIsAuthenticated(!!data.session);
       
-      // Only check subscription if the user is authenticated
       if (data.session) {
         checkSubscription();
       }
@@ -174,7 +151,7 @@ const Billing = () => {
                   <CardFooter>
                     <Button 
                       className="w-full bg-firegauge-red hover:bg-firegauge-red/90" 
-                      onClick={() => window.location.href = '/login'}
+                      onClick={() => window.location.href = '/auth'}
                     >
                       Sign In
                     </Button>
@@ -217,12 +194,11 @@ const Billing = () => {
               <Tabs defaultValue="overview" className="w-full">
                 <TabsList className="mb-6">
                   <TabsTrigger value="overview">Subscription Overview</TabsTrigger>
-                  <TabsTrigger value="payment">Payment Methods</TabsTrigger>
-                  <TabsTrigger value="history">Billing History</TabsTrigger>
+                  <TabsTrigger value="plans">Change Plan</TabsTrigger>
+                  <TabsTrigger value="payment">Payment & Billing</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="overview" className="space-y-6">
-                  {/* Current Plan */}
                   <Card className={`border-2 ${subscribed ? 'border-firegauge-accent' : 'border-gray-300'}`}>
                     <CardHeader>
                       <div className="flex justify-between items-center">
@@ -241,10 +217,6 @@ const Billing = () => {
                           <div className="text-right">
                             <div className="text-3xl font-bold">
                               {currentPlan.price}
-                              <span className="text-sm font-normal text-gray-500">/month</span>
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              {currentPlan.name === "Growth" ? "During In-Season" : "Not applicable"}
                             </div>
                           </div>
                         )}
@@ -252,21 +224,11 @@ const Billing = () => {
                     </CardHeader>
                     <CardContent>
                       {subscribed ? (
-                        <div className="grid gap-6 md:grid-cols-3">
+                        <div className="grid gap-6 md:grid-cols-2">
                           <div className="space-y-1">
-                            <div className="text-sm text-gray-500">Stations</div>
+                            <div className="text-sm text-gray-500">Plan Features</div>
                             <div className="font-medium">
-                              {activePlanDetails?.features.length === 2 ? "1-5 stations" :
-                               activePlanDetails?.features.length === 5 ? "6-15 stations" :
-                               activePlanDetails?.features.length === 6 ? "16+ stations" : "N/A"}
-                            </div>
-                          </div>
-                          <div className="space-y-1">
-                            <div className="text-sm text-gray-500">Team Members</div>
-                            <div className="font-medium">
-                              {activePlanDetails?.features.length === 2 ? "2 members" :
-                               activePlanDetails?.features.length === 5 ? "5 members" :
-                               activePlanDetails?.features.length === 6 ? "Unlimited" : "N/A"}
+                              {activePlanDetails?.features.join(", ") || "See plan details"}
                             </div>
                           </div>
                           <div className="space-y-1">
@@ -280,103 +242,31 @@ const Billing = () => {
                             <AlertCircle className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                             <h3 className="text-lg font-medium mb-2">No Active Subscription</h3>
                             <p className="text-gray-500 mb-6">
-                              Select a plan below to subscribe and access all features.
+                              Select a plan to get started with FireGauge.
                             </p>
-                          </div>
-                        </div>
-                      )}
-                      
-                      {subscribed && (
-                        <div className="mt-6 pt-6 border-t">
-                          <div className="flex justify-between items-center">
-                            <div className="space-y-1">
-                              <div className="font-medium">Season-Smart Pricing</div>
-                              <div className="text-sm text-gray-500 flex items-center">
-                                <Calendar className="h-4 w-4 mr-1" />
-                                Automatically adjusts between seasons
-                              </div>
-                            </div>
-                            <div>
-                              <div className="flex items-center space-x-2">
-                                <div className={`px-3 py-1 rounded text-sm ${activePlanDetails?.annualPriceId === subscription_tier ? 'bg-firegauge-red/10 text-firegauge-red' : 'bg-gray-100'}`}>
-                                  {activePlanDetails?.name} Plan
-                                </div>
-                              </div>
-                            </div>
                           </div>
                         </div>
                       )}
                     </CardContent>
                     <CardFooter className="flex justify-between">
                       {subscribed ? (
-                        <>
-                          <Button 
-                            className="bg-firegauge-charcoal hover:bg-firegauge-charcoal/90"
-                            onClick={handleManageSubscription}
-                          >
-                            Manage Subscription (Portal)
-                          </Button>
-                        </>
+                        <Button 
+                          className="bg-firegauge-charcoal hover:bg-firegauge-charcoal/90"
+                          onClick={handleManageSubscription}
+                        >
+                          Manage in Stripe Portal
+                        </Button>
                       ) : (
                         <Button 
                           className="bg-firegauge-red hover:bg-firegauge-red/90 w-full"
                           onClick={() => window.location.href = '/pricing'}
                         >
-                          Subscribe Now
+                          Choose a Plan
                         </Button>
                       )}
                     </CardFooter>
                   </Card>
                   
-                  {/* Plan comparison */}
-                  {!subscribed && (
-                    <div className="mt-8">
-                      <h3 className="text-xl font-semibold mb-4 text-center">Choose Your Plan</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {[
-                          { name: "Basic", monthlyPriceId: "price_1RNJhVP1sYOfvCvLsAvRxcqb", priceDisplay: "$75/mo", features: ["Up to 75 hoses", "PDF Reports"] },
-                          { name: "Standard", monthlyPriceId: "price_1RNJrPP1sYOfvCvLdRBmGLrt", priceDisplay: "$150/mo", features: ["Up to 500 hoses", "Audit Logs"], recommended: true },
-                          { name: "Professional", monthlyPriceId: "price_1RNJryP1sYOfvCvLSMsb5zqQ", priceDisplay: "$250/mo", features: ["Up to 2000 hoses", "API Access"] },
-                        ].map((plan) => (
-                          <Card key={plan.name} className={`flex flex-col ${plan.recommended ? 'border-2 border-firegauge-accent shadow-lg' : 'border'}`}>
-                            {plan.recommended && (
-                                <div className="bg-firegauge-accent text-white text-center py-1 font-medium text-sm">
-                                RECOMMENDED
-                                </div>
-                            )}
-                            <CardHeader>
-                              <CardTitle>{plan.name}</CardTitle>
-                              <div className="mt-2">
-                                <span className="text-3xl font-bold">{plan.priceDisplay.split('/')[0]}</span>
-                                <span className="text-base font-normal text-gray-500">/mo</span>
-                              </div>
-                            </CardHeader>
-                            <CardContent className="flex-grow">
-                              <ul className="space-y-1">
-                                {plan.features.map((feature, i) => (
-                                  <li key={i} className="flex items-start text-sm">
-                                    <Check className="h-4 w-4 text-firegauge-red mr-2 mt-0.5 flex-shrink-0" />
-                                    {feature}
-                                  </li>
-                                ))}
-                              </ul>
-                            </CardContent>
-                            <CardFooter>
-                              <Button 
-                                className={`w-full ${plan.recommended ? 'bg-firegauge-red hover:bg-firegauge-red/90' : 'bg-firegauge-charcoal hover:bg-firegauge-charcoal/90'}`}
-                                onClick={() => handlePlanAction(plan.monthlyPriceId, plan.name)}
-                                disabled={isPlanChangeLoading === plan.monthlyPriceId}
-                              >
-                                {isPlanChangeLoading === plan.monthlyPriceId ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : `Choose ${plan.name}`}
-                              </Button>
-                            </CardFooter>
-                          </Card>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Plan Features */}
                   {subscribed && activePlanDetails && (
                     <Card>
                       <CardHeader>
@@ -386,18 +276,7 @@ const Billing = () => {
                         <div className="grid gap-4 md:grid-cols-2">
                           {activePlanDetails.features.map((feature, i) => (
                             <div key={i} className="flex items-center">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5 text-firegauge-red mr-2"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
+                              <Check className="h-5 w-5 text-firegauge-red mr-2" />
                               <span>{feature}</span>
                             </div>
                           ))}
@@ -407,45 +286,69 @@ const Billing = () => {
                   )}
                 </TabsContent>
                 
-                <TabsContent value="payment" className="space-y-6">
+                <TabsContent value="plans" className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {[
+                      { name: "Essential", monthlyPriceId: "price_1RSqVe00HE2ZS1pmDEo9KWsH", priceDisplay: "$39/mo", features: ["Up to 300 assets", "1 Admin + 2 Inspectors"] },
+                      { name: "Pro", monthlyPriceId: "price_1RSqWZ00HE2ZS1pmcp0iWhqg", priceDisplay: "$99/mo", features: ["Up to 1,500 assets", "3 Admins + 5 Inspectors"], recommended: true },
+                      { name: "Contractor", monthlyPriceId: "price_1RSqXb00HE2ZS1pmNY4PlTA5", priceDisplay: "$279/mo", features: ["Unlimited assets", "Unlimited users"] },
+                    ].map((plan) => (
+                      <Card key={plan.name} className={`flex flex-col ${plan.recommended ? 'border-2 border-firegauge-accent shadow-lg' : 'border'}`}>
+                        {plan.recommended && (
+                            <div className="bg-firegauge-accent text-white text-center py-1 font-medium text-sm">
+                            RECOMMENDED
+                            </div>
+                        )}
+                        <CardHeader>
+                          <CardTitle>{plan.name}</CardTitle>
+                          <div className="mt-2">
+                            <span className="text-3xl font-bold">{plan.priceDisplay.split('/')[0]}</span>
+                            <span className="text-base font-normal text-gray-500">/mo</span>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="flex-grow">
+                          <ul className="space-y-1">
+                            {plan.features.map((feature, i) => (
+                              <li key={i} className="flex items-start text-sm">
+                                <Check className="h-4 w-4 text-firegauge-red mr-2 mt-0.5 flex-shrink-0" />
+                                {feature}
+                              </li>
+                            ))}
+                          </ul>
+                        </CardContent>
+                        <CardFooter>
+                          <Button 
+                            className={`w-full ${plan.recommended ? 'bg-firegauge-red hover:bg-firegauge-red/90' : 'bg-firegauge-charcoal hover:bg-firegauge-charcoal/90'}`}
+                            onClick={() => handlePlanAction(plan.monthlyPriceId, plan.name)}
+                            disabled={isPlanChangeLoading === plan.monthlyPriceId}
+                          >
+                            {isPlanChangeLoading === plan.monthlyPriceId ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : `Choose ${plan.name}`}
+                          </Button>
+                        </CardFooter>
+                      </Card>
+                    ))}
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="payment">
                   <Card>
                     <CardHeader>
-                      <CardTitle>Payment Methods</CardTitle>
+                      <CardTitle>Payment Methods & Billing</CardTitle>
                       <CardDescription>
-                        Manage your payment methods and billing preferences
+                        Manage your payment methods and billing information through Stripe
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
                       {subscribed ? (
                         <div className="space-y-4">
-                          <div className="border rounded-lg p-4 flex justify-between items-center">
-                            <div className="flex items-center">
-                              <div className="w-10 h-6 bg-blue-600 rounded mr-3 flex items-center justify-center text-white font-bold text-xs">
-                                VISA
-                              </div>
-                              <div>
-                                <p className="font-medium">Visa ending in 4242</p>
-                                <p className="text-sm text-gray-500">Expires 12/2025</p>
-                              </div>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <Badge>Default</Badge>
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                onClick={handleManageSubscription}
-                              >
-                                Edit
-                              </Button>
-                            </div>
-                          </div>
-                          
+                          <p className="text-gray-600">
+                            Use the Stripe Customer Portal to update your payment methods, view invoices, and manage your billing information.
+                          </p>
                           <Button 
-                            className="mt-4"
-                            variant="outline"
+                            className="bg-firegauge-charcoal hover:bg-firegauge-charcoal/90"
                             onClick={handleManageSubscription}
                           >
-                            Manage Payment Methods
+                            Open Stripe Portal
                           </Button>
                         </div>
                       ) : (
@@ -460,94 +363,8 @@ const Billing = () => {
                               className="bg-firegauge-red hover:bg-firegauge-red/90"
                               onClick={() => window.location.href = '/pricing'}
                             >
-                              Subscribe Now
+                              Choose a Plan
                             </Button>
-                          </div>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                  
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Billing Information</CardTitle>
-                      <CardDescription>
-                        Your billing address for invoices
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      {subscribed ? (
-                        <div className="space-y-4">
-                          <div>
-                            <p className="font-medium">FireGauge Testing Co.</p>
-                            <p>123 Main Street, Suite 100</p>
-                            <p>San Francisco, CA 94103</p>
-                            <p>United States</p>
-                          </div>
-                          <Button
-                            variant="outline"
-                            onClick={handleManageSubscription}
-                          >
-                            Edit Billing Information
-                          </Button>
-                        </div>
-                      ) : (
-                        <div className="flex items-center justify-center p-6">
-                          <div className="text-center">
-                            <AlertCircle className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                            <h3 className="text-lg font-medium mb-2">No Billing Information</h3>
-                            <p className="text-gray-500 mb-6">
-                              Subscribe to a plan to add billing information.
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-                
-                <TabsContent value="history">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Invoice History</CardTitle>
-                      <CardDescription>
-                        Your recent invoices and payment history
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      {subscribed ? (
-                        <div className="rounded-md border">
-                          <div className="grid grid-cols-5 font-medium p-4 border-b bg-gray-50">
-                            <div>Invoice</div>
-                            <div>Date</div>
-                            <div>Amount</div>
-                            <div>Status</div>
-                            <div className="text-right">Actions</div>
-                          </div>
-                          {invoices.map((invoice, i) => (
-                            <div key={i} className="grid grid-cols-5 p-4 border-b last:border-0 items-center">
-                              <div>{invoice.id}</div>
-                              <div>{invoice.date}</div>
-                              <div>{invoice.amount}</div>
-                              <div>
-                                <Badge variant={invoice.status === "Paid" ? "secondary" : "default"}>
-                                  {invoice.status}
-                                </Badge>
-                              </div>
-                              <div className="text-right">
-                                <Button variant="ghost" size="sm">Download PDF</Button>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="flex items-center justify-center p-6">
-                          <div className="text-center">
-                            <AlertCircle className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                            <h3 className="text-lg font-medium mb-2">No Invoice History</h3>
-                            <p className="text-gray-500 mb-6">
-                              Subscribe to a plan to generate invoices.
-                            </p>
                           </div>
                         </div>
                       )}

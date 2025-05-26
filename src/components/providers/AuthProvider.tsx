@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../../integrations/supabase/client';
@@ -5,7 +6,6 @@ import {
   onAuthStateChange,
   signInTenant,
   signUpTenant,
-  // Assuming these are the correct type names from your auth.ts
   type SignInTenantCredentials,
   type SignUpTenantCredentials
 } from '../../integrations/supabase/auth';
@@ -14,10 +14,9 @@ import type { Database } from '../../types/supabase';
 interface AuthContextType {
   session: Session | null;
   user: User | null;
-  tenant: Database['public']['Tables']['tenant']['Row'] | null;
+  userProfile: Database['public']['Tables']['user']['Row'] | null;
   loading: boolean;
   error: Error | null;
-  // Add the new function signatures
   signInTenant: (credentials: SignInTenantCredentials) => Promise<{ session: Session | null; user: User | null; error: any }>;
   signUpTenant: (credentials: SignUpTenantCredentials) => Promise<{ user: User | null; tenant: Database['public']['Tables']['tenant']['Row'] | null; error: any }>;
   signOut: () => Promise<void>;
@@ -33,7 +32,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   console.log("AuthProvider: Initializing");
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
-  const [tenant, setTenant] = useState<Database['public']['Tables']['tenant']['Row'] | null>(null);
+  const [userProfile, setUserProfile] = useState<Database['public']['Tables']['user']['Row'] | null>(null);
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState<Error | null>(null);
 
@@ -51,21 +50,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setSession(initialSession);
         setUser(initialSession?.user ?? null);
         if (initialSession?.user) {
-          console.log("AuthProvider: getInitialSession - User found, about to call fetchTenantData for user:", initialSession.user.id);
-          await fetchTenantData(initialSession.user.id);
-          console.log("AuthProvider: getInitialSession - fetchTenantData completed or errored gracefully.");
+          console.log("AuthProvider: getInitialSession - User found, about to call fetchUserProfile for user:", initialSession.user.id);
+          await fetchUserProfile(initialSession.user.id);
         } else {
           console.log("AuthProvider: getInitialSession - No user found in initial session");
-          setTenant(null);
+          setUserProfile(null);
         }
       } catch (e: any) {
         console.error("AuthProvider: ERROR in getInitialSession", e);
         setAuthError(e instanceof Error ? e : new Error(String(e)));
         setUser(null);
         setSession(null);
-        setTenant(null);
+        setUserProfile(null);
       } finally {
-        console.log("AuthProvider: getInitialSession finally block. Current user state:", user, "session:", session, "loading: false");
+        console.log("AuthProvider: getInitialSession finally block");
         setLoading(false);
       }
     };
@@ -80,18 +78,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
         if (currentSession?.user) {
-          console.log("AuthProvider: onAuthStateChange - User found, about to call fetchTenantData for user:", currentSession.user.id);
-          await fetchTenantData(currentSession.user.id);
-          console.log("AuthProvider: onAuthStateChange - fetchTenantData completed or errored gracefully.");
+          console.log("AuthProvider: onAuthStateChange - User found, about to call fetchUserProfile for user:", currentSession.user.id);
+          await fetchUserProfile(currentSession.user.id);
         } else {
           console.log("AuthProvider: onAuthStateChange - No user in current session");
-          setTenant(null);
+          setUserProfile(null);
         }
       } catch (e: any) {
         console.error("AuthProvider: ERROR in onAuthStateChange handler", e);
         setAuthError(e instanceof Error ? e : new Error(String(e)));
       } finally {
-        console.log("AuthProvider: onAuthStateChange finally block. Event:", _event, "Current user state:", user, "session:", currentSession, "loading: false");
+        console.log("AuthProvider: onAuthStateChange finally block");
         setLoading(false);
       }
     });
@@ -102,36 +99,40 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
   }, []);
 
-  const fetchTenantData = async (authUserId: string) => {
-    console.log("AuthProvider: fetchTenantData called for authUserId:", authUserId);
+  const fetchUserProfile = async (authUserId: string) => {
+    console.log("AuthProvider: fetchUserProfile called for authUserId:", authUserId);
     if (!authUserId) {
-      console.log("AuthProvider: fetchTenantData - No authUserId provided, setting tenant to null");
-      setTenant(null);
-      console.log("AuthProvider: fetchTenantData finished (no authUserId).");
+      console.log("AuthProvider: fetchUserProfile - No authUserId provided, setting userProfile to null");
+      setUserProfile(null);
       return;
     }
     try {
       const { data, error: fetchError } = await supabase
-        .from('tenant')
-        .select('id, created_at, is_active, name, plan, stripe_customer_id, supabase_auth_user_id, updated_at') 
+        .from('user')
+        .select('*') 
         .eq('supabase_auth_user_id', authUserId)
-        .single<Database['public']['Tables']['tenant']['Row']>(); // Explicit type for single()
-      console.log("AuthProvider: fetchTenantData - Supabase response:", { data, fetchError });
-
-      if (fetchError) throw fetchError;
+        .maybeSingle();
       
-      setTenant(data || null); // data is now typed as TenantRow | null
-      console.log("AuthProvider: fetchTenantData - Tenant set to:", data);
+      console.log("AuthProvider: fetchUserProfile - Supabase response:", { data, fetchError });
+
+      if (fetchError) {
+        console.error('AuthProvider: ERROR fetching user profile:', fetchError);
+        setAuthError(fetchError);
+        setUserProfile(null);
+        return;
+      }
+      
+      setUserProfile(data);
+      console.log("AuthProvider: fetchUserProfile - User profile set to:", data);
     } catch (e: any) {
-      console.error('AuthProvider: ERROR fetching tenant data:', e.message, e);
+      console.error('AuthProvider: ERROR fetching user profile:', e);
       setAuthError(e instanceof Error ? e : new Error(String(e)));
-      setTenant(null);
+      setUserProfile(null);
     }
-    console.log("AuthProvider: fetchTenantData finished (after try-catch).");
   };
 
   const handleSignInTenant = async (credentials: SignInTenantCredentials) => {
-    console.log("AuthProvider: handleSignInTenant called with credentials:", credentials.email);
+    console.log("AuthProvider: handleSignInTenant called");
     setLoading(true);
     setAuthError(null);
     try {
@@ -144,13 +145,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setAuthError(e instanceof Error ? e : new Error(String(e)));
       return { session: null, user: null, error: e };
     } finally {
-      console.log("AuthProvider: handleSignInTenant finally block. loading: false");
       setLoading(false); 
     }
   };
 
   const handleSignUpTenant = async (credentials: SignUpTenantCredentials) => {
-    console.log("AuthProvider: handleSignUpTenant called with credentials:", credentials.email);
+    console.log("AuthProvider: handleSignUpTenant called");
     setLoading(true);
     setAuthError(null);
     try {
@@ -163,7 +163,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setAuthError(e instanceof Error ? e : new Error(String(e)));
       return { user: null, tenant: null, error: e }; 
     } finally {
-      console.log("AuthProvider: handleSignUpTenant finally block. loading: false");
       setLoading(false);
     }
   };
@@ -177,19 +176,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.log("AuthProvider: handleSignOut - signOut result:", { signOutError });
       if (signOutError) throw signOutError;
     } catch (e: any) {
-      console.error('AuthProvider: ERROR signing out:', e.message, e);
+      console.error('AuthProvider: ERROR signing out:', e);
       setAuthError(e instanceof Error ? e : new Error(String(e)));
     } finally {
-      console.log("AuthProvider: handleSignOut finally block. loading: false");
       setLoading(false);
     }
   };
 
-  console.log("AuthProvider: value being provided to context:", { session, user, tenant, loading, authError });
   const value = {
     session,
     user,
-    tenant,
+    userProfile,
     loading,
     error: authError,
     signInTenant: handleSignInTenant, 
@@ -202,7 +199,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  // console.log("useAuth: context is:", context); // Too noisy, enable if specific debugging needed
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }

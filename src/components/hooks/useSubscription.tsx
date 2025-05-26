@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "../../integrations/supabase/client";
 import { toast } from "../ui/sonner";
@@ -23,8 +24,6 @@ export const useSubscription = () => {
   });
   const [isCheckingInternal, setIsCheckingInternal] = useState(false);
 
-  console.log("useSubscription: Initial state - user:", user, "authLoading:", authLoading, "current status:", status);
-
   const checkSubscription = async () => {
     if (isCheckingInternal) {
       console.log("useSubscription: checkSubscription - Already checking, skipping.");
@@ -39,7 +38,7 @@ export const useSubscription = () => {
         subscription_tier: null,
         subscription_end: null,
         isLoading: false,
-        error: "User not authenticated for subscription check"
+        error: null
       });
       setIsCheckingInternal(false);
       return;
@@ -67,9 +66,9 @@ export const useSubscription = () => {
       
       console.log("useSubscription: checkSubscription - Success from function. Setting status with data:", data);
       setStatus({
-        subscribed: data.subscribed,
-        subscription_tier: data.subscription_tier,
-        subscription_end: data.subscription_end,
+        subscribed: data.subscribed || false,
+        subscription_tier: data.subscription_tier || data.plan_id || null,
+        subscription_end: data.subscription_end || data.current_period_end || null,
         isLoading: false,
         error: null,
       });
@@ -150,24 +149,23 @@ export const useSubscription = () => {
 
   useEffect(() => {
     console.log("useSubscription: useEffect triggered. User from useAuth:", user, "AuthLoading state:", authLoading);
-    if (!authLoading && user) {
-      console.log("useSubscription: useEffect - Auth is loaded and user exists. Calling checkSubscription.");
-      checkSubscription();
-    } else if (!authLoading && !user) {
-      console.log("useSubscription: useEffect - Auth is loaded but NO user. Setting subscription status to not subscribed, loading false.");
-      setStatus({
-        subscribed: false,
-        subscription_tier: null,
-        subscription_end: null,
-        isLoading: false, 
-        error: "User not authenticated"
-      });
-    } else if (authLoading) {
-        console.log("useSubscription: useEffect - Auth is still loading. Waiting for auth to complete before checking subscription.");
+    if (!authLoading) {
+      if (user) {
+        console.log("useSubscription: useEffect - Auth is loaded and user exists. Calling checkSubscription.");
+        checkSubscription();
+      } else {
+        console.log("useSubscription: useEffect - Auth is loaded but NO user. Setting subscription status to not subscribed, loading false.");
+        setStatus({
+          subscribed: false,
+          subscription_tier: null,
+          subscription_end: null,
+          isLoading: false, 
+          error: null
+        });
+      }
     }
   }, [user, authLoading]);
 
-  console.log("useSubscription: Returning status and functions:", { ...status, checkSubscription, createCheckoutSession, openCustomerPortal });
   return {
     ...status,
     checkSubscription,

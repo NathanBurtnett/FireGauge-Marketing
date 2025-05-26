@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,7 +18,7 @@ interface PricingPlan {
   annualPrice?: string;
   description: string;
   userCount: string;
-  hoseCount?: string;
+  assetCount: string;
   coreModules: string;
   features: string[];
   ctaText: string;
@@ -31,15 +32,14 @@ const Pricing = () => {
   const [isLoading, setIsLoading] = useState<string | null>(null);
 
   const plans: PricingPlan[] = [
-    // ---------- FREE PILOT ----------
     {
       name: "Pilot 90",
       priceDisplay: "Free",
       priceAnnotation: "90-day trial",
-      monthlyPriceId: "price_pilot_placeholder",   // use a $0 price with 90-day trial in Stripe
+      monthlyPriceId: "price_1RSqV400HE2ZS1pmK1uKuTCe",
       description: "Run one full test season at no cost. Auto-reminds you 75 days in.",
       userCount: "1 Admin + 1 Inspector",
-      hoseCount: "Up to 100 assets",
+      assetCount: "Up to 100 assets",
       coreModules: "Hose Testing (NFPA-1962)",
       features: [
         "Offline PWA / Mobile App",
@@ -49,18 +49,16 @@ const Pricing = () => {
       ctaText: "Start Free Pilot",
       ctaNavPath: "/auth"
     },
-  
-    // ---------- ESSENTIAL ----------
     {
       name: "Essential",
       priceDisplay: "$39",
       priceAnnotation: "/mo",
-      monthlyPriceId: "price_essential_month",
-      annualPriceId: "price_essential_year",
+      monthlyPriceId: "price_1RSqVe00HE2ZS1pmDEo9KWsH",
+      annualPriceId: "price_1RSqW500HE2ZS1pmn2qPRJ16",
       annualPrice: "$399/yr (save 15%)",
       description: "Perfect for volunteer or single-station departments.",
       userCount: "1 Admin + 2 Inspectors",
-      hoseCount: "Up to 300 assets",
+      assetCount: "Up to 300 assets",
       coreModules: "Hose, Ladder add-on ready",
       features: [
         "Everything in Pilot",
@@ -71,18 +69,16 @@ const Pricing = () => {
       ctaText: "Choose Essential",
       ctaNavPath: "/auth"
     },
-  
-    // ---------- PRO ----------
     {
       name: "Pro",
       priceDisplay: "$99",
       priceAnnotation: "/mo",
-      monthlyPriceId: "price_pro_month",
-      annualPriceId: "price_pro_year",
+      monthlyPriceId: "price_1RSqWZ00HE2ZS1pmcp0iWhqg",
+      annualPriceId: "price_1RSqWs00HE2ZS1pmkDdtxYdV",
       annualPrice: "$999/yr (save 15%)",
       description: "For career departments that need bigger capacity & audit automation.",
       userCount: "3 Admins + 5 Inspectors",
-      hoseCount: "Up to 1,500 assets",
+      assetCount: "Up to 1,500 assets",
       coreModules: "Hose + Audit Logs + Reminders",
       features: [
         "Everything in Essential",
@@ -94,17 +90,16 @@ const Pricing = () => {
       ctaNavPath: "/auth",
       recommended: true
     },
-  
-    // ---------- CONTRACTOR ----------
     {
       name: "Contractor",
       priceDisplay: "$279",
       priceAnnotation: "/mo",
-      monthlyPriceId: "price_contractor_month",
-      annualPriceId: "price_contractor_year",
+      monthlyPriceId: "price_1RSqXb00HE2ZS1pmNY4PlTA5",
+      annualPriceId: "price_1RSqY000HE2ZS1pmKSzq7p3i",
       annualPrice: "$2,999/yr (save 10%)",
       description: "Unlimited assets & child departments—ideal for hose-testing vendors.",
       userCount: "Unlimited users",
+      assetCount: "Unlimited assets",
       coreModules: "All Pro features + White Label",
       features: [
         "Unlimited departments & assets",
@@ -115,15 +110,14 @@ const Pricing = () => {
       ctaText: "Get Contractor",
       ctaNavPath: "/auth"
     },
-  
-    // ---------- ENTERPRISE ----------
     {
       name: "Enterprise",
       priceDisplay: "Custom",
       priceAnnotation: "",
-      monthlyPriceId: "price_enterprise_placeholder",
+      monthlyPriceId: "price_1RSqYn00HE2ZS1pmrIORlH1Q",
       description: "County-wide or multi-station? Let's craft a custom solution.",
       userCount: "Unlimited users & assets",
+      assetCount: "Unlimited assets",
       coreModules: "All modules + custom SLAs",
       features: [
         "White-glove onboarding",
@@ -134,11 +128,6 @@ const Pricing = () => {
       ctaText: "Contact Sales",
       isEnterprise: true
     }
-  ];
-  
-  const addOns = [
-    { name: "Ladder Inspections Module", price: "+$50/mo per module", id: "price_1RNJtXP1sYOfvCvL8Ovg4wJG" },
-    { name: "Pump Testing Module", price: "+$50/mo per module", id: "price_1RNJtmP1sYOfvCvLgKCVp5vT" },
   ];
 
   const handleCtaClick = async (plan: PricingPlan) => {
@@ -214,13 +203,13 @@ const Pricing = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 items-stretch">
           {plans.map((plan, index) => (
             <div 
               key={index}
               className={`bg-white rounded-xl shadow-lg overflow-hidden flex flex-col transition-all duration-300 hover:shadow-xl ${
                 plan.recommended ? 'border-2 border-firegauge-accent relative transform md:scale-105' : 'border border-gray-200'
-              } ${plan.isEnterprise ? 'lg:col-span-1 md:col-span-2' : 'lg:col-span-1'}`}
+              }`}
             >
               {plan.recommended && (
                 <div className="bg-firegauge-accent text-white text-center py-1.5 font-semibold text-xs tracking-wider uppercase">
@@ -242,7 +231,7 @@ const Pricing = () => {
                 
                 <div className="mb-5 text-sm">
                   <p className="text-gray-700"><strong className="font-medium text-firegauge-charcoal">Users:</strong> {plan.userCount}</p>
-                  {plan.hoseCount && <p className="text-gray-700"><strong className="font-medium text-firegauge-charcoal">Hoses:</strong> {plan.hoseCount}</p>}
+                  <p className="text-gray-700"><strong className="font-medium text-firegauge-charcoal">Assets:</strong> {plan.assetCount}</p>
                   <p className="text-gray-700"><strong className="font-medium text-firegauge-charcoal">Core:</strong> {plan.coreModules}</p>
                 </div>
                 
@@ -273,25 +262,9 @@ const Pricing = () => {
             </div>
           ))}
         </div>
-
-        <div className="mt-16 pt-8 border-t border-gray-200">
-          <h3 className="text-2xl font-bold text-center mb-4 text-firegauge-charcoal">Optional Add-On Modules</h3>
-          <p className="text-center text-gray-600 mb-8 max-w-xl mx-auto">
-            Enhance your FireGauge experience with specialized modules. Add to any plan (Basic, Standard, Professional).
-          </p>
-          <div className="max-w-md mx-auto grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {addOns.map(addon => (
-              <div key={addon.name} className="bg-white p-6 rounded-lg shadow-md text-center">
-                <h4 className="text-lg font-semibold text-firegauge-charcoal mb-1">{addon.name}</h4>
-                <p className="text-firegauge-red font-bold">{addon.price}</p>
-              </div>
-            ))}
-          </div>
-        </div>
         
         <div className="text-center mt-12">
-            <p className="text-sm text-gray-600">* "Unlimited asset tracking" for Professional and Enterprise plans refers to assets beyond the specified hose counts, such as equipment, vehicles, or other testable items. Hose testing itself is subject to the listed hose counts for Basic, Standard, and Professional plans, or as defined in custom Enterprise agreements.</p>
-            <p className="text-sm text-gray-600 mt-1">** All paid plans (Basic, Standard, Professional) come with a 30-day free trial. Enterprise plan trials are subject to discussion.</p>
+            <p className="text-sm text-gray-600">All paid plans come with a 30-day free trial. Enterprise plan trials are subject to discussion.</p>
         </div>
 
       </div>

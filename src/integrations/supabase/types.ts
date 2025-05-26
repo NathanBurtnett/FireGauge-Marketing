@@ -9,6 +9,18 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      alembic_version: {
+        Row: {
+          version_num: string
+        }
+        Insert: {
+          version_num: string
+        }
+        Update: {
+          version_num?: string
+        }
+        Relationships: []
+      }
       equipment: {
         Row: {
           created_at: string
@@ -103,179 +115,76 @@ export type Database = {
         }
         Relationships: []
       }
-      invoices: {
-        Row: {
-          amount: number | null
-          created_at: string
-          currency: string | null
-          date: string
-          id: string
-          invoice_id: string | null
-          status: string | null
-          user_id: string | null
-        }
-        Insert: {
-          amount?: number | null
-          created_at?: string
-          currency?: string | null
-          date?: string
-          id?: string
-          invoice_id?: string | null
-          status?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          amount?: number | null
-          created_at?: string
-          currency?: string | null
-          date?: string
-          id?: string
-          invoice_id?: string | null
-          status?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
-      plan: {
-        Row: {
-          amount_cents: number
-          created_at: string
-          id: number
-          interval: Database["public"]["Enums"]["billing_interval"]
-          name: string
-          stripe_price_id: string
-          updated_at: string
-        }
-        Insert: {
-          amount_cents: number
-          created_at?: string
-          id?: number
-          interval: Database["public"]["Enums"]["billing_interval"]
-          name: string
-          stripe_price_id: string
-          updated_at?: string
-        }
-        Update: {
-          amount_cents?: number
-          created_at?: string
-          id?: number
-          interval?: Database["public"]["Enums"]["billing_interval"]
-          name?: string
-          stripe_price_id?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
       station: {
         Row: {
           created_at: string
           id: number
           name: string
+          share_token: string | null
+          share_token_expiry: string | null
           updated_at: string
         }
         Insert: {
           created_at?: string
           id?: number
           name: string
+          share_token?: string | null
+          share_token_expiry?: string | null
           updated_at?: string
         }
         Update: {
           created_at?: string
           id?: number
           name?: string
+          share_token?: string | null
+          share_token_expiry?: string | null
           updated_at?: string
         }
         Relationships: []
       }
-      subscribers: {
-        Row: {
-          created_at: string
-          email: string
-          id: string
-          season_status: string | null
-          stripe_customer_id: string | null
-          subscribed: boolean
-          subscription_end: string | null
-          subscription_tier: string | null
-          updated_at: string
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string
-          email: string
-          id?: string
-          season_status?: string | null
-          stripe_customer_id?: string | null
-          subscribed?: boolean
-          subscription_end?: string | null
-          subscription_tier?: string | null
-          updated_at?: string
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string
-          email?: string
-          id?: string
-          season_status?: string | null
-          stripe_customer_id?: string | null
-          subscribed?: boolean
-          subscription_end?: string | null
-          subscription_tier?: string | null
-          updated_at?: string
-          user_id?: string | null
-        }
-        Relationships: []
-      }
-      subscription: {
+      subscriptions: {
         Row: {
           cancel_at_period_end: boolean
-          canceled_at: string | null
           created_at: string
-          current_period_end: string | null
-          current_period_start: string | null
-          id: number
-          plan_id: number
-          status: Database["public"]["Enums"]["subscription_status_enum"]
+          current_period_end: string
+          current_period_start: string
+          id: string
+          status: string
+          stripe_customer_id: string
+          stripe_price_id: string
           stripe_subscription_id: string
           tenant_id: number
           updated_at: string
         }
         Insert: {
           cancel_at_period_end?: boolean
-          canceled_at?: string | null
           created_at?: string
-          current_period_end?: string | null
-          current_period_start?: string | null
-          id?: number
-          plan_id: number
-          status: Database["public"]["Enums"]["subscription_status_enum"]
+          current_period_end: string
+          current_period_start: string
+          id?: string
+          status: string
+          stripe_customer_id: string
+          stripe_price_id: string
           stripe_subscription_id: string
           tenant_id: number
           updated_at?: string
         }
         Update: {
           cancel_at_period_end?: boolean
-          canceled_at?: string | null
           created_at?: string
-          current_period_end?: string | null
-          current_period_start?: string | null
-          id?: number
-          plan_id?: number
-          status?: Database["public"]["Enums"]["subscription_status_enum"]
+          current_period_end?: string
+          current_period_start?: string
+          id?: string
+          status?: string
+          stripe_customer_id?: string
+          stripe_price_id?: string
           stripe_subscription_id?: string
           tenant_id?: number
           updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "subscription_plan_id_fkey"
-            columns: ["plan_id"]
-            isOneToOne: false
-            referencedRelation: "plan"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "subscription_tenant_id_fkey"
+            foreignKeyName: "subscriptions_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenant"
@@ -290,6 +199,8 @@ export type Database = {
           is_active: boolean
           name: string
           plan: string | null
+          stripe_customer_id: string | null
+          supabase_auth_user_id: string | null
           updated_at: string
         }
         Insert: {
@@ -298,6 +209,8 @@ export type Database = {
           is_active?: boolean
           name: string
           plan?: string | null
+          stripe_customer_id?: string | null
+          supabase_auth_user_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -306,6 +219,8 @@ export type Database = {
           is_active?: boolean
           name?: string
           plan?: string | null
+          stripe_customer_id?: string | null
+          supabase_auth_user_id?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -355,33 +270,33 @@ export type Database = {
       test_record: {
         Row: {
           created_at: string
-          data: Json | null
           equipment_id: number
           id: number
           notes: string | null
-          result: Database["public"]["Enums"]["test_result_enum"]
+          overall_result: Database["public"]["Enums"]["test_result_enum"]
+          results: Json | null
           test_date: string
           updated_at: string
           user_id: number
         }
         Insert: {
           created_at?: string
-          data?: Json | null
           equipment_id: number
           id?: number
           notes?: string | null
-          result: Database["public"]["Enums"]["test_result_enum"]
+          overall_result: Database["public"]["Enums"]["test_result_enum"]
+          results?: Json | null
           test_date: string
           updated_at?: string
           user_id: number
         }
         Update: {
           created_at?: string
-          data?: Json | null
           equipment_id?: number
           id?: number
           notes?: string | null
-          result?: Database["public"]["Enums"]["test_result_enum"]
+          overall_result?: Database["public"]["Enums"]["test_result_enum"]
+          results?: Json | null
           test_date?: string
           updated_at?: string
           user_id?: number
@@ -405,31 +320,34 @@ export type Database = {
       }
       user: {
         Row: {
-          auth_uid: string | null
           created_at: string
           id: number
-          password_hash: string
+          is_active: boolean
+          password_hash: string | null
           role: string
+          supabase_auth_user_id: string | null
           tenant_id: number
           updated_at: string
           username: string
         }
         Insert: {
-          auth_uid?: string | null
           created_at?: string
           id?: number
-          password_hash: string
+          is_active?: boolean
+          password_hash?: string | null
           role: string
+          supabase_auth_user_id?: string | null
           tenant_id: number
           updated_at?: string
           username: string
         }
         Update: {
-          auth_uid?: string | null
           created_at?: string
           id?: number
-          password_hash?: string
+          is_active?: boolean
+          password_hash?: string | null
           role?: string
+          supabase_auth_user_id?: string | null
           tenant_id?: number
           updated_at?: string
           username?: string
@@ -449,7 +367,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_super_admin: {
+        Args: Record<PropertyKey, never> | { user_uid: string }
+        Returns: boolean
+      }
     }
     Enums: {
       billing_interval: "monthly" | "annual"
