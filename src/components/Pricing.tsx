@@ -31,87 +31,111 @@ const Pricing = () => {
   const [isLoading, setIsLoading] = useState<string | null>(null);
 
   const plans: PricingPlan[] = [
+    // ---------- FREE PILOT ----------
     {
-      name: "Basic",
-      priceDisplay: "$75",
-      priceAnnotation: "/mo",
-      monthlyPriceId: "price_1RNJhVP1sYOfvCvLsAvRxcqb",
-      annualPriceId: "price_1RNJqcP1sYOfvCvLEoaumdgs",
-      annualPrice: "$765/yr (Save ≈15%)",
-      description: "Ideal for small departments or those new to digital testing.",
+      name: "Pilot 90",
+      priceDisplay: "Free",
+      priceAnnotation: "90-day trial",
+      monthlyPriceId: "price_pilot_placeholder",   // use a $0 price with 90-day trial in Stripe
+      description: "Run one full test season at no cost. Auto-reminds you 75 days in.",
       userCount: "1 Admin + 1 Inspector",
-      hoseCount: "≤ 75 hoses",
+      hoseCount: "Up to 100 assets",
       coreModules: "Hose Testing (NFPA-1962)",
       features: [
-        "Offline PWA or Mobile App",
-        "PDF Reports",
-        "Geo-time Stamps",
-        "Guided Pass/Fail Tests"
+        "Offline PWA / Mobile App",
+        "PDF export (1-yr archive)",
+        "Guided Pass/Fail flow"
       ],
-      ctaText: "Get Started",
-      ctaNavPath: "/auth",
+      ctaText: "Start Free Pilot",
+      ctaNavPath: "/auth"
     },
+  
+    // ---------- ESSENTIAL ----------
     {
-      name: "Standard",
-      priceDisplay: "$150",
+      name: "Essential",
+      priceDisplay: "$39",
       priceAnnotation: "/mo",
-      monthlyPriceId: "price_1RNJrPP1sYOfvCvLdRBmGLrt",
-      annualPriceId: "price_1RNJrdP1sYOfvCvLmOcwLZes",
-      annualPrice: "$1,530/yr (Save ≈15%)",
-      description: "Best for growing departments needing more capacity and features.",
-      userCount: "2 Admins + 5 Inspectors",
-      hoseCount: "Up to 500 hoses",
-      coreModules: "Hose Testing + Audit Logs + Reminders",
+      monthlyPriceId: "price_essential_month",
+      annualPriceId: "price_essential_year",
+      annualPrice: "$399/yr (save 15%)",
+      description: "Perfect for volunteer or single-station departments.",
+      userCount: "1 Admin + 2 Inspectors",
+      hoseCount: "Up to 300 assets",
+      coreModules: "Hose, Ladder add-on ready",
       features: [
-        "Everything in Basic",
-        "Audit Logs & Tamper-Proof Records",
-        "Automated Reminders",
-        "Basic Integrations"
+        "Everything in Pilot",
+        "5-yr PDF archive",
+        "CSV import/export",
+        "Email support + updates"
       ],
-      ctaText: "Sign Up Now",
-      ctaNavPath: "/auth",
-      recommended: true,
+      ctaText: "Choose Essential",
+      ctaNavPath: "/auth"
     },
+  
+    // ---------- PRO ----------
     {
-      name: "Professional",
-      priceDisplay: "$250",
+      name: "Pro",
+      priceDisplay: "$99",
       priceAnnotation: "/mo",
-      monthlyPriceId: "price_1RNJryP1sYOfvCvLSMsb5zqQ",
-      annualPriceId: "price_1RNJsAP1sYOfvCvL4sOrMFAT",
-      annualPrice: "$2,550/yr (Save ≈15%)",
-      description: "For established departments requiring advanced features and support.",
-      userCount: "3 Admins + 10 Inspectors",
-      hoseCount: "Up to 2,000 hoses",
-      coreModules: "All Standard Features + API Access",
+      monthlyPriceId: "price_pro_month",
+      annualPriceId: "price_pro_year",
+      annualPrice: "$999/yr (save 15%)",
+      description: "For career departments that need bigger capacity & audit automation.",
+      userCount: "3 Admins + 5 Inspectors",
+      hoseCount: "Up to 1,500 assets",
+      coreModules: "Hose + Audit Logs + Reminders",
       features: [
-        "Everything in Standard",
-        "Unlimited Asset Count (beyond hoses)",
-        "API Access",
-        "Priority Support"
+        "Everything in Essential",
+        "Automated ISO audit packet",
+        "Role-based permissions",
+        "Zapier / CSV integrations"
       ],
-      ctaText: "Choose Professional",
+      ctaText: "Upgrade to Pro",
       ctaNavPath: "/auth",
+      recommended: true
     },
+  
+    // ---------- CONTRACTOR ----------
+    {
+      name: "Contractor",
+      priceDisplay: "$279",
+      priceAnnotation: "/mo",
+      monthlyPriceId: "price_contractor_month",
+      annualPriceId: "price_contractor_year",
+      annualPrice: "$2,999/yr (save 10%)",
+      description: "Unlimited assets & child departments—ideal for hose-testing vendors.",
+      userCount: "Unlimited users",
+      coreModules: "All Pro features + White Label",
+      features: [
+        "Unlimited departments & assets",
+        "White-label PDF & portal",
+        "API access",
+        "Priority support (next-day)"
+      ],
+      ctaText: "Get Contractor",
+      ctaNavPath: "/auth"
+    },
+  
+    // ---------- ENTERPRISE ----------
     {
       name: "Enterprise",
       priceDisplay: "Custom",
-      priceAnnotation: "Tailored to your needs",
-      monthlyPriceId: "price_1RNJsvP1sYOfvCvLpPjx4t8n",
-      description: "For large organizations with unique requirements, advanced security, and dedicated support.",
-      userCount: "Unlimited Users & Assets",
-      coreModules: "All Modules + Custom Development",
+      priceAnnotation: "",
+      monthlyPriceId: "price_enterprise_placeholder",
+      description: "County-wide or multi-station? Let's craft a custom solution.",
+      userCount: "Unlimited users & assets",
+      coreModules: "All modules + custom SLAs",
       features: [
-        "Everything in Professional",
-        "White-glove onboarding & data migration",
-        "SSO/LDAP integration",
-        "Custom SLAs & dedicated support",
-        "Volume discounts & custom contract terms"
+        "White-glove onboarding",
+        "SSO / LDAP / SCIM",
+        "Dedicated CSM & phone support",
+        "Custom contract terms"
       ],
       ctaText: "Contact Sales",
-      isEnterprise: true,
-    },
+      isEnterprise: true
+    }
   ];
-
+  
   const addOns = [
     { name: "Ladder Inspections Module", price: "+$50/mo per module", id: "price_1RNJtXP1sYOfvCvL8Ovg4wJG" },
     { name: "Pump Testing Module", price: "+$50/mo per module", id: "price_1RNJtmP1sYOfvCvLgKCVp5vT" },

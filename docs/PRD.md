@@ -49,73 +49,50 @@ The FireGauge Marketing & Account Portal (`www.firegauge.app`) serves as the pri
     *   Ladder inspections: +$50/mo
     *   Pump testing: +$50/mo
 
-**2. Functional Requirements**
+**2. Target Users & Key Features**
 
-The marketing site will utilize Supabase for user authentication and Stripe for payment processing.
+| User Persona         | Core Needs                                                                 | Key Features in Marketing Site/Portal                                                                                                | Notes                                                                                                                               |
+|----------------------|----------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
+| **Prospective Dept.** | Understand FireGauge value, see pricing, start a trial/subscription.       | Clear product info, demo videos/screenshots, pricing table, prominent CTAs for signup/trial.                                           | Focus on benefits: ISO compliance, time savings, ease of use.                                                                       |
+| **Tenant Admin**     | Manage subscription, view billing history, manage users for their FireGauge tenant. | Authenticated portal with: Account overview, **Stripe Customer Portal integration for billing/subscription management**, **user management interface (invite, set roles for app.firegauge.app)**. | Secure login via Supabase. User roles set here will determine access within the main `app.firegauge.app`.                        |
+| **Individual User**  | Log into their account (if managing billing/users directly), access support. | Login, link to main app, support/FAQ access.                                                                                         | Most operational tasks happen in `app.firegauge.app`.                                                                               |
 
-**2.1. Public-Facing Pages (Pre-Login):**
+**3. Functional Scope**
 
-*   **Homepage (`/`):**
-    *   Compelling headline and sub-headline.
-    *   Clear overview of FireGauge and its key benefits (leveraging value propositions).
-    *   Visually appealing design with relevant imagery/graphics.
-    *   Prominent Call to Actions (CTAs) like "Sign Up Now" or "View Pricing."
-    *   Brief overview of features.
-    *   Testimonials or social proof (if available, placeholder for now).
-*   **Features Page (`/features` - *Optional, can be part of Homepage*):**
-    *   Detailed breakdown of each core feature and module (Hose, Ladder, Pump testing).
-    *   Use cases and benefits for each feature.
-*   **Pricing Page (`/pricing`):**
-    *   Clear presentation of all pricing tiers and add-on modules.
-    *   Feature comparison between tiers.
-    *   CTA for each plan (e.g., "Choose Basic," "Get Started with Standard").
-    *   FAQ section related to pricing and plans.
-*   **Auth Page (`/auth`):**
-    *   Sign-up form: Collect necessary user information (e.g., name, email, password, company name).
-    *   Login form.
-    *   Password reset functionality.
-    *   Links to Terms of Service and Privacy Policy.
+### 3.1. Public-Facing Site
+-   **Homepage:** Engaging hero section, value proposition, key features overview, social proof/testimonials (future), CTAs.
+-   **Features Pages:** Detailed explanations of core FireGauge functionalities (e.g., Equipment Testing, ISO Dashboard, Reporting).
+-   **Pricing Page:** Clear breakdown of plans (Freemium, Station, District, Metro, Enterprise), features per plan, monthly/annual options. Link to Stripe Checkout.
+-   **About Us/Contact:** Standard informational pages.
+-   **Blog/Resources (Future):** Articles on fire department compliance, ISO standards, product updates.
+-   **Sign-up Flow:**
+    1.  User selects plan on Pricing Page.
+    2.  Redirect to Stripe Checkout for the selected plan.
+    3.  On successful payment, Stripe webhook notifies our backend.
+    4.  Backend API (on `app.firegauge.app` or a dedicated service) creates the new `tenant` and initial `user` (with Admin role) in the main application database.
+    5.  User is redirected to `app.firegauge.app` to begin onboarding, or to the marketing site's authenticated portal.
 
-**2.2. Authenticated User Portal (Post-Login - `www.firegauge.app`):**
+### 3.2. Authenticated User Portal (on `www.firegauge.app`)
+-   **Login/Registration:** Supabase Auth.
+-   **Dashboard Overview:** Simple summary (e.g., current plan, number of active users in `app.firegauge.app` - may require an API call).
+-   **Account Management:** Update profile information (name, email - synced with Supabase Auth).
+-   **Subscription & Billing Management:**
+    -   Display current plan, next billing date, cost.
+    -   **Integrate Stripe Customer Portal** for self-serve actions: update payment method, view invoices, change/cancel subscription.
+-   **User Management (for their Tenant):**
+    -   Invite new users to their tenant (email-based invites).
+    -   Assign/change roles for users within `app.firegauge.app` (e.g., Operator, Admin).
+    -   View list of users in their tenant, deactivate/remove users.
+    -   (This interacts with the main application's user table via API calls).
+-   **Help/Support Links:** Easy access to FAQs, documentation, contact support.
 
-*   **Dashboard (`/dashboard`):**
-    *   Welcome message.
-    *   High-level overview/summary:
-        *   Current subscription plan.
-        *   Quick stats (e.g., number of active stations, number of users). This may require API calls to the main application (`app.firegauge.app`) or a shared data layer in Supabase.
-    *   Navigation to other portal sections (Account, Billing, User Management).
-    *   Prominent link/button to "Go to App" (redirecting to `app.firegauge.app`).
-*   **Account Management (`/account`):**
-    *   View and update company profile information.
-    *   View and update personal profile information (name, email).
-    *   Change password.
-*   **Billing Management (`/billing`):**
-    *   Integration with Stripe customer portal or custom-built interface using Stripe API.
-    *   View current subscription plan and details.
-    *   Upgrade or downgrade subscription plan.
-    *   Update payment methods.
-    *   View billing history and download invoices.
-    *   Cancel subscription.
-*   **User Management (`/users` - *New Page*):**
-    *   (For Admin roles) View list of current users within their organization.
-    *   Invite new users (Operators and Admins) via email.
-    *   Assign/change user roles (Operator, Admin).
-    *   Deactivate/remove users.
-*   **Station Overview (`/stations` - *New Page, simplified*):**
-    *   (For Admin roles) View a list of their company's testing stations.
-    *   High-level status or summary for each station (e.g., last test date, number of assets). This data would likely come from the main app's database via Supabase.
-    *   *Note: Detailed station management and testing operations occur in `app.firegauge.app`.*
+### 3.3. Integration with Main Application (`app.firegauge.app`)
+-   **Signup:** Marketing site initiates user/tenant creation in the main app's database via a secure API call after successful Stripe payment.
+-   **Authentication:** Supabase Auth can be shared (using same Supabase project) or JWTs can be used for S2S communication if needed.
+-   **User Role Synchronization:** Roles assigned in the marketing portal dictate permissions within `app.firegauge.app`.
+-   Clear visual distinction and potentially subdomains (e.g., `www.firegauge.app` for marketing/portal, `app.firegauge.app` for the operational tool).
 
-**2.3. Integrations:**
-
-*   **Supabase:** For user authentication and potentially storing user/account data shared between the marketing site and the main app.
-*   **Stripe:** For all payment processing and subscription management.
-*   **Render:** Hosting platform.
-*   **(Future Considerations):**
-    *   Email Marketing Platform (e.g., Mailchimp, SendGrid) for transactional emails (welcome, password reset) and marketing communications.
-    *   Analytics (e.g., Google Analytics, Plausible) for tracking website traffic and user behavior.
-
-**3. Technical Requirements**
+**4. Technical Requirements**
 
 *   **Frontend Stack:** Vite, React, TypeScript, Tailwind CSS (as existing).
 *   **UI Components:** Leverage existing `src/components/ui/` (Shadcn/ui likely) and expand as needed.
@@ -126,7 +103,7 @@ The marketing site will utilize Supabase for user authentication and Stripe for 
 *   **Deployment:** Render.
 *   **API Communication:** Secure API endpoints for any interaction with the main `app.firegauge.app` backend (if direct data fetching is needed beyond what Supabase provides).
 
-**4. User Stories**
+**5. User Stories**
 
 *   **As a Fire Chief (Potential Customer), I want to quickly understand how FireGauge solves NFPA compliance and reduces inspection time, so I can assess if it's right for my department.**
 *   **As a Testing Contractor (Potential Customer), I want to see clear pricing and available features for different tiers, so I can choose the best plan for my business size and needs.**
@@ -138,7 +115,7 @@ The marketing site will utilize Supabase for user authentication and Stripe for 
 *   **As a Subscribed Admin, I want to easily upgrade or change my subscription plan as my team or needs grow.**
 *   **As any user, I want to be able to reset my password if I forget it.**
 
-**5. Non-Functional Requirements**
+**6. Non-Functional Requirements**
 
 *   **Branding & Design:**
     *   **Goal:** Modern, professional, trustworthy, and easy-to-use.
@@ -166,7 +143,7 @@ The marketing site will utilize Supabase for user authentication and Stripe for 
     *   Protection against common web vulnerabilities (OWASP Top 10).
 *   **Content Management:** Initially, content will be managed via code. A headless CMS could be considered later if frequent content updates by non-technical users are required.
 
-**6. Success Metrics**
+**7. Success Metrics**
 
 *   **Primary:**
     *   Sign-up conversion rate (visitors who complete sign-up).
