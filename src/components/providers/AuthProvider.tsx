@@ -38,12 +38,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     console.log("AuthProvider: useEffect for getInitialSession and onAuthStateChange triggered");
+    const withTimeout = <T,>(promise: Promise<T>, ms: number): Promise<T> => {
+      return Promise.race([
+        promise,
+        new Promise<T>((_, reject) =>
+          setTimeout(() => reject(new Error('Request timed out')), ms)
+        ),
+      ]);
+    };
+
     const getInitialSession = async () => {
       console.log("AuthProvider: getInitialSession started");
       setLoading(true);
       setAuthError(null);
       try {
-        const { data: { session: initialSession }, error: sessionError } = await supabase.auth.getSession();
+        const { data: { session: initialSession }, error: sessionError } = await withTimeout(
+          supabase.auth.getSession(),
+          10000
+        );
         console.log("AuthProvider: getInitialSession - supabase.auth.getSession returned", { initialSession, sessionError });
         if (sessionError) throw sessionError;
 
