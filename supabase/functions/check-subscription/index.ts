@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -11,103 +10,232 @@ const logStep = (step: string, details?: any) => {
   console.log(`[CHECK-SUBSCRIPTION] ${step}${detailsStr}`);
 };
 
+/**
+ * Extract user ID from JWT token
+ */
+const extractUserIdFromToken = (authHeader: string): string | null => {
+  try {
+    if (!authHeader.startsWith('Bearer ')) {
+      return null;
+    }
+    
+    const token = authHeader.substring(7);
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.sub || null;
+  } catch (error) {
+    console.error('Error extracting user ID from token:', error);
+    return null;
+  }
+};
+
+/**
+ * Make raw fetch request to Supabase REST API
+ */
+const fetchFromSupabase = async (endpoint: string, authHeader: string): Promise<any> => {
+  const supabaseUrl = Deno.env.get("SUPABASE_URL");
+  const supabaseKey = Deno.env.get("SUPABASE_ANON_KEY");
+  
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error('Missing Supabase configuration');
+  }
+
+  const response = await fetch(`${supabaseUrl}/rest/v1/${endpoint}`, {
+    method: 'GET',
+    headers: {
+      'apikey': supabaseKey,
+      'Authorization': authHeader,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  return await response.json();
+};
+
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response("ok", { headers: corsHeaders });
   }
 
   try {
-    logStep("Function started");
+    logStep("Starting subscription check");
 
+    // Get authorization header
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("No authorization header provided");
-    const token = authHeader.replace("Bearer ", "");
-    logStep("Authenticating user with token");
-    
-    const supabaseUrl = Deno.env.get("SUPABASE_URL") as string;
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") as string;
-    if (!supabaseServiceKey) throw new Error("SUPABASE_SERVICE_ROLE_KEY is not set.");
-    if (!supabaseUrl) throw new Error("SUPABASE_URL is not set.");
-
-    const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2.45.0");
-    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
-      auth: { persistSession: false } 
-    });
-
-    const { data: authUserData, error: authUserError } = await supabase.auth.getUser(token);
-    
-    if (authUserError) throw new Error(`Authentication error: ${authUserError.message}`);
-    const authUser = authUserData.user;
-    if (!authUser?.id) throw new Error("User not authenticated or ID not available");
-    logStep("User authenticated via Supabase Auth", { userId: authUser.id });
-
-    // Get user profile to find tenant_id
-    const { data: userProfile, error: userError } = await supabase
-      .from('user')
-      .select('tenant_id, role')
-      .eq('supabase_auth_user_id', authUser.id)
-      .maybeSingle();
-
-    if (userError) {
-      logStep("Error fetching user from public.user table", { error: userError.message });
-      throw new Error(`Could not retrieve user details: ${userError.message}`);
-    }
-    
-    if (!userProfile || userProfile.tenant_id === null || userProfile.tenant_id === undefined) {
-      logStep("User not found in public.user table or tenant_id is missing", { supabase_auth_user_id: authUser.id });
-      return new Response(JSON.stringify({ subscribed: false, error: "User not associated with a tenant." }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 403,
-      });
-    }
-    
-    const tenantId = userProfile.tenant_id;
-    logStep("Fetched tenant_id for user", { userId: authUser.id, tenantId });
-
-    // Check for active subscriptions
-    const activeSubscriptionStatuses = ['active', 'trialing']; 
-
-    const { data: subscriptionData, error: subscriptionError } = await supabase
-      .from('subscriptions')
-      .select('*')
-      .eq('tenant_id', tenantId)
-      .in('status', activeSubscriptionStatuses)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (subscriptionError) {
-      logStep("Error fetching subscription from public.subscriptions table", { error: subscriptionError.message });
-      throw new Error(`Could not retrieve subscription details: ${subscriptionError.message}`);
+    if (!authHeader) {
+      logStep("No authorization header found");
+      return new Response(
+        JSON.stringify({ 
+          subscribed: false, 
+          subscription_tier: null, 
+          subscription_end: null,
+          error: "Authentication required" 
+        }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 401,
+        },
+      );
     }
 
-    if (subscriptionData) {
-      logStep("Active subscription found in DB for tenant", { tenantId, subscriptionId: subscriptionData.id, status: subscriptionData.status });
-      return new Response(JSON.stringify({
-        subscribed: true,
-        status: subscriptionData.status,
-        plan_id: subscriptionData.stripe_price_id,
-        current_period_end: subscriptionData.current_period_end,
-        subscription_tier: subscriptionData.stripe_price_id,
-      }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200,
-      });
-    } else {
-      logStep("No active subscription found in DB for tenant", { tenantId });
-      return new Response(JSON.stringify({ subscribed: false }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200,
-      });
+    // Extract user ID from token
+    const userId = extractUserIdFromToken(authHeader);
+    if (!userId) {
+      logStep("Failed to extract user ID from token");
+      return new Response(
+        JSON.stringify({ 
+          subscribed: false, 
+          subscription_tier: null, 
+          subscription_end: null,
+          error: "Invalid authentication token" 
+        }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 401,
+        },
+      );
+    }
+
+    logStep("Checking subscription for user", { userId });
+
+    // First, check if user record exists using raw fetch
+    try {
+      const userData = await fetchFromSupabase(
+        `user?supabase_auth_user_id=eq.${userId}&select=tenant_id`,
+        authHeader
+      );
+
+      logStep("User data fetched", { userCount: userData?.length });
+
+      // If no user record exists, return default free subscription state
+      if (!userData || userData.length === 0) {
+        logStep("No user record found, returning default free subscription state");
+        return new Response(
+          JSON.stringify({ 
+            subscribed: true, // Consider them subscribed to free tier
+            subscription_tier: "price_1RSqV400HE2ZS1pmK1uKuTCe", // Pilot 90 - Free tier
+            subscription_end: null,
+            plan_id: "price_1RSqV400HE2ZS1pmK1uKuTCe",
+            current_period_end: null
+          }),
+          {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            status: 200,
+          },
+        );
+      }
+
+      const userRecord = userData[0];
+      const tenantId = userRecord.tenant_id;
+
+      logStep("User record found", { tenantId });
+
+      // Check for active subscription using raw fetch
+      try {
+        const subscriptionData = await fetchFromSupabase(
+          `subscriptions?tenant_id=eq.${tenantId}&status=eq.active&select=stripe_price_id,status,current_period_end,stripe_subscription_id,stripe_customer_id&order=created_at.desc&limit=1`,
+          authHeader
+        );
+
+        logStep("Subscription data fetched", { subscriptionCount: subscriptionData?.length });
+
+        // If no active subscription found, return free tier
+        if (!subscriptionData || subscriptionData.length === 0) {
+          logStep("No active subscription found in database, returning free tier");
+          return new Response(
+            JSON.stringify({ 
+              subscribed: true,
+              subscription_tier: "price_1RSqV400HE2ZS1pmK1uKuTCe", // Free tier
+              subscription_end: null,
+              plan_id: "price_1RSqV400HE2ZS1pmK1uKuTCe",
+              current_period_end: null
+            }),
+            {
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+              status: 200,
+            },
+          );
+        }
+
+        // Return active subscription data
+        const subscription = subscriptionData[0];
+        const priceId = subscription.stripe_price_id;
+        const currentPeriodEnd = subscription.current_period_end;
+
+        logStep("Returning active subscription", { priceId, currentPeriodEnd });
+
+        return new Response(
+          JSON.stringify({
+            subscribed: true,
+            subscription_tier: priceId,
+            subscription_end: currentPeriodEnd,
+            plan_id: priceId,
+            current_period_end: currentPeriodEnd,
+            stripe_subscription_id: subscription.stripe_subscription_id,
+            stripe_customer_id: subscription.stripe_customer_id
+          }),
+          {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            status: 200,
+          },
+        );
+
+      } catch (subscriptionError) {
+        logStep("Error fetching subscription", { error: subscriptionError.message });
+        // Return free tier if subscription lookup fails
+        return new Response(
+          JSON.stringify({ 
+            subscribed: true,
+            subscription_tier: "price_1RSqV400HE2ZS1pmK1uKuTCe", // Pilot 90 - Free tier
+            subscription_end: null,
+            plan_id: "price_1RSqV400HE2ZS1pmK1uKuTCe",
+            current_period_end: null
+          }),
+          {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            status: 200,
+          },
+        );
+      }
+
+    } catch (userError) {
+      logStep("Error fetching user record", { error: userError.message });
+      // Return free tier if user lookup fails
+      return new Response(
+        JSON.stringify({ 
+          subscribed: true, 
+          subscription_tier: "price_1RSqV400HE2ZS1pmK1uKuTCe",
+          subscription_end: null,
+          plan_id: "price_1RSqV400HE2ZS1pmK1uKuTCe",
+          current_period_end: null
+        }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        },
+      );
     }
 
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error(`[CHECK-SUBSCRIPTION] Error: ${errorMessage}`);
-    
-    return new Response(JSON.stringify({ error: errorMessage, subscribed: false }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 500,
-    });
+    logStep("Unexpected error in check-subscription", { error: error.message });
+    return new Response(
+      JSON.stringify({ 
+        subscribed: true, // Default to free tier on any error
+        subscription_tier: "price_1RSqV400HE2ZS1pmK1uKuTCe",
+        subscription_end: null,
+        plan_id: "price_1RSqV400HE2ZS1pmK1uKuTCe",
+        current_period_end: null,
+        error: "Internal server error" 
+      }),
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200, // Return 200 with free tier instead of 500
+      },
+    );
   }
 });

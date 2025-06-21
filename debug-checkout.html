@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Checkout Function</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <h1>Debug Checkout Function</h1>
+    <div id="status">Loading...</div>
+    <button id="testCheckout" disabled>Test Checkout Function</button>
+    <button id="testDebugCheckout" disabled>Test Debug Checkout Function</button>
+    <pre id="results"></pre>
+
+    <script>
+        const SUPABASE_URL = 'https://juznipgitbmtfmoszzek.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp1em5pcGdpdGJtdGZtb3N6emVrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU5NzUyNTQsImV4cCI6MjA2MTU1MTI1NH0.ZLHbYxFV624fq0eRMncjKnxAm19fukELhgN4zrKsqOo';
+        const TEST_PRICE_ID = 'price_1RSqV400HE2ZS1pmK1uKuTCe';
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        let userToken = null;
+        
+        async function init() {
+            const statusDiv = document.getElementById('status');
+            const resultsDiv = document.getElementById('results');
+            const testButton = document.getElementById('testCheckout');
+            const debugButton = document.getElementById('testDebugCheckout');
+            
+            try {
+                // Get current session
+                const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+                
+                if (sessionError || !sessionData.session) {
+                    statusDiv.innerHTML = '❌ Not logged in. Please sign in to the main site first.';
+                    return;
+                }
+                
+                userToken = sessionData.session.access_token;
+                statusDiv.innerHTML = `✅ Logged in as: ${sessionData.session.user.email}`;
+                testButton.disabled = false;
+                debugButton.disabled = false;
+                
+                resultsDiv.textContent = `User Token (first 50 chars): ${userToken.substring(0, 50)}...`;
+                
+            } catch (error) {
+                statusDiv.innerHTML = `❌ Error: ${error.message}`;
+                resultsDiv.textContent = error.stack;
+            }
+        }
+        
+        async function testCheckout() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.textContent = 'Testing create-checkout function...\\n';
+            
+            try {
+                const response = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${userToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ priceId: TEST_PRICE_ID }),
+                });
+                
+                const responseText = await response.text();
+                
+                resultsDiv.textContent += `Status: ${response.status}\\n`;
+                resultsDiv.textContent += `Headers: ${JSON.stringify(Object.fromEntries(response.headers.entries()), null, 2)}\\n`;
+                resultsDiv.textContent += `Body: ${responseText}\\n`;
+                
+                if (response.ok) {
+                    const data = JSON.parse(responseText);
+                    resultsDiv.textContent += `\\n✅ SUCCESS! Checkout URL: ${data.url}\\n`;
+                } else {
+                    resultsDiv.textContent += `\\n❌ FAILED!\\n`;
+                }
+                
+            } catch (error) {
+                resultsDiv.textContent += `\\n❌ ERROR: ${error.message}\\n${error.stack}`;
+            }
+        }
+        
+        async function testDebugCheckout() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.textContent = 'Testing create-checkout-debug function...\\n';
+            
+            try {
+                const response = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout-debug`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${userToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ priceId: TEST_PRICE_ID }),
+                });
+                
+                const responseText = await response.text();
+                
+                resultsDiv.textContent += `Status: ${response.status}\\n`;
+                resultsDiv.textContent += `Headers: ${JSON.stringify(Object.fromEntries(response.headers.entries()), null, 2)}\\n`;
+                resultsDiv.textContent += `Body: ${responseText}\\n`;
+                
+                if (response.ok) {
+                    const data = JSON.parse(responseText);
+                    resultsDiv.textContent += `\\n✅ SUCCESS! Checkout URL: ${data.url}\\n`;
+                } else {
+                    resultsDiv.textContent += `\\n❌ FAILED!\\n`;
+                }
+                
+            } catch (error) {
+                resultsDiv.textContent += `\\n❌ ERROR: ${error.message}\\n${error.stack}`;
+            }
+        }
+        
+        document.getElementById('testCheckout').addEventListener('click', testCheckout);
+        document.getElementById('testDebugCheckout').addEventListener('click', testDebugCheckout);
+        
+        // Initialize when page loads
+        init();
+    </script>
+</body>
+</html> 

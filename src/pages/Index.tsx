@@ -1,5 +1,6 @@
-
 import React, { useEffect } from 'react';
+import { useSEO, seoConfigs } from '@/hooks/useSEO';
+import { analyticsEvents } from '@/utils/seo';
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Benefits from "@/components/Benefits";
@@ -13,6 +14,9 @@ import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
 
 const Index = () => {
+  // Initialize SEO for home page
+  useSEO(seoConfigs.home);
+
   useEffect(() => {
     // Intersection Observer for scroll animations
     const observer = new IntersectionObserver(
@@ -35,17 +39,31 @@ const Index = () => {
     };
   }, []);
 
+  // Track engagement events
+  const handleCTAClick = (location: string) => {
+    analyticsEvents.ctaClick(location);
+  };
+
+  const handlePricingView = () => {
+    analyticsEvents.pricingViewed();
+  };
+
   return (
     <div className="min-h-screen relative">
       <Navbar />
-      <Hero />
-      <Benefits />
-      <ROIBanner />
-      <Features />
-      <Testimonials />
-      <Pricing />
-      <FAQ />
-      <CTASection />
+      <main>
+        <Hero onCTAClick={() => handleCTAClick('hero')} />
+        <Benefits />
+        <ROIBanner />
+        <Features />
+        <Testimonials />
+        <Pricing />
+        <FAQ />
+        <CTASection 
+          onCTAClick={() => handleCTAClick('bottom')} 
+          onPricingClick={handlePricingView}
+        />
+      </main>
       <Footer />
       <ScrollToTop />
     </div>

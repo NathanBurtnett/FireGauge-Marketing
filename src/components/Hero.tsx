@@ -1,42 +1,84 @@
 import React from 'react';
-import { Button } from "@/components/ui/button";
-import { Play } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Button } from "./ui/button";
+import { ArrowRight, Smartphone, Shield, Users, Play } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Hero = () => {
-  const navigate = useNavigate();
-  
+  const handleDemoRequest = () => {
+    // Scroll to contact section or open demo modal
+    const contactSection = document.getElementById('contact');
+    if (contactSection) {
+      contactSection.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      // Fallback: open email client
+      window.open('mailto:demo@firegauge.app?subject=Demo Request&body=I would like to schedule a demo of FireGauge.', '_blank');
+    }
+  };
+
   return (
-    <section className="relative pt-20 md:pt-28 overflow-hidden min-h-[85vh] flex items-center">
-      {/* Background image with overlay */}
-      <div 
-        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
-        style={{ 
-          backgroundImage: "url('https://images.unsplash.com/photo-1529704193007-e8c78f0f46f9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')",
-          filter: "brightness(0.4)"
-        }}
-      ></div>
-      
-      {/* Subtle flame overlay */}
-      <div className="absolute inset-0 z-0 bg-gradient-to-r from-firegauge-red/20 to-firegauge-accent/20 mix-blend-overlay"></div>
-      
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-3xl mx-auto md:mx-0">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 opacity-0 animate-fade-in">
-            Go Paperless for NFPA Hose, Ladder & Pump Tests—In 5 Minutes
-          </h1>
+    <section className="hero bg-gradient-to-br from-firegauge-charcoal via-gray-800 to-firegauge-red text-white relative overflow-hidden">
+      <div className="absolute inset-0 bg-black opacity-20"></div>
+      <div className="container relative z-10 py-20 lg:py-32">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="flex justify-center items-center space-x-8 mb-6">
+            <div className="flex items-center space-x-2">
+              <Smartphone className="h-6 w-6 text-firegauge-accent" />
+              <span className="text-sm font-medium">Mobile-First Testing</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Shield className="h-6 w-6 text-firegauge-accent" />
+              <span className="text-sm font-medium">ISO/NFPA Compliant</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Users className="h-6 w-6 text-firegauge-accent" />
+              <span className="text-sm font-medium">Multi-Tenant Ready</span>
+            </div>
+          </div>
           
-          <p className="text-xl text-white/90 mb-8 opacity-0 animate-fade-in-delay-1">
-            Record offline, auto-sync, e-sign & generate audit-ready PDFs
+          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+            The Future of Fire Hose
+            <span className="text-firegauge-accent block">Testing & Compliance</span>
+          </h1>
+          <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+            Mobile-first platform designed for contractors and fire departments. 
+            Streamline NFPA compliance, reduce testing time by 75%, and eliminate manual paperwork—all from your smartphone.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 opacity-0 animate-fade-in-delay-2">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
             <Button 
-              className="bg-firegauge-red hover:bg-firegauge-red/90 text-white py-6 px-8 text-lg"
-              onClick={() => navigate('/auth')}
+              asChild
+              size="lg" 
+              className="bg-firegauge-red hover:bg-firegauge-red/90 text-white px-8 py-4 text-lg font-semibold rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105"
             >
-              Start Your Free 30-Day Pilot
+              <Link to="/pricing">
+                Start Free Trial
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
             </Button>
+            <Button 
+              onClick={handleDemoRequest}
+              variant="outline" 
+              size="lg"
+              className="bg-white/20 border-white text-white hover:bg-white hover:text-firegauge-charcoal backdrop-blur-sm px-8 py-4 text-lg font-semibold rounded-lg transition-all duration-300"
+            >
+              <Play className="mr-2 h-5 w-5" />
+              Request Demo
+            </Button>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto text-center">
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
+              <div className="text-3xl font-bold text-firegauge-accent mb-2">75%</div>
+              <div className="text-sm">Faster Testing Process</div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
+              <div className="text-3xl font-bold text-firegauge-accent mb-2">100%</div>
+              <div className="text-sm">NFPA Compliant Reports</div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
+              <div className="text-3xl font-bold text-firegauge-accent mb-2">$50K+</div>
+              <div className="text-sm">Annual Savings Per Dept</div>
+            </div>
           </div>
         </div>
       </div>

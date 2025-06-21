@@ -1,13 +1,14 @@
-
 import React, { useState } from 'react';
 import { Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from "@/components/ui/sonner";
-import { loadStripe } from '@stripe/stripe-js';
+import { supabase } from "@/lib/supabase";
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+// Lazy load Stripe only when needed
+const getStripe = async () => {
+  const { loadStripe } = await import('@stripe/stripe-js');
+  return loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+};
 
 interface PricingPlan {
   name: string;
@@ -22,13 +23,11 @@ interface PricingPlan {
   coreModules: string;
   features: string[];
   ctaText: string;
-  ctaNavPath?: string;
   recommended?: boolean;
   isEnterprise?: boolean;
 }
 
 const Pricing = () => {
-  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState<string | null>(null);
 
   const plans: PricingPlan[] = [
@@ -46,8 +45,7 @@ const Pricing = () => {
         "PDF export (1-yr archive)",
         "Guided Pass/Fail flow"
       ],
-      ctaText: "Start Free Pilot",
-      ctaNavPath: "/auth"
+      ctaText: "Start Free Trial"
     },
     {
       name: "Essential",
@@ -66,8 +64,7 @@ const Pricing = () => {
         "CSV import/export",
         "Email support + updates"
       ],
-      ctaText: "Choose Essential",
-      ctaNavPath: "/auth"
+      ctaText: "Choose Essential"
     },
     {
       name: "Pro",
@@ -87,7 +84,6 @@ const Pricing = () => {
         "Zapier / CSV integrations"
       ],
       ctaText: "Upgrade to Pro",
-      ctaNavPath: "/auth",
       recommended: true
     },
     {
@@ -107,8 +103,7 @@ const Pricing = () => {
         "API access",
         "Priority support (next-day)"
       ],
-      ctaText: "Get Contractor",
-      ctaNavPath: "/auth"
+      ctaText: "Get Contractor"
     },
     {
       name: "Enterprise",
@@ -130,62 +125,88 @@ const Pricing = () => {
     }
   ];
 
-  const handleCtaClick = async (plan: PricingPlan) => {
-    setIsLoading(plan.name);
-
-    if (plan.isEnterprise) {
-      window.location.href = "mailto:sales@firegauge.app?subject=Enterprise%20Plan%20Inquiry";
-      setIsLoading(null);
-      return;
-    }
-
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-
-    if (sessionError || !session) {
-      toast.info("Please sign in or create an account to subscribe.", {
-        action: {
-          label: "Sign In",
-          onClick: () => navigate("/auth"),
-        },
+  // "Pay First" checkout flow - no authentication required
+  const createCheckoutSession = async (priceId: string, planName: string) => {
+    try {
+      console.log(`[PRICING] Creating checkout session for ${planName} (${priceId})`);
+      
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: {
+          priceId: priceId,
+          metadata: {
+            plan_name: planName,
+            source: 'marketing_site',
+            // Generate a temporary ID to track this specific checkout
+            checkout_session_id: Date.now().toString(),
+            // Will create account during webhook processing
+            requires_account_creation: 'true'
+          }
+        }
       });
-      setIsLoading(null);
-      if(plan.ctaNavPath && !session) navigate(plan.ctaNavPath);
+
+      if (error) {
+        console.error('[PRICING] Supabase function error:', error);
+        throw error;
+      }
+
+      if (!data?.url) {
+        console.error('[PRICING] No checkout URL returned:', data);
+        throw new Error('No checkout URL returned from server');
+      }
+
+      console.log('[PRICING] Checkout session created successfully:', data.url);
+      return data.url;
+    } catch (error) {
+      console.error('[PRICING] Error creating checkout session:', error);
+      throw error;
+    }
+  };
+
+  const handleSubscribe = async (priceId: string, planName: string) => {
+    if (planName === "Enterprise") {
+      // Redirect to contact page for enterprise
+      window.open('mailto:sales@firegauge.app?subject=Enterprise Plan Inquiry', '_blank');
       return;
     }
-    
-    const selectedPriceId = plan.monthlyPriceId; 
-    if (!selectedPriceId) {
-        toast.error("This plan does not have a configured monthly price ID.");
-        setIsLoading(null);
-        return;
+
+    if (planName === "Pilot 90") {
+      // For free trial, redirect to signup page
+      window.location.href = '/onboarding?plan=pilot';
+      return;
     }
+
+    setIsLoading(priceId);
 
     try {
-      const { data: checkoutResponse, error: checkoutError } = await supabase.functions.invoke('create-checkout', {
-        body: { priceId: selectedPriceId },
+      console.log(`[PRICING] Starting checkout for ${planName}`);
+      
+      const checkoutUrl = await createCheckoutSession(priceId, planName);
+      
+      console.log(`[PRICING] Redirecting to Stripe checkout:`, checkoutUrl);
+      
+      // Analytics tracking
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'begin_checkout', {
+          currency: 'USD',
+          value: parseFloat(plans.find(p => p.monthlyPriceId === priceId)?.priceDisplay.replace('$', '') || '0'),
+          items: [{
+            item_id: priceId,
+            item_name: planName,
+            category: 'subscription',
+            quantity: 1
+          }]
+        });
+      }
+
+      // Redirect to Stripe Checkout
+      // Account will be created automatically via webhook after payment
+      window.location.href = checkoutUrl;
+      
+    } catch (error) {
+      console.error('[PRICING] Checkout error:', error);
+      toast.error('Failed to start checkout', {
+        description: error instanceof Error ? error.message : 'Please try again or contact support'
       });
-
-      if (checkoutError) {
-        throw new Error(`Checkout function error: ${checkoutError.message}`);
-      }
-
-      if (checkoutResponse && checkoutResponse.url) {
-        const stripe = await stripePromise;
-        if (!stripe) {
-          toast.error("Stripe.js failed to load.");
-          setIsLoading(null);
-          return;
-        }
-        const { error: stripeError } = await stripe.redirectToCheckout({ sessionId: checkoutResponse.sessionId || checkoutResponse.url });
-        if (stripeError) {
-          toast.error(`Stripe redirect error: ${stripeError.message}`);
-        }
-      } else {
-        toast.error("Failed to create checkout session. No URL returned.");
-      }
-    } catch (error: any) {
-      toast.error(`Subscription error: ${error.message}`);
-      console.error("Subscription process error:", error);
     } finally {
       setIsLoading(null);
     }
@@ -199,7 +220,7 @@ const Pricing = () => {
             Simple, Transparent Pricing
           </h2>
           <p className="text-lg text-gray-700 max-w-3xl mx-auto">
-            Choose the plan that fits your department's size and needs. All paid plans include a 30-day free trial.
+            Choose the plan that fits your department's size and needs. Start immediately with our streamlined checkout.
           </p>
         </div>
         
@@ -218,42 +239,76 @@ const Pricing = () => {
               )}
               
               <div className="p-6 flex flex-col flex-grow">
-                <h3 className="text-2xl font-semibold mb-3 text-firegauge-charcoal">{plan.name}</h3>
-                <p className="text-sm text-gray-600 mb-4 min-h-[3em]">{plan.description}</p>
+                {/* Plan Name */}
+                <h3 className="text-xl font-bold text-firegauge-charcoal mb-2">
+                  {plan.name}
+                </h3>
                 
-                <div className="mb-5">
-                  <span className="text-4xl font-bold text-firegauge-charcoal">{plan.priceDisplay}</span>
-                  <span className="text-lg font-medium text-gray-500 ml-1">{plan.priceAnnotation}</span>
+                {/* Price */}
+                <div className="mb-4">
+                  <span className="text-4xl font-bold text-firegauge-charcoal">
+                    {plan.priceDisplay}
+                  </span>
+                  {plan.priceAnnotation && (
+                    <span className="text-gray-600 ml-1">{plan.priceAnnotation}</span>
+                  )}
                   {plan.annualPrice && (
-                    <p className="text-xs text-gray-500 mt-1">{plan.annualPrice}</p>
+                    <div className="text-sm text-firegauge-accent font-medium mt-1">
+                      {plan.annualPrice}
+                    </div>
                   )}
                 </div>
                 
-                <div className="mb-5 text-sm">
-                  <p className="text-gray-700"><strong className="font-medium text-firegauge-charcoal">Users:</strong> {plan.userCount}</p>
-                  <p className="text-gray-700"><strong className="font-medium text-firegauge-charcoal">Assets:</strong> {plan.assetCount}</p>
-                  <p className="text-gray-700"><strong className="font-medium text-firegauge-charcoal">Core:</strong> {plan.coreModules}</p>
+                {/* Description */}
+                <p className="text-gray-600 mb-6 text-sm leading-relaxed">
+                  {plan.description}
+                </p>
+                
+                {/* Capacity Info */}
+                <div className="mb-6 space-y-2">
+                  <div className="text-sm">
+                    <span className="font-medium text-firegauge-charcoal">Users:</span>{' '}
+                    <span className="text-gray-600">{plan.userCount}</span>
+                  </div>
+                  <div className="text-sm">
+                    <span className="font-medium text-firegauge-charcoal">Assets:</span>{' '}
+                    <span className="text-gray-600">{plan.assetCount}</span>
+                  </div>
+                  <div className="text-sm">
+                    <span className="font-medium text-firegauge-charcoal">Modules:</span>{' '}
+                    <span className="text-gray-600">{plan.coreModules}</span>
+                  </div>
                 </div>
                 
-                <ul className="space-y-2 mb-6 text-sm flex-grow">
-                  {plan.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-start">
-                      <Check className="text-firegauge-red h-4 w-4 mr-2 mt-0.5 flex-shrink-0" />
-                      <span className="text-gray-600">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
+                {/* Features List */}
+                <div className="mb-8 flex-grow">
+                  <ul className="space-y-3">
+                    {plan.features.map((feature, featureIndex) => (
+                      <li key={featureIndex} className="flex items-start">
+                        <Check className="h-5 w-5 text-firegauge-accent mr-3 mt-0.5 flex-shrink-0" />
+                        <span className="text-sm text-gray-700">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
                 
-                <Button 
-                  onClick={() => handleCtaClick(plan)}
-                  disabled={isLoading === plan.name}
-                  className={`w-full mt-6 py-3 text-lg font-semibold rounded-md transition-colors duration-300 ease-in-out 
-                    ${plan.recommended ? 'bg-firegauge-red text-white hover:bg-firegauge-red/90' : 'bg-firegauge-charcoal text-white hover:bg-black'}
-                    ${plan.isEnterprise ? 'bg-firegauge-blue text-white hover:bg-firegauge-blue/90' : ''}
-                  `}
+                {/* CTA Button */}
+                <Button
+                  className={`w-full py-3 font-semibold transition-all duration-300 ${
+                    plan.recommended
+                      ? 'bg-firegauge-accent hover:bg-firegauge-accent/90 text-white'
+                      : plan.isEnterprise
+                      ? 'bg-firegauge-charcoal hover:bg-firegauge-charcoal/90 text-white'
+                      : 'bg-firegauge-red hover:bg-firegauge-red/90 text-white'
+                  }`}
+                  onClick={() => handleSubscribe(plan.monthlyPriceId, plan.name)}
+                  disabled={isLoading === plan.monthlyPriceId}
                 >
-                  {isLoading === plan.name ? (
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  {isLoading === plan.monthlyPriceId ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processing...
+                    </>
                   ) : (
                     plan.ctaText
                   )}
@@ -264,9 +319,13 @@ const Pricing = () => {
         </div>
         
         <div className="text-center mt-12">
-            <p className="text-sm text-gray-600">All paid plans come with a 30-day free trial. Enterprise plan trials are subject to discussion.</p>
+          <p className="text-gray-600 mb-4">
+            Need help choosing? <a href="/contact" className="text-firegauge-red hover:underline">Contact our team</a> for a personalized recommendation.
+          </p>
+          <p className="text-sm text-gray-500">
+            All plans include SSL encryption, automatic backups, and 99.9% uptime SLA.
+          </p>
         </div>
-
       </div>
     </section>
   );

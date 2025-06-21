@@ -1,5 +1,16 @@
 import React, { useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
+import { 
+  Smartphone, 
+  Shield, 
+  Users, 
+  Zap, 
+  FileCheck, 
+  Clock,
+  DollarSign,
+  Building2,
+  CheckCircle
+} from "lucide-react";
 
 const Features = () => {
   useEffect(() => {
@@ -22,117 +33,119 @@ const Features = () => {
     };
   }, []);
 
+  const features = [
+    {
+      icon: <Smartphone className="h-12 w-12 text-firegauge-red" />,
+      title: "Mobile-First Testing Interface",
+      description: "Purpose-built for field operations. Test hoses, ladders, and pumps directly from your smartphone—even offline. Our intuitive mobile interface reduces training time and eliminates the need for separate devices or clipboards.",
+      highlight: "75% faster than traditional methods"
+    },
+    {
+      icon: <Shield className="h-12 w-12 text-firegauge-red" />,
+      title: "Automated NFPA/ISO Compliance",
+      description: "Every test automatically generates audit-ready reports that meet NFPA 1962, ISO standards, and AHJ requirements. Built-in validation prevents non-compliant data entry and ensures your documentation passes every inspection.",
+      highlight: "100% compliance guarantee"
+    },
+    {
+      icon: <Users className="h-12 w-12 text-firegauge-red" />,
+      title: "Multi-Tenant Contractor Platform",
+      description: "Designed for testing contractors serving multiple fire departments. Manage unlimited departments, white-label reports, and maintain separate data silos while centralizing operations and billing—all in one platform.",
+      highlight: "Unlimited departments & users"
+    },
+    {
+      icon: <Zap className="h-12 w-12 text-firegauge-red" />,
+      title: "Instant Report Generation",
+      description: "Generate professional, branded PDF reports instantly upon test completion. Digital signatures, automatic calculations, and customizable templates mean no more manual report writing or follow-up paperwork.",
+      highlight: "Reports in under 30 seconds"
+    },
+    {
+      icon: <FileCheck className="h-12 w-12 text-firegauge-red" />,
+      title: "Digital Asset Management",
+      description: "Complete equipment lifecycle tracking with automated test scheduling, maintenance reminders, and performance analytics. Barcode scanning integrates seamlessly with existing asset management systems.",
+      highlight: "Automated scheduling & alerts"
+    },
+    {
+      icon: <Clock className="h-12 w-12 text-firegauge-red" />,
+      title: "Offline-First Architecture",
+      description: "Record tests in any environment—basements, remote stations, or areas with poor connectivity. Data automatically syncs when connection is restored, ensuring zero test data loss and uninterrupted workflow.",
+      highlight: "Works anywhere, syncs everywhere"
+    },
+    {
+      icon: <DollarSign className="h-12 w-12 text-firegauge-red" />,
+      title: "Proven ROI & Cost Savings",
+      description: "Departments typically save $50,000+ annually through reduced labor costs, eliminated re-testing, faster inspector workflows, and streamlined compliance processes. ROI realized within first quarter.",
+      highlight: "$50K+ annual savings"
+    },
+    {
+      icon: <Building2 className="h-12 w-12 text-firegauge-red" />,
+      title: "Scalable for Any Size Operation",
+      description: "From single-station volunteer departments to county-wide contractor operations. Our flexible architecture scales with your needs while maintaining performance and simplicity.",
+      highlight: "Volunteer to Enterprise ready"
+    },
+    {
+      icon: <CheckCircle className="h-12 w-12 text-firegauge-red" />,
+      title: "API Integration & Interoperability",
+      description: "Seamlessly connect with existing fire department software, asset management systems, and municipal platforms through our robust API. Export data in any format your AHJ requires.",
+      highlight: "Integration-ready architecture"
+    }
+  ];
+
   return (
-    <section id="features" className="section bg-gray-50">
+    <section id="features" className="section bg-white">
       <div className="container">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-firegauge-charcoal animate-on-scroll">
-            Features Built for Fire Professionals
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-firegauge-charcoal">
+            Why Fire Departments & Contractors Choose FireGauge
           </h2>
-          <p className="text-lg text-gray-700 max-w-3xl mx-auto animate-on-scroll">
-            Streamlined workflows designed with input from real fire departments to ensure efficiency and compliance.
+          <p className="text-lg text-gray-700 max-w-3xl mx-auto">
+            Built from the ground up for modern fire safety professionals who demand efficiency, compliance, and reliability in their testing operations.
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-          {/* Feature mockups in device frames */}
-          <Card className="overflow-hidden shadow-lg animate-on-scroll">
-            <CardContent className="p-0">
-              <div className="relative pb-[178%]">
-                <div className="absolute inset-0 bg-black rounded-t-lg">
-                  <img 
-                    src="https://images.unsplash.com/photo-1563206767-5b18f218e8de?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
-                    alt="Barcode scan workflow" 
-                    className="w-full h-full object-cover opacity-90"
-                  />
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                    <h3 className="text-white font-bold text-lg">Barcode Scan Workflow</h3>
-                    <p className="text-white/80 text-sm">Quick inventory tracking with scan-to-test</p>
-                  </div>
-                </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {features.map((feature, index) => (
+            <div key={index} className="group p-6 rounded-xl border border-gray-200 hover:border-firegauge-red/30 hover:shadow-lg transition-all duration-300 bg-white">
+              <div className="mb-4">
+                {feature.icon}
               </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="overflow-hidden shadow-lg animate-on-scroll">
-            <CardContent className="p-0">
-              <div className="relative pb-[178%]">
-                <div className="absolute inset-0 bg-black rounded-t-lg">
-                  <img 
-                    src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
-                    alt="Scheduled reminders dashboard" 
-                    className="w-full h-full object-cover opacity-90"
-                  />
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                    <h3 className="text-white font-bold text-lg">Scheduled Reminders</h3>
-                    <p className="text-white/80 text-sm">Never miss another test date or inspection</p>
-                  </div>
-                </div>
+              <h3 className="text-xl font-semibold mb-3 text-firegauge-charcoal group-hover:text-firegauge-red transition-colors">
+                {feature.title}
+              </h3>
+              <p className="text-gray-600 mb-4 leading-relaxed">
+                {feature.description}
+              </p>
+              <div className="inline-flex items-center px-3 py-1 rounded-full bg-firegauge-red/10 text-firegauge-red text-sm font-medium">
+                <CheckCircle className="h-4 w-4 mr-1" />
+                {feature.highlight}
               </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="overflow-hidden shadow-lg animate-on-scroll">
-            <CardContent className="p-0">
-              <div className="relative pb-[178%]">
-                <div className="absolute inset-0 bg-black rounded-t-lg">
-                  <img 
-                    src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
-                    alt="Failure analytics" 
-                    className="w-full h-full object-cover opacity-90"
-                  />
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                    <h3 className="text-white font-bold text-lg">Failure Analytics</h3>
-                    <p className="text-white/80 text-sm">Track trends and forecast replacement needs</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+            </div>
+          ))}
         </div>
         
-        <div className="bg-white p-8 rounded-xl shadow-lg max-w-4xl mx-auto mb-12 animate-on-scroll">
-          <h3 className="text-2xl font-bold mb-4 text-center text-firegauge-charcoal">Modular & Scalable: Grow With Your Needs</h3>
-          <p className="text-gray-700 mb-4 text-center">
-            FireGauge adapts to your operational scale and service offerings.
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-            <div>
-              <h4 className="font-semibold text-firegauge-red mb-1">Core Hose Testing</h4>
-              <p className="text-sm text-gray-600">Comprehensive NFPA 1962 workflows out-of-the-box.</p>
-            </div>
-            <div>
-              <h4 className="font-semibold text-firegauge-red mb-1">Add-On Modules</h4>
-              <p className="text-sm text-gray-600">Easily expand to ladder, pump testing, and more.</p>
-            </div>
-            <div>
-              <h4 className="font-semibold text-firegauge-red mb-1">Multi-Tenant Ready</h4>
-              <p className="text-sm text-gray-600">Manage multiple clients or stations with role-based access.</p>
+        <div className="mt-16 text-center">
+          <div className="bg-gray-50 rounded-xl p-8 max-w-4xl mx-auto">
+            <h3 className="text-2xl font-bold mb-4 text-firegauge-charcoal">
+              Trusted by Progressive Fire Departments & Contractors
+            </h3>
+            <p className="text-gray-700 mb-6">
+              Join the growing network of fire safety professionals who've modernized their testing operations with FireGauge. 
+              From volunteer departments to large contractors serving 25+ departments.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+              <div>
+                <div className="text-3xl font-bold text-firegauge-red mb-2">25+</div>
+                <div className="text-sm text-gray-600">Fire Departments Served</div>
+              </div>
+              <div>
+                <div className="text-3xl font-bold text-firegauge-red mb-2">10,000+</div>
+                <div className="text-sm text-gray-600">Tests Completed</div>
+              </div>
+              <div>
+                <div className="text-3xl font-bold text-firegauge-red mb-2">100%</div>
+                <div className="text-sm text-gray-600">Audit Pass Rate</div>
+              </div>
             </div>
           </div>
-        </div>
-        
-        <div className="bg-white p-8 rounded-xl shadow-lg max-w-3xl mx-auto animate-on-scroll">
-          <h3 className="text-xl font-bold mb-6 text-center text-firegauge-charcoal">More Power, Less Paperwork</h3>
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-            {[
-              "Offline mode & auto-sync",
-              "Guided pass/fail tests (NFPA compliant)",
-              "Digital record keeping & e-signatures",
-              "Instant, audit-ready PDF reports",
-              "Automated email delivery of reports",
-              "Full test history archives",
-              "Multi-user collaboration",
-              "Secure automatic backups"
-            ].map((feature, index) => (
-              <li key={index} className="flex items-start">
-                <div className="bg-firegauge-red/10 rounded-full p-1 mr-3 mt-1 flex-shrink-0">
-                  <div className="w-2 h-2 bg-firegauge-red rounded-full"></div>
-                </div>
-                <span className="text-gray-700">{feature}</span>
-              </li>
-            ))}
-          </ul>
         </div>
       </div>
     </section>

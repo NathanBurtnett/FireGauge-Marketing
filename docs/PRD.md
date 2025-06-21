@@ -1,176 +1,164 @@
-# Product Requirements Document: FireGauge Marketing & Account Portal
+# Product Requirements Document: FireGauge Marketing Site (Streamlined)
 
-**Version:** 1.0
-**Date:** October 26, 2023 (Placeholder)
+**Version:** 2.0 - STRATEGIC PIVOT
+**Date:** January 2025
 
-**1. Overview & Goals**
+**1. Overview & Goals - UPDATED STRATEGY**
 
-The FireGauge Marketing & Account Portal (`www.firegauge.app`) serves as the primary digital storefront and customer management hub for the FireGauge SaaS application (`app.firegauge.app`). Its core purpose is to effectively communicate FireGauge's value propositions, drive user sign-ups, facilitate subscription management, and provide a high-level administrative interface for subscribed customers.
+The FireGauge Marketing Site (`www.firegauge.app`) is now **exclusively focused on conversion and lead generation**. All account management, billing, and user administration has been moved to the main application (`app.firegauge.app`) to create a unified admin experience.
 
-*   **Primary Goal:** Maximize sign-ups for the FireGauge application.
-*   **Secondary Goals:**
-    *   Clearly articulate the value of FireGauge to target audiences.
-    *   Provide a seamless onboarding experience.
-    *   Allow users to manage their subscriptions and billing details.
-    *   Enable account administrators to manage their users and view high-level station data.
-    *   Serve as a redirect point to the main application (`app.firegauge.app`).
+*   **Primary Goal:** Maximize sign-ups and trial conversions for the FireGauge application.
+*   **Core Focus:** 
+    *   Lead generation and qualification
+    *   Product education and value demonstration
+    *   Seamless signup and onboarding flow
+    *   Stripe Checkout integration for subscription conversion
+*   **What We REMOVED (moved to main app):**
+    *   ❌ User management interfaces
+    *   ❌ Billing management portals
+    *   ❌ Authenticated account dashboards
+    *   ❌ Support ticket systems
+    *   ❌ Administrative user controls
 *   **Target Audience:**
-    *   Fire Chiefs
+    *   Prospective fire departments (chiefs, decision makers)
     *   Fire equipment testing contractors
-    *   Administrators within these organizations.
-*   **Launch Strategy:** Full initial feature set (as outlined in this PRD).
+    *   Industry stakeholders researching solutions
+*   **Strategic Rationale:** Eliminates user confusion about "multiple places to manage things" while optimizing marketing site purely for conversion.
 
-**Value Propositions (to be prominently featured):**
+**Simplified Value Propositions (conversion-focused):**
 
-*   **Purpose-Built NFPA Compliance:**
-    *   Pre-built NFPA-1962 (hose) workflows with guided pass/fail tests.
-    *   Tamper-proof, audit-grade logs and geo-time stamps.
-*   **Field-First Mobile Experience:**
-    *   Offline-capable PWA (or mobile app) that auto-syncs when you're back online.
-*   **Instant, Insurance-Grade Reporting:**
-    *   One-click generation of NFPA-compliant PDF packs.
-    *   Automated email delivery of test results and annual summary reports.
-*   **Lean, Intuitive UI:**
-    *   Minimal training for volunteer crews—large buttons, guided flows.
-*   **Modular, Scalable Platform:**
-    *   Start with hose testing, then add ladder and pump modules as needed.
-    *   Multi-tenant, role-based access (admins vs. inspectors).
-*   **ROI & Risk Reduction:**
-    *   Cut 20–30 min off each hose test; reclaim dozens of staff hours per year.
-    *   Avoid ISO/insurance penalties by maintaining complete, up-to-date records.
+*   **Purpose-Built NFPA Compliance:** Pre-built workflows, audit-grade logging
+*   **Mobile-First Experience:** Offline-capable PWA for field operations  
+*   **Instant Professional Reporting:** One-click NFPA-compliant PDF generation
+*   **Zero Training Required:** Intuitive interface for volunteer crews
+*   **Proven ROI:** 20-30 minutes saved per test, dozens of hours reclaimed annually
 
-**Pricing Tiers (to be clearly presented):**
+**2. Streamlined User Journey**
 
-*   **Basic:** $75 – $100/mo ($765 – $1,020/yr). Hose testing only (≤ 75 hoses), 1 Admin + 1 Inspector, offline app, PDF reports.
-*   **Standard:** $150 – $200/mo ($1,530 – $2,040/yr). Up to 500 hoses, 2 Admins + 5 Inspectors, audit logs, reminders, basic integrations.
-*   **Professional:** $250 – $350/mo ($2,550 – $3,570/yr). Up to 2,000 hoses, 3 Admins + 10 Inspectors, unlimited asset count, API access, priority support.
-*   **Enterprise:** Custom. Unlimited users & assets, white-glove onboarding, SSO/LDAP, custom SLAs.
-*   **Add-On Modules:**
-    *   Ladder inspections: +$50/mo
-    *   Pump testing: +$50/mo
+| User Type | Marketing Site Role | Post-Signup Experience |
+|-----------|-------------------|------------------------|
+| **Prospective Department** | Learn value → See pricing → Start trial/subscription | Redirect to `app.firegauge.app` for ALL management |
+| **Contractor** | Understand multi-tenant capabilities → Sign up | Access unified admin in main app for billing/users |
+| **Decision Maker** | Request demo → Schedule call → Convert | Complete onboarding in main application |
 
-**2. Target Users & Key Features**
+**3. Functional Scope - SIMPLIFIED**
 
-| User Persona         | Core Needs                                                                 | Key Features in Marketing Site/Portal                                                                                                | Notes                                                                                                                               |
-|----------------------|----------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
-| **Prospective Dept.** | Understand FireGauge value, see pricing, start a trial/subscription.       | Clear product info, demo videos/screenshots, pricing table, prominent CTAs for signup/trial.                                           | Focus on benefits: ISO compliance, time savings, ease of use.                                                                       |
-| **Tenant Admin**     | Manage subscription, view billing history, manage users for their FireGauge tenant. | Authenticated portal with: Account overview, **Stripe Customer Portal integration for billing/subscription management**, **user management interface (invite, set roles for app.firegauge.app)**. | Secure login via Supabase. User roles set here will determine access within the main `app.firegauge.app`.                        |
-| **Individual User**  | Log into their account (if managing billing/users directly), access support. | Login, link to main app, support/FAQ access.                                                                                         | Most operational tasks happen in `app.firegauge.app`.                                                                               |
+### 3.1. Public-Facing Site (Core Focus)
+-   **Homepage:** Compelling hero, clear value proposition, strong CTAs, social proof
+-   **Features Pages:** Equipment testing, ISO dashboard, reporting capabilities
+-   **Pricing Page:** Clear plan comparison, direct Stripe Checkout links
+-   **Demo/Trial Pages:** Lead capture forms, demo video, trial signup
+-   **About/Contact:** Company information, contact forms
+-   **SEO Content:** Blog posts, resource pages (future)
 
-**3. Functional Scope**
+### 3.2. Conversion-Optimized Signup Flow
+1.  **Plan Selection:** User chooses subscription tier
+2.  **Stripe Checkout:** Secure payment processing
+3.  **Account Creation:** Automated tenant/user creation via API
+4.  **Immediate Redirect:** Direct to `app.firegauge.app` for onboarding
+5.  **No Marketing Site Portal:** All subsequent activity in main app
 
-### 3.1. Public-Facing Site
--   **Homepage:** Engaging hero section, value proposition, key features overview, social proof/testimonials (future), CTAs.
--   **Features Pages:** Detailed explanations of core FireGauge functionalities (e.g., Equipment Testing, ISO Dashboard, Reporting).
--   **Pricing Page:** Clear breakdown of plans (Freemium, Station, District, Metro, Enterprise), features per plan, monthly/annual options. Link to Stripe Checkout.
--   **About Us/Contact:** Standard informational pages.
--   **Blog/Resources (Future):** Articles on fire department compliance, ISO standards, product updates.
--   **Sign-up Flow:**
-    1.  User selects plan on Pricing Page.
-    2.  Redirect to Stripe Checkout for the selected plan.
-    3.  On successful payment, Stripe webhook notifies our backend.
-    4.  Backend API (on `app.firegauge.app` or a dedicated service) creates the new `tenant` and initial `user` (with Admin role) in the main application database.
-    5.  User is redirected to `app.firegauge.app` to begin onboarding, or to the marketing site's authenticated portal.
+### 3.3. Integration with Main Application
+-   **One-Way Data Flow:** Marketing site → Main app (via secure API)
+-   **No Shared Authentication:** Marketing site handles anonymous users only
+-   **Clean Handoff:** Stripe success → API call → Redirect to main app
+-   **Support Channel:** Contact forms route to main app admin support system
 
-### 3.2. Authenticated User Portal (on `www.firegauge.app`)
--   **Login/Registration:** Supabase Auth.
--   **Dashboard Overview:** Simple summary (e.g., current plan, number of active users in `app.firegauge.app` - may require an API call).
--   **Account Management:** Update profile information (name, email - synced with Supabase Auth).
--   **Subscription & Billing Management:**
-    -   Display current plan, next billing date, cost.
-    -   **Integrate Stripe Customer Portal** for self-serve actions: update payment method, view invoices, change/cancel subscription.
--   **User Management (for their Tenant):**
-    -   Invite new users to their tenant (email-based invites).
-    -   Assign/change roles for users within `app.firegauge.app` (e.g., Operator, Admin).
-    -   View list of users in their tenant, deactivate/remove users.
-    -   (This interacts with the main application's user table via API calls).
--   **Help/Support Links:** Easy access to FAQs, documentation, contact support.
+**4. REMOVED Features (Migrated to Main App)**
 
-### 3.3. Integration with Main Application (`app.firegauge.app`)
--   **Signup:** Marketing site initiates user/tenant creation in the main app's database via a secure API call after successful Stripe payment.
--   **Authentication:** Supabase Auth can be shared (using same Supabase project) or JWTs can be used for S2S communication if needed.
--   **User Role Synchronization:** Roles assigned in the marketing portal dictate permissions within `app.firegauge.app`.
--   Clear visual distinction and potentially subdomains (e.g., `www.firegauge.app` for marketing/portal, `app.firegauge.app` for the operational tool).
+### 4.1. Authenticated User Portal ❌ REMOVED
+- ~~Login/Registration system~~
+- ~~User dashboard~~
+- ~~Account management~~
+- ~~Billing portal integration~~
+- ~~User management interface~~
 
-**4. Technical Requirements**
+### 4.2. Administrative Functions ❌ REMOVED  
+- ~~Role assignment~~
+- ~~Tenant user invitations~~
+- ~~Subscription management~~
+- ~~Support ticket system~~
 
-*   **Frontend Stack:** Vite, React, TypeScript, Tailwind CSS (as existing).
-*   **UI Components:** Leverage existing `src/components/ui/` (Shadcn/ui likely) and expand as needed.
-*   **Routing:** React Router (as existing).
-*   **State Management/Data Fetching:** Tanstack Query (as existing).
-*   **Authentication:** Supabase Auth.
-*   **Payment Integration:** Stripe (Stripe.js, Stripe SDK, Stripe webhooks).
-*   **Deployment:** Render.
-*   **API Communication:** Secure API endpoints for any interaction with the main `app.firegauge.app` backend (if direct data fetching is needed beyond what Supabase provides).
+**These features now live in the main application's expanded admin interface.**
 
-**5. User Stories**
+**5. Technical Requirements - SIMPLIFIED**
 
-*   **As a Fire Chief (Potential Customer), I want to quickly understand how FireGauge solves NFPA compliance and reduces inspection time, so I can assess if it's right for my department.**
-*   **As a Testing Contractor (Potential Customer), I want to see clear pricing and available features for different tiers, so I can choose the best plan for my business size and needs.**
-*   **As a new visitor, I want a simple and secure sign-up process, so I can quickly create an account and select a subscription plan.**
-*   **As a new user, I want to be guided to the main application (`app.firegauge.app`) after signing up, so I can start using the software.**
-*   **As a Subscribed Admin, I want to log into `www.firegauge.app` to manage my company's billing details and payment methods.**
-*   **As a Subscribed Admin, I want to invite new technicians (Operators) and other administrators from my company to use FireGauge.**
-*   **As a Subscribed Admin, I want to see a high-level overview of my stations and their status directly from the `www.firegauge.app` portal.**
-*   **As a Subscribed Admin, I want to easily upgrade or change my subscription plan as my team or needs grow.**
-*   **As any user, I want to be able to reset my password if I forget it.**
+*   **Frontend Stack:** Vite, React, TypeScript, Tailwind CSS (existing)
+*   **Focus Areas:** Landing page optimization, conversion tracking, A/B testing
+*   **Authentication:** NONE (anonymous users only)
+*   **Payment Integration:** Stripe Checkout (simplified, one-way flow)
+*   **Analytics:** Conversion tracking, funnel analysis, user behavior
+*   **Performance:** Fast loading, mobile optimization, SEO optimization
 
-**6. Non-Functional Requirements**
+**6. Success Metrics - CONVERSION FOCUSED**
 
-*   **Branding & Design:**
-    *   **Goal:** Modern, professional, trustworthy, and easy-to-use.
-    *   **Color Palette:** Suggestion: Blues (trust, reliability), Oranges/Reds (fire/safety, caution, action - use sparingly as accents), Grays/Whites (cleanliness, modernity). We will need to finalize this.
-    *   **Typography:** Clear, legible sans-serif fonts. One for headings, one for body text.
-    *   **Logo:** A logo needs to be designed for FireGauge.
-    *   **Imagery:** High-quality, relevant images or custom illustrations depicting fire equipment, technicians (if appropriate and inclusive), and abstract representations of data/efficiency.
-*   **User Experience (UX):**
-    *   Intuitive navigation.
-    *   Responsive design for optimal viewing on desktop, tablet, and mobile.
-    *   Fast page load times (< 3 seconds).
-    *   Clear visual feedback for user actions.
-*   **SEO & Discoverability:**
-    *   **Goal:** Achieve good rankings for relevant keywords.
-    *   **Strategy:**
-        *   Keyword research to identify terms used by fire chiefs and testing contractors (e.g., "fire hose testing software," "NFPA 1962 compliance app," "digital fire equipment logs").
-        *   On-page SEO: Optimize titles, meta descriptions, headers, and content with target keywords.
-        *   Semantic HTML.
-        *   Internal linking.
-        *   Ensure site is crawlable and indexable (sitemap.xml, robots.txt).
-*   **Accessibility:** Aim for WCAG 2.1 Level AA compliance.
-*   **Security:**
-    *   HTTPS for all traffic.
-    *   Secure handling of user credentials and payment information (Stripe handles PCI compliance).
-    *   Protection against common web vulnerabilities (OWASP Top 10).
-*   **Content Management:** Initially, content will be managed via code. A headless CMS could be considered later if frequent content updates by non-technical users are required.
+*   **Primary Metrics:**
+    *   Conversion rate (visitor → trial signup)
+    *   Cost per acquisition (CPA)
+    *   Trial-to-paid conversion rate
+    *   Demo request conversion rate
 
-**7. Success Metrics**
+*   **Secondary Metrics:**
+    *   Landing page bounce rate
+    *   Time on pricing page
+    *   Funnel drop-off points
+    *   Organic search rankings
 
-*   **Primary:**
-    *   Sign-up conversion rate (visitors who complete sign-up).
-    *   Number of new subscriptions per month/quarter.
-*   **Secondary:**
-    *   Demo request conversion rate (if a "Book a Demo" CTA is added).
-    *   Website traffic (total visits, unique visitors).
-    *   Bounce rate.
-    *   Average time on page.
-    *   Keyword rankings for core terms.
-    *   User engagement within the authenticated portal (e.g., % of users managing billing, % of admins managing users).
-    *   Customer churn rate (monitored via Stripe/main app, but influenced by overall experience including portal).
+*   **Removed Metrics:** (Now tracked in main app)
+    *   ~~User engagement in portal~~
+    *   ~~Billing management usage~~
+    *   ~~Support ticket volume~~
+
+**7. Development Priorities**
+
+### Phase 1: Simplification (Immediate)
+1. **Remove Complex Features:** Eliminate all authentication and user management
+2. **Optimize Conversion Flow:** Streamline signup process
+3. **Update Content:** Focus messaging on value and conversion
+4. **A/B Testing Setup:** Implement testing framework for optimization
+
+### Phase 2: Conversion Optimization  
+1. **Landing Page Variants:** Test different value propositions
+2. **Pricing Optimization:** Test pricing presentation and plan structures
+3. **Demo Experience:** Enhanced product demonstration capabilities
+4. **Lead Qualification:** Better lead scoring and routing
+
+### Phase 3: Growth & Scale
+1. **Content Marketing:** SEO-optimized resources and blog
+2. **Partner Integrations:** Firemark and other contractor partnerships
+3. **Advanced Analytics:** Detailed conversion funnel analysis
+4. **Performance Optimization:** Speed and mobile experience improvements
+
+**8. Migration from Current State**
+
+### Immediate Actions:
+- [ ] **Content Audit:** Remove all references to user management features
+- [ ] **Code Cleanup:** Remove authentication, user portal, billing management code
+- [ ] **Redirect Setup:** Route old portal URLs to main app
+- [ ] **Analytics Update:** Focus tracking on conversion metrics
+
+### Communication Strategy:
+- **Current Users:** Email notification about unified admin experience
+- **Marketing Materials:** Update all collateral to reflect simplified journey
+- **Sales Process:** Train on new streamlined demo and signup flow
+
+**9. Risk Mitigation**
+
+### Potential Concerns:
+- **User Confusion:** During transition period
+- **Lost Features:** Users expecting marketing site portal
+- **Conversion Impact:** Changes might affect signup flow
+
+### Mitigation Strategies:
+- **Clear Communication:** Proactive user education about changes
+- **Smooth Redirects:** Seamless routing from old URLs to main app
+- **Gradual Rollout:** Phased implementation with monitoring
+- **Rollback Plan:** Ability to restore old flow if conversion drops
 
 ---
 
-**Next Steps & Recommendations:**
+**Strategic Summary:**
 
-1.  **Branding Exercise:**
-    *   Develop 2-3 logo concepts for FireGauge.
-    *   Finalize a color palette and typography.
-    *   Create a simple style guide.
-2.  **Content Creation:**
-    *   Write compelling copy for all website pages, focusing on the value propositions and target audience.
-3.  **SEO Keyword Finalization:**
-    *   Conduct more in-depth keyword research.
-4.  **Design Mockups:**
-    *   Create wireframes and then high-fidelity mockups for key pages (Homepage, Pricing, Dashboard, Auth).
-5.  **Task Breakdown with Taskmaster:**
-    *   I recommend saving this PRD as a `.md` or `.txt` file in your project (e.g., in a `docs/` directory or `scripts/` if that's where Taskmaster expects it).
-    *   Then, we can use the `mcp_taskmaster-ai_parse_prd` tool to generate an initial set of tasks. This will help us organize the development work. 
+This streamlined approach transforms the marketing site into a pure conversion machine while eliminating user confusion about "multiple places to manage things." All complexity moves to the main application where it can be properly integrated with existing workflows, creating a superior user experience and more maintainable codebase.
+
+The marketing site becomes laser-focused on its core job: converting prospects into paying customers as efficiently as possible. 

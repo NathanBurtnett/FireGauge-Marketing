@@ -74,6 +74,29 @@ const Benefits = () => {
             </p>
           </div>
         </div>
+        
+        <div className="text-center mt-12">
+          <p className="text-lg text-gray-600 mb-6">
+            Ready to experience these benefits for your department?
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+            <a 
+              href="/pricing" 
+              className="inline-flex items-center px-6 py-3 bg-firegauge-red text-white font-semibold rounded-lg hover:bg-firegauge-red/90 transition-colors duration-300"
+            >
+              Try Free for 30 Days
+              <svg className="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+            <a 
+              href="#features" 
+              className="inline-flex items-center px-6 py-3 text-firegauge-charcoal border border-gray-300 font-semibold rounded-lg hover:bg-gray-50 transition-colors duration-300"
+            >
+              See All Features
+            </a>
+          </div>
+        </div>
       </div>
     </section>
   );

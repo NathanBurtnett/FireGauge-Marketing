@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout Function Debug Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .warning { background-color: #fff3cd; border-color: #ffeaa7; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Checkout Function Debug Test</h1>
+        <p>This page helps debug the create-checkout Supabase Edge Function</p>
+
+        <!-- Auth Status -->
+        <div class="test-section" id="auth-status">
+            <h3>🔐 Authentication Status</h3>
+            <div id="auth-info">Loading...</div>
+            <button onclick="checkAuth()">Check Auth</button>
+            <button onclick="signIn()">Sign In</button>
+            <button onclick="signOut()">Sign Out</button>
+        </div>
+
+        <!-- Function Test -->
+        <div class="test-section">
+            <h3>🧪 Function Tests</h3>
+            <button onclick="testCheckout('price_1RSqV400HE2ZS1pmK1uKuTCe')">Test Free Plan</button>
+            <button onclick="testCheckout('price_1RSqVe00HE2ZS1pmDEo9KWsH')">Test Pro Plan</button>
+            <button onclick="testCheckout('price_1RSqW700HE2ZS1pmz6HtFgxT')">Test Enterprise Plan</button>
+        </div>
+
+        <!-- Environment Check -->
+        <div class="test-section">
+            <h3>🔧 Environment Check</h3>
+            <button onclick="checkEnvironment()">Check Environment</button>
+            <div id="env-check"></div>
+        </div>
+
+        <!-- Logs -->
+        <div class="test-section">
+            <h3>📋 Debug Logs</h3>
+            <button onclick="clearLogs()">Clear Logs</button>
+            <div id="debug-logs" class="log"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.skypack.dev/@supabase/supabase-js@2.45.0';
+
+        // Configuration
+        const SUPABASE_URL = 'https://juznipgitbmtfmoszzek.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp1em5pcGdpdGJtdGZtb3N6emVrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzMzNzAzNjMsImV4cCI6MjA0ODk0NjM2M30.mKDN6X9v7W1s8lKRfUjFpLPhNFLDm8oAhJZjgOyJkfA';
+        
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Logging function
+        function log(message, level = 'info') {
+            const timestamp = new Date().toISOString();
+            const logElement = document.getElementById('debug-logs');
+            const logClass = level === 'error' ? 'error' : level === 'warning' ? 'warning' : 'success';
+            logElement.innerHTML += `<div class="${logClass}">[${timestamp}] ${message}</div>`;
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(`[${level.toUpperCase()}]`, message);
+        }
+
+        // Auth functions
+        window.checkAuth = async function() {
+            try {
+                const { data: { user }, error } = await supabase.auth.getUser();
+                const authInfo = document.getElementById('auth-info');
+                
+                if (error) {
+                    authInfo.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+                    log(`Auth error: ${error.message}`, 'error');
+                    return;
+                }
+                
+                if (user) {
+                    authInfo.innerHTML = `
+                        <div class="success">
+                            <strong>✅ Authenticated</strong><br>
+                            User ID: ${user.id}<br>
+                            Email: ${user.email}<br>
+                            Created: ${user.created_at}
+                        </div>
+                    `;
+                    log(`User authenticated: ${user.email}`, 'info');
+                } else {
+                    authInfo.innerHTML = `<div class="warning">❌ Not authenticated</div>`;
+                    log('User not authenticated', 'warning');
+                }
+            } catch (error) {
+                log(`Auth check failed: ${error.message}`, 'error');
+            }
+        };
+
+        window.signIn = async function() {
+            try {
+                const { error } = await supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                        redirectTo: window.location.href
+                    }
+                });
+                if (error) throw error;
+                log('Redirecting to Google sign-in...', 'info');
+            } catch (error) {
+                log(`Sign-in error: ${error.message}`, 'error');
+            }
+        };
+
+        window.signOut = async function() {
+            try {
+                const { error } = await supabase.auth.signOut();
+                if (error) throw error;
+                log('Signed out successfully', 'info');
+                window.checkAuth();
+            } catch (error) {
+                log(`Sign-out error: ${error.message}`, 'error');
+            }
+        };
+
+        // Test checkout function
+        window.testCheckout = async function(priceId) {
+            log(`🧪 Testing checkout with price ID: ${priceId}`, 'info');
+            
+            try {
+                // Check auth first
+                const { data: { user }, error: authError } = await supabase.auth.getUser();
+                if (authError || !user) {
+                    log('❌ Authentication required for checkout test', 'error');
+                    return;
+                }
+                
+                log(`✅ User authenticated: ${user.email}`, 'info');
+                
+                // Test the function
+                log('📡 Calling create-checkout function...', 'info');
+                const startTime = Date.now();
+                
+                const { data, error } = await supabase.functions.invoke('create-checkout', {
+                    body: { priceId }
+                });
+                
+                const duration = Date.now() - startTime;
+                log(`⏱️ Function call completed in ${duration}ms`, 'info');
+                
+                if (error) {
+                    log(`❌ Function error: ${JSON.stringify(error, null, 2)}`, 'error');
+                    
+                    // Try to get more details from the error
+                    if (error.context && typeof error.context.text === 'function') {
+                        try {
+                            const errorText = await error.context.text();
+                            log(`📄 Error response body: ${errorText}`, 'error');
+                        } catch (e) {
+                            log(`📄 Could not read error response body: ${e.message}`, 'warning');
+                        }
+                    }
+                    return;
+                }
+                
+                if (data && data.url) {
+                    log(`✅ Checkout session created successfully!`, 'success');
+                    log(`🔗 Checkout URL: ${data.url}`, 'info');
+                    
+                    // Optionally open the URL
+                    if (confirm('Open checkout URL in new tab?')) {
+                        window.open(data.url, '_blank');
+                    }
+                } else {
+                    log(`⚠️ Unexpected response: ${JSON.stringify(data, null, 2)}`, 'warning');
+                }
+                
+            } catch (error) {
+                log(`❌ Caught error: ${error.message}`, 'error');
+                log(`📄 Full error: ${JSON.stringify(error, null, 2)}`, 'error');
+            }
+        };
+
+        // Check environment
+        window.checkEnvironment = async function() {
+            const envCheck = document.getElementById('env-check');
+            log('🔧 Checking environment...', 'info');
+            
+            try {
+                // Test basic connectivity
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/`, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY
+                    }
+                });
+                
+                if (response.ok) {
+                    log('✅ Supabase connection successful', 'success');
+                } else {
+                    log(`❌ Supabase connection failed: ${response.status}`, 'error');
+                }
+                
+                // Check auth status
+                const { data: { user } } = await supabase.auth.getUser();
+                log(`🔐 Auth status: ${user ? 'Authenticated' : 'Not authenticated'}`, user ? 'success' : 'warning');
+                
+                // Display environment info
+                envCheck.innerHTML = `
+                    <div class="success">
+                        <strong>Environment Information:</strong><br>
+                        Supabase URL: ${SUPABASE_URL}<br>
+                        Anon Key: ${SUPABASE_ANON_KEY.substring(0, 20)}...<br>
+                        Current URL: ${window.location.href}<br>
+                        User Agent: ${navigator.userAgent.substring(0, 50)}...
+                    </div>
+                `;
+                
+            } catch (error) {
+                log(`❌ Environment check failed: ${error.message}`, 'error');
+                envCheck.innerHTML = `<div class="error">Environment check failed: ${error.message}</div>`;
+            }
+        };
+
+        // Clear logs
+        window.clearLogs = function() {
+            document.getElementById('debug-logs').innerHTML = '';
+        };
+
+        // Initialize
+        window.addEventListener('load', function() {
+            log('🚀 Debug page loaded', 'info');
+            window.checkAuth();
+            window.checkEnvironment();
+        });
+
+        // Handle auth state changes
+        supabase.auth.onAuthStateChange((event, session) => {
+            log(`🔄 Auth state changed: ${event}`, 'info');
+            if (event === 'SIGNED_IN') {
+                window.checkAuth();
+            }
+        });
+    </script>
+</body>
+</html> 
