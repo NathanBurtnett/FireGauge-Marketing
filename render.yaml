@@ -1,0 +1,20 @@
+services:
+  # ─────────── Marketing Site (Vite/React) ───────────
+  - type: web
+    name: firegauge-marketing
+    runtime: node
+    plan: starter
+    branch: main
+    buildCommand: "npm install && npm run build"
+    startCommand: "npm run preview"
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: VITE_API_URL
+        value: https://firegauge-api.onrender.com
+      - key: VITE_SUPABASE_URL
+        value: YOUR_SUPABASE_URL
+      - key: VITE_SUPABASE_ANON_KEY
+        value: YOUR_SUPABASE_ANON_KEY
+      - key: VITE_STRIPE_PUBLISHABLE_KEY
+        value: YOUR_STRIPE_PUBLISHABLE_KEY 
