@@ -13,8 +13,8 @@ services:
       - key: VITE_API_URL
         value: https://firegauge-api.onrender.com
       - key: VITE_SUPABASE_URL
-        value: YOUR_SUPABASE_URL
+        value: https://juznipgitbmtfmoszzek.supabase.co
       - key: VITE_SUPABASE_ANON_KEY
-        value: YOUR_SUPABASE_ANON_KEY
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp1em5pcGdpdGJtdGZtb3N6emVrIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NTk3NTI1NCwiZXhwIjoyMDYxNTUxMjU0fQ.nGed28H2fYdO6uqy-LTVGT2yOlzRpSZUyUA8yD0NhxU
       - key: VITE_STRIPE_PUBLISHABLE_KEY
-        value: YOUR_STRIPE_PUBLISHABLE_KEY 
+        value: pk_live_51RJPQn00HE2ZS1pmNxK1ojJ9joBsosOLDIRPdwoEhW7wYHYk64GI6uYHFw0AO2t77sU7cvg0LJkHkasbgn2f9MqE00hkWmaveG 
