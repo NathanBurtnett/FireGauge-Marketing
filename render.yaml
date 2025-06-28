@@ -5,8 +5,8 @@ services:
     runtime: node
     plan: starter
     branch: main
-    buildCommand: "npm install && npm run build"
-    startCommand: "npm run preview"
+    buildCommand: "bun install && bun run build"
+    startCommand: "bun run preview"
     envVars:
       - key: NODE_ENV
         value: production
