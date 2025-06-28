@@ -125,9 +125,73 @@ serve(async (req) => {
           }
 
           const supabaseUserIdFromMetadata = session.metadata?.supabase_user_id;
+          const requiresAccountCreation = session.metadata?.requires_account_creation === "true";
 
+          // Handle new user account creation flow
+          if (requiresAccountCreation && !supabaseUserIdFromMetadata) {
+            logStep("New user signup detected - calling main app account creation", { sessionId: session.id });
+            
+            try {
+              // Extract customer information for account creation
+              const customerEmail = session.customer_details?.email;
+              const customerName = session.customer_details?.name;
+              
+              if (!customerEmail) {
+                throw new Error("Customer email not found in checkout session");
+              }
+
+              // Get subscription and price information
+              const subscriptionId = typeof session.subscription === 'string' ? session.subscription : session.subscription.id;
+              
+              // Get price ID from line items
+              const expandedSession = await stripe.checkout.sessions.retrieve(session.id, {
+                expand: ['line_items']
+              });
+              const priceId = expandedSession.line_items?.data?.[0]?.price?.id;
+              
+              // Call the main app's account creation endpoint
+              const mainAppAccountUrl = "https://firegauge-api.onrender.com/api/create-account-from-marketing-site";
+              
+              const accountData = {
+                customer_email: customerEmail,
+                customer_name: customerName || customerEmail,
+                stripe_customer_id: stripeCustomerId,
+                stripe_subscription_id: subscriptionId,
+                stripe_price_id: priceId
+              };
+
+              const accountResponse = await fetch(mainAppAccountUrl, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(accountData),
+              });
+
+              if (!accountResponse.ok) {
+                const errorText = await accountResponse.text();
+                throw new Error(`Account creation failed: ${accountResponse.status} - ${errorText}`);
+              }
+
+              const accountResult = await accountResponse.json();
+              logStep("Account created successfully in main app", { 
+                tenantId: accountResult.tenant_id,
+                userId: accountResult.user_id,
+                email: customerEmail
+              });
+
+              // The main app handles all account creation, so we're done here for new users
+              break;
+              
+            } catch (error: any) {
+              logStep("Failed to create account in main app", { error: error.message });
+              throw new Error(`Account creation failed: ${error.message}`);
+            }
+          }
+
+          // Handle existing user flow (original logic)
           if (!supabaseUserIdFromMetadata) {
-            throw new Error("supabase_user_id not found in checkout session metadata.");
+            throw new Error("supabase_user_id not found in checkout session metadata for existing user.");
           }
           if(!stripeCustomerId){
              throw new Error("Stripe Customer ID not found in checkout session.");
