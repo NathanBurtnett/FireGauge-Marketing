@@ -7,8 +7,14 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { useSubscription } from "@/components/hooks/useSubscription";
 import { toast } from "@/components/ui/sonner";
+import { supabase } from "@/lib/supabase";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+
+// Declare gtag for analytics
+declare global {
+  function gtag(...args: any[]): void;
+}
 
 interface PricingPlan {
   name: string;
@@ -132,6 +138,43 @@ const PricingPage = () => {
     }
   ];
 
+  // Direct checkout function that supports both authenticated and anonymous users
+  const createDirectCheckoutSession = async (priceId: string, planName: string) => {
+    try {
+      console.log(`[PRICING PAGE] Creating checkout session for ${planName} (${priceId})`);
+      
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: {
+          priceId: priceId,
+          metadata: {
+            plan_name: planName,
+            source: 'pricing_page',
+            // Generate a unique checkout session ID
+            checkout_session_id: Date.now().toString(),
+            // For anonymous users, account creation will happen during webhook
+            requires_account_creation: user ? 'false' : 'true'
+          }
+        }
+      });
+
+      if (error) {
+        console.error('[PRICING PAGE] Supabase function error:', error);
+        throw error;
+      }
+
+      if (!data?.url) {
+        console.error('[PRICING PAGE] No checkout URL returned:', data);
+        throw new Error('No checkout URL returned from server');
+      }
+
+      console.log('[PRICING PAGE] Checkout session created successfully:', data.url);
+      return data.url;
+    } catch (error) {
+      console.error('[PRICING PAGE] Error creating checkout session:', error);
+      throw error;
+    }
+  };
+
   const handlePlanAction = async (plan: PricingPlan) => {
     setIsLoading(plan.name);
 
@@ -146,10 +189,9 @@ const PricingPage = () => {
       return;
     }
 
-    if (!user) {
-      toast.error("Authentication required", {
-        description: "Please sign in to subscribe to a plan",
-      });
+    if (plan.name === "Pilot 90") {
+      // For free trial, redirect to onboarding
+      window.location.href = '/onboarding?plan=pilot';
       setIsLoading(null);
       return;
     }
@@ -158,17 +200,34 @@ const PricingPage = () => {
       // Track trial/subscription start
       trackingHelpers.trackTrialStart(plan.name);
       
-      const checkoutUrl = await createCheckoutSession(plan.monthlyPriceId);
-      if (checkoutUrl) {
-        window.location.href = checkoutUrl;
-      } else {
-        toast.error("Could not initiate plan change", {
-          description: "Please try again or contact support",
+      console.log(`[PRICING PAGE] Starting checkout for ${plan.name}`);
+      
+      // Use direct checkout that works with or without authentication
+      const checkoutUrl = await createDirectCheckoutSession(plan.monthlyPriceId, plan.name);
+      
+      console.log(`[PRICING PAGE] Redirecting to Stripe checkout:`, checkoutUrl);
+      
+      // Analytics tracking
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'begin_checkout', {
+          currency: 'USD',
+          value: parseFloat(plan.priceDisplay.replace('$', '') || '0'),
+          items: [{
+            item_id: plan.monthlyPriceId,
+            item_name: plan.name,
+            category: 'subscription',
+            quantity: 1
+          }]
         });
       }
+
+      // Redirect to Stripe checkout
+      window.location.href = checkoutUrl;
+      
     } catch (error: any) {
-      toast.error("An unexpected error occurred", {
-        description: error.message,
+      console.error('[PRICING PAGE] Checkout error:', error);
+      toast.error("Could not start checkout", {
+        description: error.message || "Please try again or contact support",
       });
     } finally {
       setIsLoading(null);

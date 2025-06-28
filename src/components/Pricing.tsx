@@ -4,6 +4,11 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/sonner";
 import { supabase } from "@/lib/supabase";
 
+// Declare gtag for analytics
+declare global {
+  function gtag(...args: any[]): void;
+}
+
 // Lazy load Stripe only when needed
 const getStripe = async () => {
   const { loadStripe } = await import('@stripe/stripe-js');
