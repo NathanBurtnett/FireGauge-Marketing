@@ -38,7 +38,7 @@ const manageSubscriptionInSupabase = async (
     stripe_subscription_id: stripeSubscriptionObject.id,
     stripe_customer_id: stripeCustomerId,
     stripe_price_id: stripeSubscriptionObject.items.data[0]?.price.id, 
-    subscription_status_enum: stripeSubscriptionObject.status,
+    status: stripeSubscriptionObject.status,
     current_period_start: new Date(stripeSubscriptionObject.current_period_start * 1000).toISOString(),
     current_period_end: new Date(stripeSubscriptionObject.current_period_end * 1000).toISOString(),
     cancel_at_period_end: stripeSubscriptionObject.cancel_at_period_end,
@@ -274,7 +274,7 @@ serve(async (req) => {
         const { error: deleteError } = await supabaseAdmin
           .from("subscriptions")
           .update({ 
-            subscription_status_enum: relevantSubscription.status, // should be 'canceled' or a similar terminal status from Stripe
+            status: relevantSubscription.status, // should be 'canceled' or a similar terminal status from Stripe
             cancel_at_period_end: relevantSubscription.cancel_at_period_end, // ensure this is accurate
            })
           .eq("stripe_subscription_id", relevantSubscription.id);
@@ -336,7 +336,7 @@ serve(async (req) => {
           // Update your subscription status to 'past_due' or 'unpaid'
           const { error: paymentFailedError } = await supabaseAdmin
             .from("subscriptions")
-            .update({ subscription_status_enum: "past_due" }) // Or map to your specific enum value
+            .update({ status: "past_due" }) // Or map to your specific enum value
             .eq("stripe_subscription_id", subscriptionIdFailed);
 
           if (paymentFailedError) {

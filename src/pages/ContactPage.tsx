@@ -60,7 +60,7 @@ ${formData.message}
 ---
 Submitted from: firegauge.app/contact`;
 
-      const mailtoLink = `mailto:contact@firegauge.app?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      const mailtoLink = `mailto:firegaugellc@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
       
       // Open email client
       window.open(mailtoLink, '_blank');
@@ -81,7 +81,7 @@ Submitted from: firegauge.app/contact`;
 
     } catch (err: any) {
       console.error('Error submitting contact form:', err);
-      setError('Please ensure you have an email client configured, or contact us directly at contact@firegauge.app');
+      setError('Please ensure you have an email client configured, or contact us directly at firegaugellc@gmail.com');
       setIsSubmitting(false);
     }
   };
@@ -96,7 +96,7 @@ Best regards,
 [Your Name]
 [Your Organization]`;
     
-    window.open(`mailto:demo@firegauge.app?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, '_blank');
+    window.open(`mailto:firegaugellc@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, '_blank');
   };
 
   return (
@@ -145,8 +145,8 @@ Best regards,
                 <CardContent className="space-y-4">
                   <div className="flex items-center">
                     <Mail className="mr-3 h-4 w-4 text-gray-500" />
-                    <a href="mailto:contact@firegauge.app" className="text-firegauge-red hover:underline">
-                      contact@firegauge.app
+                    <a href="mailto:firegaugellc@gmail.com" className="text-firegauge-red hover:underline">
+                      firegaugellc@gmail.com
                     </a>
                   </div>
                   <div className="flex items-center">

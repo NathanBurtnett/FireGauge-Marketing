@@ -165,7 +165,7 @@ const Pricing = () => {
   const handleSubscribe = async (priceId: string, planName: string) => {
     if (planName === "Enterprise") {
       // Redirect to contact page for enterprise
-      window.open('mailto:sales@firegauge.app?subject=Enterprise Plan Inquiry', '_blank');
+      window.open('mailto:firegaugellc@gmail.com?subject=Enterprise Plan Inquiry', '_blank');
       return;
     }
 

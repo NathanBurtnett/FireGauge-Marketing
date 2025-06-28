@@ -100,7 +100,7 @@ serve(async (req) => {
 
     // Create customer email for anonymous flow
     if (!isAuthenticatedFlow && !userEmail) {
-      userEmail = `temp-${Date.now()}@firegauge.app`; // Temporary email for anonymous checkout
+      userEmail = `temp-${Date.now()}@firegaugellc.gmail.com`; // Temporary email for anonymous checkout
       logStep("Generated temporary email for anonymous user", { email: userEmail });
     }
 

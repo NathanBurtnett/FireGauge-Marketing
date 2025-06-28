@@ -28,7 +28,7 @@ const PaymentSuccess = () => {
 
   const handleSignInRedirect = () => {
     // Redirect to main FireGauge app sign-in
-    window.location.href = "https://firegauge-api.onrender.com/";
+    window.location.href = "https://firegauge-app.onrender.com/";
   };
 
   if (!sessionId) {
