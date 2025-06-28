@@ -5,7 +5,7 @@ services:
     runtime: node
     plan: starter
     branch: main
-    buildCommand: "bun install --production=false && bun run build"
+    buildCommand: "bun install && bun run build"
     startCommand: "bun run preview"
     healthCheckPath: "/"
     envVars:
