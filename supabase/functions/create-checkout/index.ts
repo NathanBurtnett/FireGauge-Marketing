@@ -131,7 +131,7 @@ serve(async (req) => {
       ],
       mode: "subscription",
       success_url: `${req.headers.get("origin") || "https://firegauge.app"}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.headers.get("origin") || "https://firegauge.app"}/pricing`,
+      cancel_url: `${req.headers.get("origin") || "https://firegauge.app"}/`,
       customer_email: userEmail,
       metadata: sessionMetadata,
       subscription_data: {
