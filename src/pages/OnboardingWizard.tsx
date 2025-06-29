@@ -219,7 +219,7 @@ const OnboardingWizard = () => {
                       email, 
                       options: { 
                         shouldCreateUser: true, 
-                        emailRedirectTo: `${window.location.origin}/onboarding${window.location.search}` 
+                        emailRedirectTo: `${window.location.origin}/auth/callback${window.location.search}` 
                       } 
                     });
                     if (error && error.message !== 'User already registered') {

@@ -11,25 +11,50 @@ export const AuthCallback: React.FC = () => {
   useEffect(() => {
     // Capture debug information
     const currentUrl = window.location.href;
-    const hasAccessToken = currentUrl.includes('access_token=');
-    const hasMagicLink = currentUrl.includes('type=magiclink');
+    const currentHash = window.location.hash;
+    const hasAccessToken = currentUrl.includes('access_token=') || currentHash.includes('access_token=');
+    const hasMagicLink = currentUrl.includes('type=magiclink') || currentHash.includes('type=magiclink');
+    const isRootWithTokens = window.location.pathname === '/' && (hasAccessToken || hasMagicLink);
+    
+    console.log('🔍 AuthCallback Debug:', {
+      currentUrl,
+      currentHash,
+      pathname: window.location.pathname,
+      hasAccessToken,
+      hasMagicLink,
+      isRootWithTokens,
+      user: user ? { id: user.id, email: user.email } : null,
+      loading,
+      timestamp: new Date().toISOString()
+    });
     
     setDebugInfo({
       currentUrl,
+      currentHash,
+      pathname: window.location.pathname,
       hasAccessToken,
       hasMagicLink,
+      isRootWithTokens,
       user: user ? { id: user.id, email: user.email } : null,
       loading,
       timestamp: new Date().toISOString()
     });
 
-    // If we have authentication tokens and user is authenticated, redirect
-    if ((hasAccessToken || hasMagicLink) && user && !loading) {
+    // If we're on root page with auth tokens, redirect to onboarding immediately
+    if (isRootWithTokens && !loading) {
+      console.log('🔄 Detected magic link callback on root page, redirecting to onboarding...');
+      
+      // Use window.location for immediate redirect
+      window.location.href = '/onboarding';
+      return;
+    }
+
+    // If we have user authenticated and we're still on root with tokens, also redirect
+    if ((hasAccessToken || hasMagicLink) && user && !loading && window.location.pathname === '/') {
       console.log('✅ Magic link authentication successful, redirecting to onboarding...');
       
-      // Clean up URL and redirect
-      window.history.replaceState({}, document.title, '/onboarding');
-      navigate('/onboarding', { replace: true });
+      // Use window.location for immediate redirect
+      window.location.href = '/onboarding';
     }
   }, [user, loading, navigate]);
 
