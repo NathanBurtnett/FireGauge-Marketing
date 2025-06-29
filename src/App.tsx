@@ -18,7 +18,7 @@ import AnalyticsDashboard from "./components/AnalyticsDashboard";
 import CustomerDashboard from "./components/CustomerDashboard";
 import { initializeSEO } from "./utils/seo";
 import { analytics } from "./lib/analytics";
-import { AuthProvider, useAuth } from "@/components/providers/AuthProvider";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +33,8 @@ const LoadingScreen = () => (
 );
 
 function App() {
+  const { loading } = useAuth();
+
   // Initialize SEO and analytics on app load
   useEffect(() => {
     initializeSEO();
@@ -53,37 +55,37 @@ function App() {
     };
   }, []);
 
+  if (loading) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <LoadingScreen />
+      </QueryClientProvider>
+    );
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        {/* Show splash while AuthProvider determines session */}
-        {(() => {
-          const { loading } = useAuth();
-          if (loading) return <LoadingScreen />;
-          return null;
-        })()}
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/pricing" element={<PricingPage />} />
-              <Route path="/about" element={<AboutUsPage />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route path="/legal" element={<LegalPage />} />
-              <Route path="/payment-success" element={<PaymentSuccess />} />
-              <Route path="/onboarding" element={<OnboardingWizard />} />
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/about" element={<AboutUsPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/legal" element={<LegalPage />} />
+            <Route path="/payment-success" element={<PaymentSuccess />} />
+            <Route path="/onboarding" element={<OnboardingWizard />} />
             <Route path="/admin/emails" element={<EmailTemplateManager />} />
             <Route path="/admin/analytics" element={<AnalyticsDashboard />} />
             <Route path="/dashboard" element={<CustomerDashboard />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-          <ScrollToTop />
-        </TooltipProvider>
-      </AuthProvider>
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+        <ScrollToTop />
+      </TooltipProvider>
     </QueryClientProvider>
   );
 }
