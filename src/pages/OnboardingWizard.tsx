@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -14,6 +14,8 @@ import { CheckCircle, ArrowRight, ArrowLeft, Building, Settings, Rocket, Loader2
 import { useToast } from "@/hooks/use-toast";
 import { emailService, ContactData } from '../lib/emailService';
 import { trackingHelpers } from '../lib/analytics';
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 // Form schemas
 const departmentInfoSchema = z.object({
@@ -28,21 +30,40 @@ const departmentInfoSchema = z.object({
 type DepartmentInfoForm = z.infer<typeof departmentInfoSchema>;
 
 const OnboardingWizard = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate(); // not currently used
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
+  const { user } = useAuth();
   
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(user ? 1 : 0);
   const [isLoading, setIsLoading] = useState(false);
   const [departmentData, setDepartmentData] = useState<DepartmentInfoForm | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState(() => {
+    const planSlug = searchParams.get('plan');
+    if (!planSlug) return 'Professional';
+    switch(planSlug) {
+      case 'pilot': return 'Pilot 90';
+      case 'essential': return 'Essential';
+      case 'pro': return 'Pro';
+      case 'contractor': return 'Contractor';
+      default: return 'Professional';
+    }
+  });
   
   const sessionId = searchParams.get('session_id');
-  const totalSteps = 4;
+  const totalSteps = user ? 4 : 5;
 
   // Track onboarding start
   useEffect(() => {
     trackingHelpers.trackOnboardingStart();
   }, []);
+
+  // Advance automatically once user is detected after sign-up
+  useEffect(() => {
+    if (user && currentStep === 0) {
+      setCurrentStep(1);
+    }
+  }, [user, currentStep]);
 
   const departmentForm = useForm<DepartmentInfoForm>({
     resolver: zodResolver(departmentInfoSchema),
@@ -151,6 +172,60 @@ const OnboardingWizard = () => {
   };
 
   const renderStep = () => {
+    // ---------- STEP 0: Account creation ----------
+    if (currentStep === 0) {
+      return (
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle>Create your FireGauge account</CardTitle>
+            <CardDescription>Enter your email to receive a magic-link sign-in.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Work Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+              <Button
+                className="w-full bg-red-600 hover:bg-red-700"
+                disabled={isLoading || !email}
+                onClick={async () => {
+                  setIsLoading(true);
+                  try {
+                    const { error } = await supabase.auth.signUp({ email: email });
+                    if (error && error.message !== 'User already registered') {
+                      throw error;
+                    }
+                    toast({
+                      title: 'Check your inbox',
+                      description: 'We\'ve sent you a magic link to complete sign-in.',
+                    });
+                  } catch (err) {
+                    console.error('Signup error', err);
+                    toast({
+                      title: 'Signup failed',
+                      description: err instanceof Error ? err.message : 'Please try again.',
+                      variant: 'destructive',
+                    });
+                  } finally {
+                    setIsLoading(false);
+                  }
+                }}
+              >
+                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Send magic link'}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      );
+    }
+
     switch (currentStep) {
       case 1:
         return (
@@ -305,7 +380,7 @@ const OnboardingWizard = () => {
                   <h3 className="font-semibold text-lg mb-2">Selected Plan</h3>
                   <div className="flex justify-between items-center">
                     <div>
-                      <p className="font-medium">Professional Plan</p>
+                      <p className="font-medium">{selectedPlan} Plan</p>
                       <p className="text-sm text-gray-600">
                         Perfect for {departmentData?.numberOfStations || 'multiple'} stations
                       </p>
@@ -328,7 +403,7 @@ const OnboardingWizard = () => {
                 </div>
 
                 <div className="flex justify-between">
-                  <Button variant="outline" onClick={prevStep}>
+                  <Button onClick={prevStep}>
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     Back
                   </Button>
@@ -384,7 +459,7 @@ const OnboardingWizard = () => {
                 </div>
 
                 <div className="flex justify-between">
-                  <Button variant="outline" onClick={prevStep}>
+                  <Button onClick={prevStep}>
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     Back
                   </Button>

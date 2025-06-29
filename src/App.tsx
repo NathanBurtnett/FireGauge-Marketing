@@ -18,9 +18,19 @@ import AnalyticsDashboard from "./components/AnalyticsDashboard";
 import CustomerDashboard from "./components/CustomerDashboard";
 import { initializeSEO } from "./utils/seo";
 import { analytics } from "./lib/analytics";
-import { AuthProvider } from "@/components/providers/AuthProvider";
+import { AuthProvider, useAuth } from "@/components/providers/AuthProvider";
 
 const queryClient = new QueryClient();
+
+// Simple full-screen loader
+const LoadingScreen = () => (
+  <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-firegauge-charcoal to-gray-800">
+    <div className="text-center text-white p-8 rounded-lg bg-white/10 backdrop-blur-sm max-w-md mx-4">
+      <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-firegauge-accent mx-auto mb-6" />
+      <p className="text-xl font-semibold">Loading…</p>
+    </div>
+  </div>
+);
 
 function App() {
   // Initialize SEO and analytics on app load
@@ -46,6 +56,12 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        {/* Show splash while AuthProvider determines session */}
+        {(() => {
+          const { loading } = useAuth();
+          if (loading) return <LoadingScreen />;
+          return null;
+        })()}
         <TooltipProvider>
           <Toaster />
           <Sonner />

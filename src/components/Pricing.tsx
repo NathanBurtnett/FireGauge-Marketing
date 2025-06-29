@@ -3,6 +3,8 @@ import { Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/sonner";
 import { supabase } from "@/lib/supabase";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 // Declare gtag for analytics
 declare global {
@@ -34,6 +36,8 @@ interface PricingPlan {
 
 const Pricing = () => {
   const [isLoading, setIsLoading] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
   const plans: PricingPlan[] = [
     {
@@ -169,14 +173,14 @@ const Pricing = () => {
 
   const handleSubscribe = async (priceId: string, planName: string) => {
     if (planName === "Enterprise") {
-      // Redirect to contact page for enterprise
       window.open('mailto:firegaugellc@gmail.com?subject=Enterprise Plan Inquiry', '_blank');
       return;
     }
 
-    if (planName === "Pilot 90") {
-      // For free trial, redirect to signup page
-      window.location.href = '/onboarding?plan=pilot';
+    // Require account creation first for all plans
+    if (!user || planName === "Pilot 90") {
+      const slug = planName === "Pilot 90" ? 'pilot' : planName.toLowerCase().replace(/\s+/g, '');
+      navigate(`/onboarding?plan=${slug}`);
       return;
     }
 
