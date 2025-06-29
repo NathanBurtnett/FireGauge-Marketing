@@ -16,9 +16,10 @@ import OnboardingWizard from "./pages/OnboardingWizard";
 import EmailTemplateManager from "./components/EmailTemplateManager";
 import AnalyticsDashboard from "./components/AnalyticsDashboard";
 import CustomerDashboard from "./components/CustomerDashboard";
+import AuthCallback from "./components/AuthCallback";
 import { initializeSEO } from "./utils/seo";
 import { analytics } from "./lib/analytics";
-import { useAuth } from "@/components/providers/AuthProvider";
+import { useAuth, AuthProvider } from "@/components/providers/AuthProvider";
 
 const queryClient = new QueryClient();
 
@@ -32,8 +33,9 @@ const LoadingScreen = () => (
   </div>
 );
 
-function App() {
-  const { loading } = useAuth();
+// Main App Content Component
+const AppContent = () => {
+  const { loading, user } = useAuth();
 
   // Initialize SEO and analytics on app load
   useEffect(() => {
@@ -55,36 +57,43 @@ function App() {
     };
   }, []);
 
+
+
   if (loading) {
-    return (
-      <QueryClientProvider client={queryClient}>
-        <LoadingScreen />
-      </QueryClientProvider>
-    );
+    return <LoadingScreen />;
   }
 
+  return (
+    <BrowserRouter>
+      <AuthCallback />
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/pricing" element={<PricingPage />} />
+        <Route path="/about" element={<AboutUsPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/legal" element={<LegalPage />} />
+        <Route path="/payment-success" element={<PaymentSuccess />} />
+        <Route path="/onboarding" element={<OnboardingWizard />} />
+        <Route path="/admin/emails" element={<EmailTemplateManager />} />
+        <Route path="/admin/analytics" element={<AnalyticsDashboard />} />
+        <Route path="/dashboard" element={<CustomerDashboard />} />
+        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+      <ScrollToTop />
+    </BrowserRouter>
+  );
+};
+
+function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/pricing" element={<PricingPage />} />
-            <Route path="/about" element={<AboutUsPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/legal" element={<LegalPage />} />
-            <Route path="/payment-success" element={<PaymentSuccess />} />
-            <Route path="/onboarding" element={<OnboardingWizard />} />
-            <Route path="/admin/emails" element={<EmailTemplateManager />} />
-            <Route path="/admin/analytics" element={<AnalyticsDashboard />} />
-            <Route path="/dashboard" element={<CustomerDashboard />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-        <ScrollToTop />
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

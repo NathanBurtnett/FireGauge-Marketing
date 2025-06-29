@@ -16,6 +16,7 @@ import { emailService, ContactData } from '../lib/emailService';
 import { trackingHelpers } from '../lib/analytics';
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { getWelcomeEmailHTML } from "@/components/WelcomeEmailTemplate";
 
 // Form schemas
 const departmentInfoSchema = z.object({
@@ -115,21 +116,35 @@ const OnboardingWizard = () => {
     setIsLoading(true);
     try {
       // Trigger email automation for onboarding completion
-      if (departmentData) {
+      if (departmentData && user) {
         const contactData: ContactData = {
-          email: 'user@example.com', // This would come from auth context
+          email: user.email || 'user@example.com',
           firstName: departmentData.primaryContact.split(' ')[0],
           lastName: departmentData.primaryContact.split(' ').slice(1).join(' '),
           departmentName: departmentData.departmentName,
-          planType: 'Pro', // This would come from the selected plan
+          planType: selectedPlan,
           signupDate: new Date().toISOString()
         };
 
-        // Trigger onboarding completion email sequence
-        await emailService.triggerEmailSequence('onboarding_complete', contactData);
-        
-        // Add contact to SendGrid marketing lists
-        await emailService.addContactToList(contactData, ['onboarded-users']);
+        // Send beautiful welcome email using our custom template
+        try {
+          const welcomeEmailHTML = getWelcomeEmailHTML({
+            userName: contactData.firstName,
+            departmentName: contactData.departmentName,
+            redirectUrl: 'https://firegauge-app.onrender.com/dashboard'
+          });
+          
+          // You can integrate this with your email service
+          console.log('Welcome email HTML generated:', welcomeEmailHTML);
+          
+          // Trigger onboarding completion email sequence
+          await emailService.triggerEmailSequence('onboarding_complete', contactData);
+          
+          // Add contact to SendGrid marketing lists
+          await emailService.addContactToList(contactData, ['onboarded-users']);
+        } catch (emailError) {
+          console.warn('Email sending failed, but continuing onboarding:', emailError);
+        }
       }
 
       // Track onboarding completion
@@ -200,7 +215,13 @@ const OnboardingWizard = () => {
                 onClick={async () => {
                   setIsLoading(true);
                   try {
-                    const { error } = await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: true, emailRedirectTo: window.location.href } });
+                    const { error } = await supabase.auth.signInWithOtp({ 
+                      email, 
+                      options: { 
+                        shouldCreateUser: true, 
+                        emailRedirectTo: `${window.location.origin}/onboarding${window.location.search}` 
+                      } 
+                    });
                     if (error && error.message !== 'User already registered') {
                       throw error;
                     }
