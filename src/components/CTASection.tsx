@@ -27,7 +27,7 @@ const CTASection: React.FC<CTASectionProps> = ({ onCTAClick, onPricingClick }) =
             Ready to Lose the Clipboards?
           </h2>
           <p className="text-xl text-gray-300 mb-8">
-            Join fire departments across the country who've upgraded to digital testing. Your 30-day free trial is just a click away.
+            Be among the first departments to upgrade to digital testing. Your 30-day free trial is just a click away.
           </p>
           
           <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6">

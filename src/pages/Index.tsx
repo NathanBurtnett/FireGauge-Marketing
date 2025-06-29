@@ -6,7 +6,6 @@ import Hero from "@/components/Hero";
 import Benefits from "@/components/Benefits";
 import ROIBanner from "@/components/ROIBanner";
 import Features from "@/components/Features";
-import Testimonials from "@/components/Testimonials";
 import Pricing from "@/components/Pricing";
 import FAQ from "@/components/FAQ";
 import CTASection from "@/components/CTASection";
@@ -52,11 +51,10 @@ const Index = () => {
     <div className="min-h-screen relative">
       <Navbar />
       <main>
-        <Hero onCTAClick={() => handleCTAClick('hero')} />
+        <Hero />
         <Benefits />
         <ROIBanner />
         <Features />
-        <Testimonials />
         <Pricing />
         <FAQ />
         <CTASection 

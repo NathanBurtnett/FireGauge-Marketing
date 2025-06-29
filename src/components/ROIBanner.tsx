@@ -12,19 +12,19 @@ const ROIBanner = () => {
         </div>
         
         <div className="flex flex-col md:flex-row items-start justify-around gap-8 md:gap-12">
-          <div className="text-center">
-            <div className="text-firegauge-accent text-4xl md:text-5xl font-bold mb-2">20-30</div>
-            <p className="text-white text-sm md:text-base">Minutes saved per hose test</p>
-          </div>
-          
-          <div className="text-center">
-            <div className="text-firegauge-accent text-4xl md:text-5xl font-bold mb-2">Dozens</div>
-            <p className="text-white text-sm md:text-base">Staff hours reclaimed annually</p>
+          <div className="text-center max-w-xs">
+            <p className="text-firegauge-accent text-4xl md:text-5xl font-bold mb-2">Less Paperwork</p>
+            <p className="text-white text-sm md:text-base">Free your team from manual data entry with digital-first workflows.</p>
           </div>
 
-          <div className="text-center">
-            <div className="text-firegauge-accent text-4xl md:text-5xl font-bold mb-2">Zero</div>
-            <p className="text-white text-sm md:text-base">Missed inspections or penalties* <span className="text-xs block text-gray-400">(*with proper use)</span></p>
+          <div className="text-center max-w-xs">
+            <p className="text-firegauge-accent text-4xl md:text-5xl font-bold mb-2">Faster Reports</p>
+            <p className="text-white text-sm md:text-base">Generate NFPA-ready PDFs in&nbsp;under&nbsp;30&nbsp;seconds.</p>
+          </div>
+
+          <div className="text-center max-w-xs">
+            <p className="text-firegauge-accent text-4xl md:text-5xl font-bold mb-2">Compliance Support</p>
+            <p className="text-white text-sm md:text-base">Built-in checks help you stay aligned with industry standards.</p>
           </div>
         </div>
       </div>

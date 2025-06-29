@@ -40,8 +40,9 @@ const Hero = () => {
             <span className="text-firegauge-accent block">Testing & Compliance</span>
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-            Mobile-first platform designed for contractors and fire departments. 
-            Streamline NFPA compliance, reduce testing time by 75%, and eliminate manual paperwork—all from your smartphone.
+            Mobile-first platform designed for contractors and fire departments.
+            Streamlines workflows, <span className="font-semibold">cuts administrative effort by&nbsp;up&nbsp;to&nbsp;75 %</span>,
+            and eliminates manual paperwork—all from your smartphone.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
@@ -66,18 +67,14 @@ const Hero = () => {
             </Button>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto text-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto text-center">
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
-              <div className="text-3xl font-bold text-firegauge-accent mb-2">75%</div>
-              <div className="text-sm">Faster Testing Process</div>
+              <div className="text-3xl font-bold text-firegauge-accent mb-2">Up&nbsp;to&nbsp;75 %</div>
+              <div className="text-sm">Less Admin Time</div>
             </div>
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
-              <div className="text-3xl font-bold text-firegauge-accent mb-2">100%</div>
-              <div className="text-sm">NFPA Compliant Reports</div>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
-              <div className="text-3xl font-bold text-firegauge-accent mb-2">$50K+</div>
-              <div className="text-sm">Annual Savings Per Dept</div>
+              <div className="text-3xl font-bold text-firegauge-accent mb-2">&lt;30&nbsp;s</div>
+              <div className="text-sm">Report Generation</div>
             </div>
           </div>
         </div>

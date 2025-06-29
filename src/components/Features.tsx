@@ -38,13 +38,13 @@ const Features = () => {
       icon: <Smartphone className="h-12 w-12 text-firegauge-red" />,
       title: "Mobile-First Testing Interface",
       description: "Purpose-built for field operations. Test hoses, ladders, and pumps directly from your smartphone—even offline. Our intuitive mobile interface reduces training time and eliminates the need for separate devices or clipboards.",
-      highlight: "75% faster than traditional methods"
+      highlight: "Cuts admin workload up to 75 %"
     },
     {
       icon: <Shield className="h-12 w-12 text-firegauge-red" />,
       title: "Automated NFPA/ISO Compliance",
       description: "Every test automatically generates audit-ready reports that meet NFPA 1962, ISO standards, and AHJ requirements. Built-in validation prevents non-compliant data entry and ensures your documentation passes every inspection.",
-      highlight: "100% compliance guarantee"
+      highlight: "Aids NFPA compliance"
     },
     {
       icon: <Users className="h-12 w-12 text-firegauge-red" />,
@@ -74,7 +74,7 @@ const Features = () => {
       icon: <DollarSign className="h-12 w-12 text-firegauge-red" />,
       title: "Proven ROI & Cost Savings",
       description: "Departments typically save $50,000+ annually through reduced labor costs, eliminated re-testing, faster inspector workflows, and streamlined compliance processes. ROI realized within first quarter.",
-      highlight: "$50K+ annual savings"
+      highlight: "Cost-saving potential"
     },
     {
       icon: <Building2 className="h-12 w-12 text-firegauge-red" />,
@@ -122,31 +122,7 @@ const Features = () => {
           ))}
         </div>
         
-        <div className="mt-16 text-center">
-          <div className="bg-gray-50 rounded-xl p-8 max-w-4xl mx-auto">
-            <h3 className="text-2xl font-bold mb-4 text-firegauge-charcoal">
-              Trusted by Progressive Fire Departments & Contractors
-            </h3>
-            <p className="text-gray-700 mb-6">
-              Join the growing network of fire safety professionals who've modernized their testing operations with FireGauge. 
-              From volunteer departments to large contractors serving 25+ departments.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-              <div>
-                <div className="text-3xl font-bold text-firegauge-red mb-2">25+</div>
-                <div className="text-sm text-gray-600">Fire Departments Served</div>
-              </div>
-              <div>
-                <div className="text-3xl font-bold text-firegauge-red mb-2">10,000+</div>
-                <div className="text-sm text-gray-600">Tests Completed</div>
-              </div>
-              <div>
-                <div className="text-3xl font-bold text-firegauge-red mb-2">100%</div>
-                <div className="text-sm text-gray-600">Audit Pass Rate</div>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Metrics section removed to align with current real-world data and avoid unfounded claims */}
       </div>
     </section>
   );
