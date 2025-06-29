@@ -36,6 +36,8 @@ const OnboardingWizard = () => {
   const { user } = useAuth();
   
   const [currentStep, setCurrentStep] = useState(user ? 1 : 0);
+  // Email state for account creation step
+  const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [departmentData, setDepartmentData] = useState<DepartmentInfoForm | null>(null);
   const [selectedPlan, setSelectedPlan] = useState(() => {
@@ -198,7 +200,7 @@ const OnboardingWizard = () => {
                 onClick={async () => {
                   setIsLoading(true);
                   try {
-                    const { error } = await supabase.auth.signUp({ email: email });
+                    const { error } = await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: true, emailRedirectTo: window.location.href } });
                     if (error && error.message !== 'User already registered') {
                       throw error;
                     }

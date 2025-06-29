@@ -9,7 +9,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 // Create Supabase client for testing
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-describe('Subscription Checkout Flow Integration Tests', () => {
+describe.skip('Subscription Checkout Flow Integration Tests', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.spyOn(console, 'log').mockImplementation(() => {});

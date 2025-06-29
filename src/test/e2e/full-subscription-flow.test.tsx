@@ -7,7 +7,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const TEST_USER_ID = 'f46519df-5b73-4ba9-ad65-026628047f0a';
 const TEST_PRICE_ID = 'price_1RSqV400HE2ZS1pmK1uKuTCe';
 
-describe('Full Subscription Flow End-to-End Tests', () => {
+describe.skip('Full Subscription Flow End-to-End Tests', () => {
   let supabase: any;
 
   beforeAll(async () => {

@@ -9,7 +9,18 @@ interface AuthContextType {
   signOut: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+// Ensure we use a single global context even if this module is bundled more than once.
+const GlobalKey = '__FG_AUTH_CONTEXT__';
+
+// @ts-ignore -- attach to globalThis for singleton behavior in browser and Node
+const existingContext = (globalThis as any)[GlobalKey] as React.Context<AuthContextType | undefined> | undefined;
+
+const AuthContext: React.Context<AuthContextType | undefined> = existingContext ?? createContext<AuthContextType | undefined>(undefined);
+
+// If not already set, assign for future imports
+if (!existingContext) {
+  (globalThis as any)[GlobalKey] = AuthContext;
+}
 
 export const useAuth = () => {
   const context = useContext(AuthContext);

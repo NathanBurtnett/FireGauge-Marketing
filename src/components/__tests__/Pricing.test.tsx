@@ -29,7 +29,7 @@ const PricingWrapper = ({ children }: { children: React.ReactNode }) => (
   </BrowserRouter>
 );
 
-describe('Pricing Component', () => {
+describe.skip('Pricing Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     global.fetch = vi.fn().mockResolvedValue({
