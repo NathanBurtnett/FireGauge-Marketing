@@ -42,10 +42,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     // Get initial session
     const getInitialSession = async () => {
+      console.log('🔐 AuthProvider: Getting initial session...');
       const { data: { session }, error } = await supabase.auth.getSession();
       if (error) {
-        console.error('Error getting session:', error);
+        console.error('❌ Error getting session:', error);
       } else {
+        console.log('✅ Initial session:', session ? { user: session.user.email, expires_at: session.expires_at } : 'No session');
         setSession(session);
         setUser(session?.user ?? null);
       }
@@ -57,6 +59,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('🔄 Auth state change:', event, session ? { user: session.user.email, expires_at: session.expires_at } : 'No session');
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);

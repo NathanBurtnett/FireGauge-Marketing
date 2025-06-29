@@ -37,6 +37,17 @@ const OnboardingWizard = () => {
   const { user } = useAuth();
   
   const [currentStep, setCurrentStep] = useState(user ? 1 : 0);
+  
+  // Debug logging
+  useEffect(() => {
+    console.log('🎯 OnboardingWizard loaded:', {
+      user: user ? { email: user.email, id: user.id } : null,
+      searchParams: Object.fromEntries(searchParams.entries()),
+      currentStep,
+      url: window.location.href,
+      hash: window.location.hash
+    });
+  }, [user, searchParams, currentStep]);
   // Email state for account creation step
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -219,7 +230,7 @@ const OnboardingWizard = () => {
                       email, 
                       options: { 
                         shouldCreateUser: true, 
-                        emailRedirectTo: `${window.location.origin}/auth/callback${window.location.search}` 
+                        emailRedirectTo: `${window.location.origin}${window.location.search}` 
                       } 
                     });
                     if (error && error.message !== 'User already registered') {

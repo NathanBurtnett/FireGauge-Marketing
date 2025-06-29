@@ -109,6 +109,48 @@
         }
       });
     </script>
+    <!-- IMMEDIATE AUTH REDIRECT SCRIPT -->
+    <script>
+      // This runs BEFORE React loads to handle auth callbacks
+      (function() {
+        try {
+          const currentUrl = window.location.href;
+          const currentHash = window.location.hash;
+          const currentSearch = window.location.search;
+          const hasAccessToken = currentUrl.includes('access_token=') || currentHash.includes('access_token=');
+          const hasMagicLink = currentUrl.includes('type=magiclink') || currentHash.includes('type=magiclink');
+          const isRootPath = window.location.pathname === '/';
+          
+          console.log('🔍 Pre-React Auth Check:', {
+            url: currentUrl,
+            hash: currentHash,
+            search: currentSearch,
+            pathname: window.location.pathname,
+            hasAccessToken,
+            hasMagicLink,
+            isRootPath
+          });
+          
+          if (isRootPath && hasAccessToken && hasMagicLink) {
+            console.log('🚀 IMMEDIATE REDIRECT: Magic link detected, redirecting to onboarding...');
+            
+            // Preserve both hash and search parameters
+            const newUrl = '/onboarding' + currentSearch + currentHash;
+            console.log('🔄 Redirecting to:', newUrl);
+            
+            // Immediate redirect before React loads
+            window.location.href = newUrl;
+          } else if (isRootPath && hasAccessToken) {
+            console.log('⚠️  Access token found but no magic link type, still redirecting to onboarding...');
+            const newUrl = '/onboarding' + currentSearch + currentHash;
+            console.log('🔄 Redirecting to:', newUrl);
+            window.location.href = newUrl;
+          }
+        } catch (error) {
+          console.error('❌ Pre-React auth check error:', error);
+        }
+      })();
+    </script>
   </head>
 
   <body>
