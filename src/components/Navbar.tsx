@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
+import { Menu, ExternalLink } from "lucide-react";
+import { useAuth } from '@/components/providers/AuthProvider';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const { user } = useAuth();
   
   const isHome = location.pathname === '/';
+
+  // Get the main app URL from environment
+  const appUrl = import.meta.env.VITE_API_URL || 'https://app.firegauge.com';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -51,12 +56,34 @@ const Navbar = () => {
               <a href="#pricing" className={`${isScrolled || !isHome ? 'text-firegauge-charcoal' : 'text-white'} hover:text-firegauge-red transition-colors duration-300`}>Pricing</a>
               <a href="#faq" className={`${isScrolled || !isHome ? 'text-firegauge-charcoal' : 'text-white'} hover:text-firegauge-red transition-colors duration-300`}>FAQ</a>
               
-              <Button 
-                className="ml-4 bg-firegauge-red hover:bg-firegauge-red/90"
-                asChild
-              >
-                <Link to="/pricing">Get Started</Link>
-              </Button>
+              {/* Show app access for authenticated users */}
+              {user ? (
+                <div className="flex gap-2">
+                  <Button 
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                    asChild
+                  >
+                    <a href={appUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                      Open FireGauge App
+                      <ExternalLink className="h-4 w-4" />
+                    </a>
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    className={`${isScrolled || !isHome ? 'border-firegauge-red text-firegauge-red' : 'border-white text-white'} hover:bg-firegauge-red hover:text-white`}
+                    asChild
+                  >
+                    <Link to="/dashboard">Account</Link>
+                  </Button>
+                </div>
+              ) : (
+                <Button 
+                  className="ml-4 bg-firegauge-red hover:bg-firegauge-red/90"
+                  asChild
+                >
+                  <Link to="/pricing">Get Started</Link>
+                </Button>
+              )}
             </>
           ) : (
             // Other pages navigation
@@ -66,12 +93,34 @@ const Navbar = () => {
               <Link to="/about" className="text-firegauge-charcoal hover:text-firegauge-red transition-colors duration-300">About</Link>
               <Link to="/contact" className="text-firegauge-charcoal hover:text-firegauge-red transition-colors duration-300">Contact</Link>
               
-              <Button 
-                className="ml-4 bg-firegauge-red hover:bg-firegauge-red/90"
-                asChild
-              >
-                <Link to="/pricing">Get Started</Link>
-              </Button>
+              {/* Show app access for authenticated users */}
+              {user ? (
+                <div className="flex gap-2">
+                  <Button 
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                    asChild
+                  >
+                    <a href={appUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                      Open FireGauge App
+                      <ExternalLink className="h-4 w-4" />
+                    </a>
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    className="border-firegauge-red text-firegauge-red hover:bg-firegauge-red hover:text-white"
+                    asChild
+                  >
+                    <Link to="/dashboard">Account</Link>
+                  </Button>
+                </div>
+              ) : (
+                <Button 
+                  className="ml-4 bg-firegauge-red hover:bg-firegauge-red/90"
+                  asChild
+                >
+                  <Link to="/pricing">Get Started</Link>
+                </Button>
+              )}
             </>
           )}
         </div>
@@ -101,12 +150,34 @@ const Navbar = () => {
                 <a href="#pricing" className="text-firegauge-charcoal hover:text-firegauge-red transition-colors duration-300" onClick={() => setMobileMenuOpen(false)}>Pricing</a>
                 <a href="#faq" className="text-firegauge-charcoal hover:text-firegauge-red transition-colors duration-300" onClick={() => setMobileMenuOpen(false)}>FAQ</a>
                 
-                <Button 
-                  className="bg-firegauge-red hover:bg-firegauge-red/90 w-full"
-                  asChild
-                >
-                  <Link to="/pricing" onClick={() => setMobileMenuOpen(false)}>Get Started</Link>
-                </Button>
+                {/* Mobile app access for authenticated users */}
+                {user ? (
+                  <div className="space-y-2 pt-2 border-t">
+                    <Button 
+                      className="bg-green-600 hover:bg-green-700 w-full"
+                      asChild
+                    >
+                      <a href={appUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+                        Open FireGauge App
+                        <ExternalLink className="h-4 w-4" />
+                      </a>
+                    </Button>
+                    <Button 
+                      variant="outline"
+                      className="border-firegauge-red text-firegauge-red hover:bg-firegauge-red hover:text-white w-full"
+                      asChild
+                    >
+                      <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>Account Dashboard</Link>
+                    </Button>
+                  </div>
+                ) : (
+                  <Button 
+                    className="bg-firegauge-red hover:bg-firegauge-red/90 w-full"
+                    asChild
+                  >
+                    <Link to="/pricing" onClick={() => setMobileMenuOpen(false)}>Get Started</Link>
+                  </Button>
+                )}
               </>
             ) : (
               // Other pages mobile navigation
@@ -140,12 +211,34 @@ const Navbar = () => {
                   Contact
                 </Link>
                 
-                <Button 
-                  className="bg-firegauge-red hover:bg-firegauge-red/90 w-full"
-                  asChild
-                >
-                  <Link to="/pricing" onClick={() => setMobileMenuOpen(false)}>Get Started</Link>
-                </Button>
+                {/* Mobile app access for authenticated users */}
+                {user ? (
+                  <div className="space-y-2 pt-2 border-t">
+                    <Button 
+                      className="bg-green-600 hover:bg-green-700 w-full"
+                      asChild
+                    >
+                      <a href={appUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+                        Open FireGauge App
+                        <ExternalLink className="h-4 w-4" />
+                      </a>
+                    </Button>
+                    <Button 
+                      variant="outline"
+                      className="border-firegauge-red text-firegauge-red hover:bg-firegauge-red hover:text-white w-full"
+                      asChild
+                    >
+                      <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>Account Dashboard</Link>
+                    </Button>
+                  </div>
+                ) : (
+                  <Button 
+                    className="bg-firegauge-red hover:bg-firegauge-red/90 w-full"
+                    asChild
+                  >
+                    <Link to="/pricing" onClick={() => setMobileMenuOpen(false)}>Get Started</Link>
+                  </Button>
+                )}
               </>
             )}
           </div>

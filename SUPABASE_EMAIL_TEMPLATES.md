@@ -18,7 +18,7 @@ Supabase allows you to customize authentication emails with your own branding. H
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign in to FireGauge</title>
+  <title>Complete Your FireGauge Sign-In</title>
   <style>
     body {
       margin: 0;
@@ -85,6 +85,28 @@ Supabase allows you to customize authentication emails with your own branding. H
     .cta-button:hover {
       transform: translateY(-2px);
       box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
+    }
+    .onboarding-steps {
+      background-color: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      padding: 20px;
+      margin: 30px 0;
+      border-radius: 4px;
+    }
+    .onboarding-steps h4 {
+      margin: 0 0 12px 0;
+      color: #1e40af;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .onboarding-steps ol {
+      margin: 0;
+      padding-left: 20px;
+      color: #1e3a8a;
+    }
+    .onboarding-steps li {
+      margin-bottom: 8px;
+      font-size: 14px;
     }
     .security-note {
       background-color: #fef3c7;
@@ -160,27 +182,43 @@ Supabase allows you to customize authentication emails with your own branding. H
 
     <!-- Content -->
     <div class="content">
-      <h1 class="greeting">Welcome back, Fire Chief!</h1>
+      <h1 class="greeting">Complete Your Sign-In</h1>
       
       <p class="message">
-        You requested to sign in to your FireGauge account. Click the secure link below to access your fire equipment management dashboard.
+        You're just one click away from accessing your FireGauge account! Click the secure button below to continue your onboarding or sign in to your dashboard.
       </p>
 
       <!-- CTA Button -->
       <div style="text-align: center;">
         <a href="{{ .ConfirmationURL }}" class="cta-button">
-          🚀 Access FireGauge Dashboard
+          🚀 Complete Sign-In & Continue Setup
         </a>
+      </div>
+
+      <!-- Onboarding Steps -->
+      <div class="onboarding-steps">
+        <h4>📋 What happens next:</h4>
+        <ol>
+          <li><strong>Click the button above</strong> - You'll be securely signed in</li>
+          <li><strong>Complete your department info</strong> - Tell us about your fire department</li>
+          <li><strong>Choose your plan & billing</strong> - Select subscription or invoice options</li>
+          <li><strong>Finish setup</strong> - Configure preferences and create user accounts</li>
+          <li><strong>Start managing equipment</strong> - Access your FireGauge dashboard</li>
+        </ol>
       </div>
 
       <!-- Security Note -->
       <div class="security-note">
         <h4>🔒 Security Notice</h4>
-        <p>This link is secure and will expire in 1 hour. If you didn't request this sign-in, please ignore this email and your account will remain secure.</p>
+        <p>This secure link expires in 1 hour and can only be used once. If you didn't request this sign-in, please ignore this email and your account will remain secure.</p>
       </div>
 
       <p class="message">
-        Need help? Our support team is here to assist you with any questions about your fire equipment management system.
+        <strong>Keep the onboarding page open</strong> while you check this email - you'll be redirected back to continue your setup seamlessly.
+      </p>
+
+      <p class="message">
+        Need help? Contact our support team at <a href="mailto:support@firegauge.app" style="color: #dc2626;">support@firegauge.app</a> - we're here to help with your fire equipment management system.
       </p>
     </div>
 
@@ -190,13 +228,17 @@ Supabase allows you to customize authentication emails with your own branding. H
       <p>Ensuring NFPA compliance and operational readiness for fire departments nationwide.</p>
       
       <div class="social-links">
-        <a href="https://firegauge-marketing.onrender.com/about">About Us</a> |
-        <a href="https://firegauge-marketing.onrender.com/contact">Support</a> |
-        <a href="https://firegauge-marketing.onrender.com/legal">Privacy Policy</a>
+        <a href="https://firegauge.app/about">About Us</a> |
+        <a href="https://firegauge.app/contact">Support</a> |
+        <a href="https://firegauge.app/legal">Privacy Policy</a>
       </div>
       
       <p class="footer-compliance">
         NFPA 1851, 1852, 1855 Compliant • Professional Fire Equipment Management Solutions
+      </p>
+      
+      <p style="font-size: 11px; color: #6b7280; margin-top: 15px;">
+        This email was sent to help you access your FireGauge account. If you have questions, reply to this email or visit our support center.
       </p>
     </div>
   </div>

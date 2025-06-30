@@ -1,5 +1,8 @@
 // Stripe Billing Portal API Integration
 // This module handles creating billing portal sessions for customer subscription management
+// and supports both subscription checkout and invoice/quote creation
+
+import { BillingMethod, BillingCycle, type BillingSelection } from '@/config/stripe-config';
 
 export interface BillingPortalSessionRequest {
   customer_id: string;
@@ -9,6 +12,57 @@ export interface BillingPortalSessionRequest {
 export interface BillingPortalSessionResponse {
   url: string;
   session_id: string;
+}
+
+export interface CheckoutSessionRequest {
+  priceId: string;
+  planName: string;
+  billingMethod: BillingMethod;
+  billingCycle: BillingCycle;
+  metadata?: Record<string, string>;
+}
+
+export interface InvoiceRequest {
+  priceId: string;
+  planName: string;
+  billingCycle: BillingCycle;
+  customerInfo: {
+    email: string;
+    name?: string;
+    phone?: string;
+    address?: {
+      line1: string;
+      line2?: string;
+      city: string;
+      state: string;
+      postal_code: string;
+      country?: string;
+    };
+  };
+  metadata?: Record<string, string>;
+}
+
+export interface CheckoutResponse {
+  url: string;
+  sessionId: string;
+  flowType: string;
+}
+
+export interface InvoiceResponse {
+  success: boolean;
+  invoice: {
+    id: string;
+    total: number;
+    currency: string;
+    status: string;
+    hostedInvoiceUrl: string;
+    invoicePdf?: string;
+  };
+  customer: {
+    id: string;
+    email: string;
+  };
+  message: string;
 }
 
 /**
@@ -44,6 +98,131 @@ export const createBillingPortalSession = async (
   } catch (error) {
     console.error('Error creating billing portal session:', error);
     throw error;
+  }
+};
+
+/**
+ * Creates a Stripe checkout session for subscription billing
+ */
+export const createCheckoutSession = async (
+  request: CheckoutSessionRequest
+): Promise<CheckoutResponse> => {
+  try {
+    console.log(`[BILLING] Creating checkout session for ${request.planName}`);
+    
+    const { supabase } = await import('@/lib/supabase');
+    
+    const { data, error } = await supabase.functions.invoke('create-checkout', {
+      body: {
+        priceId: request.priceId,
+        metadata: {
+          plan_name: request.planName,
+          billing_method: request.billingMethod,
+          billing_cycle: request.billingCycle,
+          source: 'marketing_site',
+          checkout_session_id: Date.now().toString(),
+          requires_account_creation: 'true',
+          ...request.metadata,
+        }
+      }
+    });
+
+    if (error) {
+      console.error('[BILLING] Supabase function error:', error);
+      throw error;
+    }
+
+    if (!data?.url) {
+      console.error('[BILLING] No checkout URL returned:', data);
+      throw new Error('No checkout URL returned from server');
+    }
+
+    console.log('[BILLING] Checkout session created successfully:', data.url);
+    return {
+      url: data.url,
+      sessionId: data.sessionId,
+      flowType: data.flowType || 'subscription'
+    };
+  } catch (error) {
+    console.error('[BILLING] Error creating checkout session:', error);
+    throw error;
+  }
+};
+
+/**
+ * Creates a Stripe invoice for quote/invoice billing
+ */
+export const createInvoice = async (
+  request: InvoiceRequest
+): Promise<InvoiceResponse> => {
+  try {
+    console.log(`[BILLING] Creating invoice for ${request.planName}`);
+    
+    const { supabase } = await import('@/lib/supabase');
+    
+    const { data, error } = await supabase.functions.invoke('create-invoice', {
+      body: {
+        priceId: request.priceId,
+        planName: request.planName,
+        billingCycle: request.billingCycle,
+        customerInfo: request.customerInfo,
+        metadata: {
+          source: 'marketing_site',
+          billing_method: 'invoice',
+          billing_cycle: request.billingCycle,
+          ...request.metadata,
+        }
+      }
+    });
+
+    if (error) {
+      console.error('[BILLING] Supabase invoice function error:', error);
+      throw error;
+    }
+
+    if (!data?.success) {
+      console.error('[BILLING] Invoice creation failed:', data);
+      throw new Error(data?.error || 'Invoice creation failed');
+    }
+
+    console.log('[BILLING] Invoice created successfully:', data.invoice.id);
+    return data;
+  } catch (error) {
+    console.error('[BILLING] Error creating invoice:', error);
+    throw error;
+  }
+};
+
+/**
+ * Universal billing handler that routes to appropriate method
+ */
+export const processBilling = async (
+  selection: BillingSelection,
+  customerInfo?: InvoiceRequest['customerInfo']
+): Promise<CheckoutResponse | InvoiceResponse> => {
+  const { planId, method, cycle, priceId } = selection;
+  
+  console.log(`[BILLING] Processing ${method} billing for plan ${planId} (${cycle})`);
+
+  if (method === BillingMethod.SUBSCRIPTION) {
+    return createCheckoutSession({
+      priceId,
+      planName: planId,
+      billingMethod: method,
+      billingCycle: cycle,
+    });
+  } else if (method === BillingMethod.INVOICE) {
+    if (!customerInfo) {
+      throw new Error('Customer information is required for invoice billing');
+    }
+    return createInvoice({
+      priceId,
+      planName: planId,
+      billingCycle: cycle,
+      customerInfo,
+    });
+  } else {
+    throw new Error(`Unsupported billing method: ${method}`);
   }
 };
 
@@ -188,6 +367,9 @@ export const customerUtils = {
 
 export default {
   createBillingPortalSession,
+  createCheckoutSession,
+  createInvoice,
+  processBilling,
   openBillingPortal,
   subscriptionUtils,
   customerUtils
