@@ -13,7 +13,7 @@ const Navbar = () => {
   const isHome = location.pathname === '/';
 
   // Get the main app URL from environment
-  const appUrl = import.meta.env.VITE_API_URL || 'https://app.firegauge.com';
+  const appUrl = import.meta.env.VITE_API_URL || 'https://app.firegauge.app';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -63,7 +63,7 @@ const Navbar = () => {
                     className="bg-green-600 hover:bg-green-700 text-white"
                     asChild
                   >
-                    <a href={appUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                    <a href={`${appUrl}/login`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
                       Open FireGauge App
                       <ExternalLink className="h-4 w-4" />
                     </a>
@@ -100,7 +100,7 @@ const Navbar = () => {
                     className="bg-green-600 hover:bg-green-700 text-white"
                     asChild
                   >
-                    <a href={appUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                    <a href={`${appUrl}/login`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
                       Open FireGauge App
                       <ExternalLink className="h-4 w-4" />
                     </a>
@@ -157,7 +157,7 @@ const Navbar = () => {
                       className="bg-green-600 hover:bg-green-700 w-full"
                       asChild
                     >
-                      <a href={appUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+                      <a href={`${appUrl}/login`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2" onClick={() => setMobileMenuOpen(false)}>
                         Open FireGauge App
                         <ExternalLink className="h-4 w-4" />
                       </a>
@@ -218,7 +218,7 @@ const Navbar = () => {
                       className="bg-green-600 hover:bg-green-700 w-full"
                       asChild
                     >
-                      <a href={appUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+                      <a href={`${appUrl}/login`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2" onClick={() => setMobileMenuOpen(false)}>
                         Open FireGauge App
                         <ExternalLink className="h-4 w-4" />
                       </a>
