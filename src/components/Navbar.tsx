@@ -12,8 +12,9 @@ const Navbar = () => {
   
   const isHome = location.pathname === '/';
 
-  // Get the main app URL from environment
-  const appUrl = import.meta.env.VITE_API_URL || 'https://app.firegauge.com';
+  // Get the FireGauge App login URL from environment
+  const appUrl =
+    import.meta.env.VITE_API_URL || 'https://app.firegauge.app/login';
 
   useEffect(() => {
     const handleScroll = () => {
