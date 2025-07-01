@@ -12,8 +12,8 @@ const Navbar = () => {
   
   const isHome = location.pathname === '/';
 
-  // Get the main app login URL
-  const appLoginUrl = 'https://app.firegauge.app/login';
+  // Get the main app URL from environment
+  const appUrl = import.meta.env.VITE_API_URL || 'https://app.firegauge.com';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -63,7 +63,7 @@ const Navbar = () => {
                     className="bg-green-600 hover:bg-green-700 text-white"
                     asChild
                   >
-                    <a href={appLoginUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                    <a href={appUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
                       Open FireGauge App
                       <ExternalLink className="h-4 w-4" />
                     </a>
@@ -88,15 +88,24 @@ const Navbar = () => {
               
               {/* Show app access for authenticated users */}
               {user ? (
-                <Button 
-                  className="bg-green-600 hover:bg-green-700 text-white"
-                  asChild
-                >
-                  <a href={appLoginUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
-                    Open FireGauge App
-                    <ExternalLink className="h-4 w-4" />
-                  </a>
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                    asChild
+                  >
+                    <a href={appUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                      Open FireGauge App
+                      <ExternalLink className="h-4 w-4" />
+                    </a>
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    className="border-firegauge-red text-firegauge-red hover:bg-firegauge-red hover:text-white"
+                    asChild
+                  >
+                    <Link to="/dashboard">Account</Link>
+                  </Button>
+                </div>
               ) : (
                 <Button 
                   className="ml-4 bg-firegauge-red hover:bg-firegauge-red/90"
@@ -136,15 +145,24 @@ const Navbar = () => {
                 
                 {/* Mobile app access for authenticated users */}
                 {user ? (
-                  <Button 
-                    className="bg-green-600 hover:bg-green-700 w-full mt-2"
-                    asChild
-                  >
-                    <a href={appLoginUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2" onClick={() => setMobileMenuOpen(false)}>
-                      Open FireGauge App
-                      <ExternalLink className="h-4 w-4" />
-                    </a>
-                  </Button>
+                  <div className="space-y-2 pt-2 border-t">
+                    <Button 
+                      className="bg-green-600 hover:bg-green-700 w-full"
+                      asChild
+                    >
+                      <a href={appUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+                        Open FireGauge App
+                        <ExternalLink className="h-4 w-4" />
+                      </a>
+                    </Button>
+                    <Button 
+                      variant="outline"
+                      className="border-firegauge-red text-firegauge-red hover:bg-firegauge-red hover:text-white w-full"
+                      asChild
+                    >
+                      <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>Account Dashboard</Link>
+                    </Button>
+                  </div>
                 ) : (
                   <Button 
                     className="bg-firegauge-red hover:bg-firegauge-red/90 w-full"
@@ -188,15 +206,24 @@ const Navbar = () => {
                 
                 {/* Mobile app access for authenticated users */}
                 {user ? (
-                  <Button 
-                    className="bg-green-600 hover:bg-green-700 w-full mt-2"
-                    asChild
-                  >
-                    <a href={appLoginUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2" onClick={() => setMobileMenuOpen(false)}>
-                      Open FireGauge App
-                      <ExternalLink className="h-4 w-4" />
-                    </a>
-                  </Button>
+                  <div className="space-y-2 pt-2 border-t">
+                    <Button 
+                      className="bg-green-600 hover:bg-green-700 w-full"
+                      asChild
+                    >
+                      <a href={appUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+                        Open FireGauge App
+                        <ExternalLink className="h-4 w-4" />
+                      </a>
+                    </Button>
+                    <Button 
+                      variant="outline"
+                      className="border-firegauge-red text-firegauge-red hover:bg-firegauge-red hover:text-white w-full"
+                      asChild
+                    >
+                      <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>Account Dashboard</Link>
+                    </Button>
+                  </div>
                 ) : (
                   <Button 
                     className="bg-firegauge-red hover:bg-firegauge-red/90 w-full"
