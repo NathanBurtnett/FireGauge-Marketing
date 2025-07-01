@@ -98,13 +98,6 @@ const Navbar = () => {
                       <ExternalLink className="h-4 w-4" />
                     </a>
                   </Button>
-                  <Button 
-                    variant="outline"
-                    className="border-firegauge-red text-firegauge-red hover:bg-firegauge-red hover:text-white"
-                    asChild
-                  >
-                    <Link to="/dashboard">Account</Link>
-                  </Button>
                 </div>
               ) : (
                 <Button 
@@ -154,13 +147,6 @@ const Navbar = () => {
                         Open FireGauge App
                         <ExternalLink className="h-4 w-4" />
                       </a>
-                    </Button>
-                    <Button 
-                      variant="outline"
-                      className="border-firegauge-red text-firegauge-red hover:bg-firegauge-red hover:text-white w-full"
-                      asChild
-                    >
-                      <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>Account Dashboard</Link>
                     </Button>
                   </div>
                 ) : (
@@ -221,7 +207,6 @@ const Navbar = () => {
                       className="border-firegauge-red text-firegauge-red hover:bg-firegauge-red hover:text-white w-full"
                       asChild
                     >
-                      <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>Account Dashboard</Link>
                     </Button>
                   </div>
                 ) : (

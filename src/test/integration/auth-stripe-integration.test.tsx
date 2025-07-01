@@ -3,7 +3,6 @@ import { screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { render, createMockUser, createMockSubscription } from '../utils';
 import { AuthProvider } from '@/components/providers/AuthProvider';
-import CustomerDashboard from '@/components/CustomerDashboard';
 import { Pricing } from '@/components/Pricing';
 import OnboardingWizard from '@/pages/OnboardingWizard';
 
@@ -400,56 +399,6 @@ describe('Supabase Authentication & Stripe Checkout Integration Tests', () => {
     });
   });
 
-  describe('Customer Dashboard Integration', () => {
-    it('should render dashboard for authenticated user with subscription', async () => {
-      render(<CustomerDashboard />, { wrapper: createIntegrationTestWrapper });
-
-      await waitFor(() => {
-        // Should display user information and subscription details
-        expect(screen.getByText(/welcome/i) || document.body).toBeInTheDocument();
-      });
-    });
-
-    it('should handle dashboard loading states', async () => {
-      mockUseSubscription.mockReturnValue({
-        subscribed: false,
-        subscription_tier: null,
-        isLoading: true,
-        error: null,
-      });
-
-      render(<CustomerDashboard />, { wrapper: createIntegrationTestWrapper });
-
-      // Should handle loading state gracefully
-      expect(document.body).toBeInTheDocument();
-    });
-
-    it('should handle billing portal access from dashboard', async () => {
-      const mockOpenCustomerPortal = vi.fn();
-      mockUseSubscription.mockReturnValue({
-        openCustomerPortal: mockOpenCustomerPortal,
-        subscribed: true,
-        subscription_tier: 'price_1RSqV400HE2ZS1pmK1uKuTCe',
-        isLoading: false,
-        error: null,
-      });
-
-      render(<CustomerDashboard />, { wrapper: createIntegrationTestWrapper });
-
-      await waitFor(() => {
-        const billingButtons = screen.getAllByRole('button');
-        const billingButton = billingButtons.find(button => 
-          button.textContent?.toLowerCase().includes('billing') ||
-          button.textContent?.toLowerCase().includes('manage')
-        );
-
-        if (billingButton) {
-          fireEvent.click(billingButton);
-          expect(mockOpenCustomerPortal).toHaveBeenCalled();
-        }
-      });
-    });
-  });
 
   describe('Onboarding Flow Integration', () => {
     it('should handle new user onboarding', async () => {
@@ -583,7 +532,7 @@ describe('Supabase Authentication & Stripe Checkout Integration Tests', () => {
   });
 
   describe('End-to-End User Journey', () => {
-    it('should complete full user journey: signup -> onboarding -> subscription -> dashboard', async () => {
+    it('should complete full user journey: signup -> onboarding -> subscription', async () => {
       // Step 1: User signs up
       mockSupabaseAuth.signUp.mockResolvedValue({
         data: { user: mockUser, session: mockSession },
@@ -617,19 +566,14 @@ describe('Supabase Authentication & Stripe Checkout Integration Tests', () => {
       const checkoutUrl = await mockCreateCheckoutSession('price_1RSqV400HE2ZS1pmK1uKuTCe');
       expect(checkoutUrl).toBe('https://checkout.stripe.com/success');
 
-      // Step 4: User accesses dashboard
+      // Step 4: User subscription becomes active
       mockUseSubscription.mockReturnValue({
         subscribed: true,
         subscription_tier: 'price_1RSqV400HE2ZS1pmK1uKuTCe',
         isLoading: false,
         error: null,
       });
-
-      render(<CustomerDashboard />, { wrapper: createIntegrationTestWrapper });
-      
-      await waitFor(() => {
-        expect(document.body).toBeInTheDocument();
-      });
+      expect(mockUseSubscription().subscribed).toBe(true);
     });
   });
-}); 
+});

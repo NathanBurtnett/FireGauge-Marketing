@@ -20,11 +20,6 @@ The FireGauge marketing site now includes a comprehensive analytics and conversi
 - **Custom Events**: Department onboarding, plan selection, feature usage
 - **Form Interactions**: Contact forms, newsletter signups, error tracking
 
-### Real-time Analytics Dashboard
-- **Conversion Metrics**: Detailed conversion rate analysis
-- **Funnel Visualization**: Step-by-step user progression tracking
-- **Revenue Analytics**: Average order value and total revenue
-- **Drop-off Analysis**: Identify bottlenecks in the user journey
 
 ## 🛠️ **Implementation Details**
 
@@ -69,10 +64,8 @@ trackingHelpers.trackContactForm(isEnterprise?)
 - User activation monitoring
 - Drop-off analysis
 
-#### 5. **Analytics Dashboard** (`src/components/AnalyticsDashboard.tsx`)
-- Real-time metrics visualization
-- Conversion funnel analysis
-- Administrative oversight
+#### 5. **Analytics Dashboard**
+Analytics metrics are now available directly within the main FireGauge application.
 
 ## 🔧 **Configuration Setup**
 
@@ -190,13 +183,7 @@ onboarding_step: 1 | 2 | 3 | 4
 ## 📊 **Dashboard Access**
 
 ### Internal Analytics Dashboard
-Access at: `/admin/analytics`
-
-Features:
-- Real-time conversion metrics
-- Funnel visualization with drop-off analysis
-- Event tracking overview
-- Setup and configuration status
+The internal analytics dashboard has moved to the main FireGauge application.
 
 ### Google Analytics 4 Dashboard
 - **Traffic Acquisition**: How users find the site

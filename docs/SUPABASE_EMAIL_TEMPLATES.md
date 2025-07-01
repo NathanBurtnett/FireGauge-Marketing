@@ -203,7 +203,7 @@ Supabase allows you to customize authentication emails with your own branding. H
           <li><strong>Complete your department info</strong> - Tell us about your fire department</li>
           <li><strong>Choose your plan & billing</strong> - Select subscription or invoice options</li>
           <li><strong>Finish setup</strong> - Configure preferences and create user accounts</li>
-          <li><strong>Start managing equipment</strong> - Access your FireGauge dashboard</li>
+          <li><strong>Start managing equipment</strong> - Access the FireGauge app</li>
         </ol>
       </div>
 

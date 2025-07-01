@@ -1,8 +1,10 @@
 # Customer Dashboard Implementation Guide
 
+**Note:** The customer dashboard has been removed from the marketing site. Account management now occurs within the main FireGauge application. The information below is retained for historical reference.
+
 ## Overview
 
-The FireGauge Customer Dashboard provides a comprehensive post-purchase account management interface for fire departments. It integrates subscription management, usage analytics, billing portal access, and support resources in a unified, user-friendly interface.
+The FireGauge Customer Dashboard provided a comprehensive post-purchase account management interface for fire departments. It integrated subscription management, usage analytics, billing portal access, and support resources in a unified, user-friendly interface.
 
 ## Features Implemented
 
@@ -92,7 +94,7 @@ The dashboard integrates with several API endpoints:
 POST /api/create-billing-portal-session
 {
   "customer_id": "cust_123",
-  "return_url": "https://firegauge.app/dashboard"
+  "return_url": "https://app.firegauge.app"
 }
 
 // Response
@@ -131,7 +133,7 @@ app.post('/api/create-billing-portal-session', async (req, res) => {
   try {
     const session = await stripe.billingPortal.sessions.create({
       customer: customer_id,
-      return_url: return_url || 'https://firegauge.app/dashboard',
+      return_url: return_url || 'https://app.firegauge.app',
     });
     
     res.json({ url: session.url, session_id: session.id });
@@ -180,18 +182,13 @@ ws.onmessage = (event) => {
 ## Routing and Navigation
 
 ### Route Configuration
-The dashboard is accessible at `/dashboard` and integrated into the main App routing:
+The dashboard was previously accessible at `/dashboard` within the marketing site. This route has been removed and the functionality now lives in the main FireGauge application.
 
-```typescript
-// App.tsx
-<Route path="/dashboard" element={<CustomerDashboard />} />
-```
-
-### Authentication Flow
-1. **Post-Purchase Redirect**: Users are redirected to `/onboarding` after payment
-2. **Onboarding Completion**: Wizard redirects to `/dashboard` after setup
-3. **Direct Access**: Authenticated users can access `/dashboard` directly
-4. **Authentication Check**: Implement auth guards to ensure only authenticated users access the dashboard
+### Authentication Flow (Legacy)
+1. **Post-Purchase Redirect**: Users were redirected to `/onboarding` after payment.
+2. **Onboarding Completion**: The wizard redirected to `/dashboard` after setup.
+3. **Direct Access**: Authenticated users could access `/dashboard` directly.
+4. **Authentication Check**: Auth guards ensured only authenticated users accessed the dashboard.
 
 ## Responsive Design
 
