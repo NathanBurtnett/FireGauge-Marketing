@@ -202,12 +202,6 @@ const Navbar = () => {
                         <ExternalLink className="h-4 w-4" />
                       </a>
                     </Button>
-                    <Button 
-                      variant="outline"
-                      className="border-firegauge-red text-firegauge-red hover:bg-firegauge-red hover:text-white w-full"
-                      asChild
-                    >
-                    </Button>
                   </div>
                 ) : (
                   <Button 
