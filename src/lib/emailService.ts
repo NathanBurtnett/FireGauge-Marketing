@@ -183,7 +183,7 @@ Need help? Schedule a quick call with our team: https://calendly.com/firegauge`
           </div>
           
           <div style="text-align: center; margin: 30px 0;">
-            <a href="https://app.firegauge.com/dashboard" style="background-color: #e11d48; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; margin-right: 10px;">Open Dashboard</a>
+            <a href="https://app.firegauge.com/dashboard" style="background-color: #e11d48; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; margin-right: 10px;">Open FireGauge App</a>
             <a href="https://calendly.com/firegauge" style="background-color: #f3f4f6; color: #374151; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; border: 1px solid #d1d5db;">Book Training</a>
           </div>
           
@@ -205,7 +205,7 @@ Congratulations on completing your setup! Here's your quick start guide to make 
 - NFPA Compliance Checklist: https://firegauge.com/docs/nfpa-compliance
 - Video Tutorials: https://firegauge.com/support
 
-Open Dashboard: https://app.firegauge.com/dashboard
+Open FireGauge App: https://app.firegauge.com/dashboard
 Book Training: https://calendly.com/firegauge
 
 Questions? Reply to this email or contact us at support@firegauge.com. We're here to help!`

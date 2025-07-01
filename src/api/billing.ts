@@ -74,7 +74,7 @@ export const createBillingPortalSession = async (
   returnUrl?: string
 ): Promise<BillingPortalSessionResponse> => {
   const baseUrl = window.location.origin;
-  const defaultReturnUrl = `${baseUrl}/dashboard`;
+  const defaultReturnUrl = baseUrl;
 
   try {
     const response = await fetch('/api/create-billing-portal-session', {

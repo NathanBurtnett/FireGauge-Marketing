@@ -13,9 +13,6 @@ import ScrollToTop from "./components/ScrollToTop";
 import PricingPage from "./pages/PricingPage";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import OnboardingWizard from "./pages/OnboardingWizard";
-import EmailTemplateManager from "./components/EmailTemplateManager";
-import AnalyticsDashboard from "./components/AnalyticsDashboard";
-import CustomerDashboard from "./components/CustomerDashboard";
 import AuthCallback from "./components/AuthCallback";
 import AuthCallbackHandler from "./pages/AuthCallbackHandler";
 import { initializeSEO } from "./utils/seo";
@@ -36,7 +33,7 @@ const LoadingScreen = () => (
 
 // Main App Content Component
 const AppContent = () => {
-  const { loading, user } = useAuth();
+  const { loading } = useAuth();
 
   // Initialize SEO and analytics on app load
   useEffect(() => {
@@ -101,9 +98,6 @@ const AppContent = () => {
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/onboarding" element={<OnboardingWizard />} />
         <Route path="/auth/callback" element={<AuthCallbackHandler />} />
-        <Route path="/admin/emails" element={<EmailTemplateManager />} />
-        <Route path="/admin/analytics" element={<AnalyticsDashboard />} />
-        <Route path="/dashboard" element={<CustomerDashboard />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>

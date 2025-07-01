@@ -381,7 +381,7 @@ const OnboardingWizard = () => {
 
       toast({
         title: "Account Created Successfully!",
-        description: "Your department and user accounts are set up. Redirecting to your FireGauge dashboard...",
+        description: "Your department and user accounts are set up. Redirecting to the FireGauge app...",
       });
 
       // Store completion info in localStorage for welcome flow
@@ -841,7 +841,7 @@ const OnboardingWizard = () => {
                   <h4 className="font-medium text-blue-800 mb-2">Quick Setup</h4>
                   <p className="text-sm text-blue-700">
                     We'll configure your account with default settings for {departmentData?.departmentType} departments.
-                    You can customize everything later in your dashboard.
+                    You can customize everything later in the app.
                   </p>
                 </div>
 
@@ -1132,7 +1132,7 @@ const OnboardingWizard = () => {
                         </div>
                       </div>
                       <p className="text-xs text-blue-600 mt-2">
-                        💡 Save these credentials! You'll use them to access your FireGauge dashboard.
+                        💡 Save these credentials! You'll use them to access the FireGauge app.
                       </p>
                     </div>
                   )}
@@ -1172,11 +1172,11 @@ const OnboardingWizard = () => {
                     {isLoading ? (
                       <>
                         <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        Setting up your dashboard...
+                        Setting up your account...
                       </>
                     ) : (
                       <>
-                        Launch FireGauge Dashboard
+                        Launch FireGauge App
                         <ArrowRight className="ml-2 h-5 w-5" />
                       </>
                     )}
@@ -1212,7 +1212,7 @@ const OnboardingWizard = () => {
                   </div>
                   
                   <p className="text-sm text-gray-500 text-center">
-                    You'll be redirected to your FireGauge dashboard where you can start managing your equipment immediately.
+                    You'll be redirected to the FireGauge app where you can start managing your equipment immediately.
                   </p>
                 </div>
               </div>

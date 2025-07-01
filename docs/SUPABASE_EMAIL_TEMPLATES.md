@@ -185,7 +185,7 @@ Supabase allows you to customize authentication emails with your own branding. H
       <h1 class="greeting">Complete Your Sign-In</h1>
       
       <p class="message">
-        You're just one click away from accessing your FireGauge account! Click the secure button below to continue your onboarding or sign in to your dashboard.
+        You're just one click away from accessing your FireGauge account! Click the secure button below to continue your onboarding or sign in to the FireGauge app.
       </p>
 
       <!-- CTA Button -->
@@ -203,7 +203,7 @@ Supabase allows you to customize authentication emails with your own branding. H
           <li><strong>Complete your department info</strong> - Tell us about your fire department</li>
           <li><strong>Choose your plan & billing</strong> - Select subscription or invoice options</li>
           <li><strong>Finish setup</strong> - Configure preferences and create user accounts</li>
-          <li><strong>Start managing equipment</strong> - Access your FireGauge dashboard</li>
+          <li><strong>Start managing equipment</strong> - Access the FireGauge app</li>
         </ol>
       </div>
 
