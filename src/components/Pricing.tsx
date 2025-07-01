@@ -14,7 +14,7 @@ import {
   BillingCycle,
   type FireGaugePlan 
 } from '@/config/stripe-config';
-import { processBilling, type CheckoutResponse, type InvoiceResponse } from '@/api/billing';
+import { processBilling, openCustomerPortal, type CheckoutResponse, type InvoiceResponse } from '@/api/billing';
 
 // Declare gtag for analytics
 declare global {
@@ -28,6 +28,26 @@ const Pricing = () => {
   const { user } = useAuth();
 
   const plans = getAllPlans();
+
+  const handleBillingPortal = async () => {
+    if (!user) {
+      toast.error('Please sign in to manage billing');
+      return;
+    }
+
+    setIsLoading('billing-portal');
+    try {
+      const { url } = await openCustomerPortal();
+      window.open(url, '_blank');
+    } catch (error) {
+      console.error('Failed to open billing portal:', error);
+      toast.error('Failed to open billing portal', {
+        description: error instanceof Error ? error.message : 'Please try again or contact support'
+      });
+    } finally {
+      setIsLoading(null);
+    }
+  };
 
   const handleSubscribe = async (plan: FireGaugePlan, method: BillingMethod = BillingMethod.SUBSCRIPTION) => {
     // Handle enterprise plan separately
@@ -170,6 +190,33 @@ const Pricing = () => {
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Professional fire equipment management solutions designed for departments of every size
           </p>
+          
+          {/* Billing Management for Authenticated Users */}
+          {user && (
+            <div className="mt-8 max-w-md mx-auto">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div className="text-left">
+                    <p className="text-sm font-medium text-blue-800">Existing Customer?</p>
+                    <p className="text-xs text-blue-600">Manage your subscription and billing</p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleBillingPortal}
+                    disabled={isLoading === 'billing-portal'}
+                    className="border-blue-300 text-blue-700 hover:bg-blue-100"
+                  >
+                    {isLoading === 'billing-portal' ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      'Manage Billing'
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
           
           {/* Billing Cycle Toggle */}
           <div className="flex justify-center mt-8">

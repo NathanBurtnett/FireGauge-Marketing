@@ -83,17 +83,10 @@ const OnboardingWizard = () => {
   const [departmentData, setDepartmentData] = useState<DepartmentInfoForm | null>(null);
   const [userCredentials, setUserCredentials] = useState<UserCredentialsForm | null>(null);
   
-  // Enhanced plan and billing state
+  // Enhanced plan and billing state  
   const [selectedPlan, setSelectedPlan] = useState(() => {
     const planSlug = searchParams.get('plan');
-    if (!planSlug) return 'Professional';
-    switch(planSlug) {
-      case 'pilot': return 'Pilot 90';
-      case 'essential': return 'Essential';
-      case 'pro': return 'Pro';
-      case 'contractor': return 'Contractor';
-      default: return 'Professional';
-    }
+    return planSlug || 'pro'; // Default to 'pro' plan, keep plan IDs not display names
   });
   
   // Billing method and cycle from URL parameters or defaults
@@ -113,7 +106,7 @@ const OnboardingWizard = () => {
   const [billingResult, setBillingResult] = useState<CheckoutResponse | InvoiceResponse | null>(null);
   
   // Get the actual plan configuration
-  const planConfig = getPlanById(selectedPlan.toLowerCase().replace(/\s+/g, '')) || null;
+  const planConfig = getPlanById(selectedPlan) || null;
   
   // Password visibility state for user credentials step
   const [showPasswords, setShowPasswords] = useState({
@@ -1196,7 +1189,7 @@ const OnboardingWizard = () => {
                       className="flex-1"
                       asChild
                     >
-                      <a href="/dashboard" className="flex items-center justify-center gap-2">
+                      <a href="https://app.firegauge.app/login" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2">
                         Account Settings
                       </a>
                     </Button>

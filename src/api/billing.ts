@@ -365,12 +365,44 @@ export const customerUtils = {
   }
 };
 
+/**
+ * Open Stripe Customer Portal for managing subscriptions (Supabase function)
+ */
+export const openCustomerPortal = async (): Promise<{ url: string }> => {
+  console.log('[BILLING] Opening customer portal...');
+  
+  try {
+    const { supabase } = await import('@/lib/supabase');
+    
+    const { data, error } = await supabase.functions.invoke('customer-portal', {
+      method: 'GET',
+    });
+
+    if (error) {
+      console.error('[BILLING] Customer portal error:', error);
+      throw new Error(error.message || 'Failed to open customer portal');
+    }
+
+    if (!data?.url) {
+      throw new Error('No portal URL returned from server');
+    }
+
+    console.log('[BILLING] Customer portal session created successfully');
+    return { url: data.url };
+    
+  } catch (error) {
+    console.error('[BILLING] Customer portal request failed:', error);
+    throw error instanceof Error ? error : new Error('Customer portal request failed');
+  }
+};
+
 export default {
   createBillingPortalSession,
   createCheckoutSession,
   createInvoice,
   processBilling,
   openBillingPortal,
+  openCustomerPortal,
   subscriptionUtils,
   customerUtils
 }; 
