@@ -26,21 +26,25 @@ export const FIREGAUGE_PLANS: Record<string, FireGaugePlan> = {
     id: 'pilot',
     name: 'Pilot 90',
     displayPrice: 'Free',
-    description: 'Run one full test season at no cost. Auto-reminds you 75 days in.',
+    description: 'Run one full test season at no cost. Auto-reminds you 75 days in. Includes billing setup for seamless transition.',
     userCount: '1 Admin + 1 Inspector',
     assetCount: 'Up to 100 assets',
     coreModules: 'Hose Testing (NFPA-1962)',
     features: [
       'Offline PWA / Mobile App',
       'PDF export (1-yr archive)',
-      'Guided Pass/Fail flow'
+      'Guided Pass/Fail flow',
+      'Billing setup included',
+      'Cancel anytime',
+      'Automatic trial reminders'
     ],
     ctaText: 'Start Free Trial',
     pricing: {
-      monthly: 'price_1RSqV400HE2ZS1pmK1uKuTCe',
+      monthly: 'price_1RSqV400HE2ZS1pmK1uKuTCe', // Free trial price
       annual: 'price_1RSqV400HE2ZS1pmK1uKuTCe', // Same as monthly for free trial
+      invoice: 'price_1RSqV400HE2ZS1pmK1uKuTCe', // Enable invoice option for trial
     },
-    supportsInvoice: false, // Free trial doesn't need invoice option
+    supportsInvoice: true, // Enable for proper billing setup
   },
   essential: {
     id: 'essential',

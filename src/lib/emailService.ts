@@ -69,7 +69,7 @@ class EmailService {
           </div>
           
           <div style="text-align: center; margin: 30px 0;">
-            <a href="https://app.firegauge.com/onboarding" style="background-color: #e11d48; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Complete Setup</a>
+            <a href="https://app.firegauge.app/onboarding" style="background-color: #e11d48; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Complete Setup</a>
           </div>
           
           <p>If you have any questions, our support team is here to help. Simply reply to this email or contact us at support@firegauge.com.</p>
@@ -93,7 +93,7 @@ What's Next?
 - Start tracking your hose inventory and test results
 - Generate compliance reports with just a few clicks
 
-Complete your setup: https://app.firegauge.com/onboarding
+Complete your setup: https://app.firegauge.app/onboarding
 
 If you have any questions, our support team is here to help. Simply reply to this email or contact us at support@firegauge.com.
 
@@ -127,7 +127,7 @@ firegauge.com`
           </div>
           
           <div style="text-align: center; margin: 30px 0;">
-            <a href="https://app.firegauge.com/onboarding" style="background-color: #e11d48; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Complete Setup Now</a>
+            <a href="https://app.firegauge.app/onboarding" style="background-color: #e11d48; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Complete Setup Now</a>
           </div>
           
           <p>Need help? Schedule a quick call with our team: <a href="https://calendly.com/firegauge" style="color: #e11d48;">Book a Demo</a></p>
@@ -143,7 +143,7 @@ Why complete your setup?
 - Save Time: Automate testing schedules and report generation
 - Reduce Risk: Never miss a critical test date
 
-Complete your setup: https://app.firegauge.com/onboarding
+Complete your setup: https://app.firegauge.app/onboarding
 
 Need help? Schedule a quick call with our team: https://calendly.com/firegauge`
     },
@@ -183,7 +183,7 @@ Need help? Schedule a quick call with our team: https://calendly.com/firegauge`
           </div>
           
           <div style="text-align: center; margin: 30px 0;">
-            <a href="https://app.firegauge.com/dashboard" style="background-color: #e11d48; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; margin-right: 10px;">Open FireGauge App</a>
+            <a href="https://app.firegauge.app/dashboard" style="background-color: #e11d48; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; margin-right: 10px;">Open FireGauge App</a>
             <a href="https://calendly.com/firegauge" style="background-color: #f3f4f6; color: #374151; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; border: 1px solid #d1d5db;">Book Training</a>
           </div>
           
@@ -205,7 +205,7 @@ Congratulations on completing your setup! Here's your quick start guide to make 
 - NFPA Compliance Checklist: https://firegauge.com/docs/nfpa-compliance
 - Video Tutorials: https://firegauge.com/support
 
-Open FireGauge App: https://app.firegauge.com/dashboard
+Open FireGauge App: https://app.firegauge.app/dashboard
 Book Training: https://calendly.com/firegauge
 
 Questions? Reply to this email or contact us at support@firegauge.com. We're here to help!`
@@ -240,7 +240,7 @@ Questions? Reply to this email or contact us at support@firegauge.com. We're her
           </div>
           
           <div style="text-align: center; margin: 30px 0;">
-            <a href="https://app.firegauge.com/reports/setup" style="background-color: #e11d48; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Set Up Auto Reports</a>
+            <a href="https://app.firegauge.app/reports/setup" style="background-color: #e11d48; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Set Up Auto Reports</a>
           </div>
           
           <p><strong>Pro Tip:</strong> Configure monthly reports to be sent to your fire marshal automatically. It's a great way to maintain open communication and demonstrate proactive compliance!</p>
@@ -261,7 +261,7 @@ Did you know that FireGauge can automatically generate and schedule your complia
 - Stay audit-ready with professional, detailed reports
 - Reduce errors with automated data compilation
 
-Set Up Auto Reports: https://app.firegauge.com/reports/setup
+Set Up Auto Reports: https://app.firegauge.app/reports/setup
 
 Pro Tip: Configure monthly reports to be sent to your fire marshal automatically. It's a great way to maintain open communication and demonstrate proactive compliance!
 

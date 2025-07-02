@@ -11,7 +11,7 @@ const Navbar = () => {
   const { user } = useAuth();
   
   const isHome = location.pathname === '/';
-  const appUrl = import.meta.env.VITE_API_URL || 'https://app.firegauge.com';
+  const appUrl = import.meta.env.VITE_API_URL || 'https://app.firegauge.app';
 
   useEffect(() => {
     const handleScroll = () => {

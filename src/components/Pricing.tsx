@@ -168,7 +168,7 @@ const Pricing = () => {
                     variant="outline"
                     size="sm"
                     className="border-blue-300 text-blue-700 hover:bg-blue-100"
-                    onClick={() => window.open(import.meta.env.VITE_API_URL || 'https://app.firegauge.com', '_blank')}
+                    onClick={() => window.open(import.meta.env.VITE_API_URL || 'https://app.firegauge.app', '_blank')}
                   >
                     Open App
                   </Button>

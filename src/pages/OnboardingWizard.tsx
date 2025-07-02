@@ -26,7 +26,7 @@ const OnboardingWizard = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   
   const selectedPlan = searchParams.get('plan') || 'pilot';
-  const appUrl = import.meta.env.VITE_API_URL || 'https://app.firegauge.com';
+  const appUrl = import.meta.env.VITE_API_URL || 'https://app.firegauge.app';
 
   useEffect(() => {
     if (user && step === 0) {
