@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Loader2, ExternalLink, Mail } from "lucide-react";
+import { CheckCircle, Loader2, ArrowRight, Mail } from "lucide-react";
 import { trackingHelpers, analytics } from '../lib/analytics';
 
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [showAccountInfo, setShowAccountInfo] = useState(false);
   
   const sessionId = searchParams.get('session_id');
@@ -26,9 +27,9 @@ const PaymentSuccess = () => {
     return () => clearTimeout(timer);
   }, [sessionId]);
 
-  const handleSignInRedirect = () => {
-    // Redirect to main FireGauge app sign-in
-    window.location.href = "https://firegauge-app.onrender.com/";
+  const handleOnboardingRedirect = () => {
+    // Redirect to onboarding wizard for consistent flow
+    navigate('/onboarding');
   };
 
   if (!sessionId) {
@@ -61,7 +62,7 @@ const PaymentSuccess = () => {
           <Loader2 className="h-16 w-16 text-firegauge-accent mx-auto mb-4 animate-spin" />
           <h1 className="text-2xl font-bold mb-4">Payment Successful!</h1>
           <p className="text-gray-300 mb-6">
-            Creating your FireGauge account...
+            Setting up your FireGauge account...
           </p>
           <div className="bg-white/20 rounded-lg p-4">
             <p className="text-sm text-gray-300">
@@ -77,29 +78,30 @@ const PaymentSuccess = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-firegauge-charcoal to-gray-800">
       <div className="text-center text-white p-8 rounded-lg bg-white/10 backdrop-blur-sm max-w-lg mx-4">
         <CheckCircle className="h-16 w-16 text-green-400 mx-auto mb-4" />
-        <h1 className="text-2xl font-bold mb-4">Welcome to FireGauge!</h1>
+        <h1 className="text-2xl font-bold mb-4">Payment Successful!</h1>
         <p className="text-gray-300 mb-6">
-          Your account has been created successfully! We've sent you a magic link to sign in to your new FireGauge account.
+          Welcome to FireGauge! Your payment has been processed successfully. 
+          Let's complete your account setup and get you started.
         </p>
         
         <div className="bg-white/20 rounded-lg p-4 mb-6">
           <Mail className="h-8 w-8 text-firegauge-accent mx-auto mb-2" />
           <p className="text-sm text-gray-300 mb-2">
-            <strong>Check your email</strong> for a sign-in link, or click below to access FireGauge directly.
+            <strong>Next Step:</strong> Complete your department setup and create your admin account.
           </p>
         </div>
 
         <div className="space-y-3">
           <Button 
-            onClick={handleSignInRedirect}
+            onClick={handleOnboardingRedirect}
             className="w-full bg-firegauge-red hover:bg-firegauge-red/90 text-white"
           >
-            <ExternalLink className="mr-2 h-4 w-4" />
-            Sign In to FireGauge
+            <ArrowRight className="mr-2 h-4 w-4" />
+            Continue to Setup
           </Button>
           
           <p className="text-xs text-gray-400">
-            You'll be redirected to the main FireGauge application where you can sign in with your email.
+            We'll guide you through setting up your department and creating your administrator account.
           </p>
         </div>
       </div>

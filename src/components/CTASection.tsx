@@ -27,7 +27,7 @@ const CTASection: React.FC<CTASectionProps> = ({ onCTAClick, onPricingClick }) =
             Ready to Lose the Clipboards?
           </h2>
           <p className="text-xl text-gray-300 mb-8">
-            Be among the first departments to upgrade to digital testing. Your 30-day free trial is just a click away.
+            Be among the first departments to upgrade to digital testing. Your 90-day free trial is just a click away.
           </p>
           
           <div className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6">
@@ -40,14 +40,14 @@ const CTASection: React.FC<CTASectionProps> = ({ onCTAClick, onPricingClick }) =
               }}
             >
               <Link to="/pricing">
-                Start Free 30-Day Trial
+                Start Free 90-Day Trial
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
             
             <Button 
               variant="outline" 
-              className="border-white text-white hover:bg-white hover:text-firegauge-charcoal py-3 px-8 text-lg w-full sm:w-auto order-2 transition-all duration-300"
+              className="border-white bg-transparent text-white hover:bg-white hover:text-firegauge-charcoal py-3 px-8 text-lg w-full sm:w-auto order-2 transition-all duration-300"
               onClick={handleDemoRequest}
             >
               <Play className="mr-2 h-5 w-5" />

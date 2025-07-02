@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import { Wifi, FileText, ShieldCheck } from "lucide-react";
 
@@ -84,7 +83,7 @@ const Benefits = () => {
               href="/pricing" 
               className="inline-flex items-center px-6 py-3 bg-firegauge-red text-white font-semibold rounded-lg hover:bg-firegauge-red/90 transition-colors duration-300"
             >
-              Try Free for 30 Days
+              Try Free for 90 Days
               <svg className="ml-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>

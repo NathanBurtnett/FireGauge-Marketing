@@ -55,35 +55,8 @@ const AppContent = () => {
     };
   }, []);
 
-  // Emergency fallback redirect for magic link authentication
-  useEffect(() => {
-    const currentUrl = window.location.href;
-    const currentHash = window.location.hash;
-    const hasAuthTokens = (currentUrl.includes('access_token=') || currentHash.includes('access_token=')) && 
-                         (currentUrl.includes('type=magiclink') || currentHash.includes('type=magiclink'));
-    
-    if (hasAuthTokens && window.location.pathname === '/') {
-      console.log('🚨 Emergency fallback: Redirecting magic link to onboarding...');
-      window.location.href = '/onboarding';
-    }
-  }, []);
-
-
-
   if (loading) {
     return <LoadingScreen />;
-  }
-
-  // Check if this is an auth callback on the root path
-  const currentUrl = window.location.href;
-  const currentHash = window.location.hash;
-  const isAuthCallback = (currentUrl.includes('access_token=') || currentHash.includes('access_token=')) && 
-                        (currentUrl.includes('type=magiclink') || currentHash.includes('type=magiclink')) &&
-                        window.location.pathname === '/';
-
-  // If this is an auth callback, show the handler instead
-  if (isAuthCallback) {
-    return <AuthCallbackHandler />;
   }
 
   return (

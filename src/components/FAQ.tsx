@@ -13,6 +13,29 @@ interface FAQItem {
 
 const FAQ = () => {
   const faqs: FAQItem[] = [
+    // Billing & Plans
+    {
+      question: "Is there a free trial?",
+      answer: "Yes! We offer a 90-day free trial on all plans. No credit card required to start your trial. You can fully test FireGauge with your equipment and team before making any commitment."
+    },
+    {
+      question: "What happens after the 90-day free trial?",
+      answer: "Towards the end of your 90-day trial, you can choose to subscribe to one of our paid plans (Basic, Standard, or Professional) that best fits your needs. There is no automatic billing; you'll have the opportunity to make an informed decision about continuing with FireGauge."
+    },
+    {
+      question: "What counts as a user?",
+      answer: "A user is any individual with login credentials, whether an Administrator or an Inspector/Operator. Each plan includes a specific number of Admin and Inspector users."
+    },
+    {
+      question: "Can I change my plan later?",
+      answer: "Yes, you can upgrade or downgrade your plan at any time. Upgrades are effective immediately (pro-rated), and downgrades apply at the end of your current billing cycle."
+    },
+    {
+      question: "What payment methods do you accept?",
+      answer: "We accept all major credit cards (Visa, Mastercard, American Express, Discover) processed securely via Stripe."
+    },
+    
+    // Technical & Features
     {
       question: "What if I lose connection in the field?",
       answer: "FireGauge is designed to work offline. All your data is stored locally on your device and will automatically sync when you regain connection. You can continue testing and recording results even in areas with no cell coverage or in deep basements with concrete walls."
@@ -26,9 +49,11 @@ const FAQ = () => {
       answer: "Yes! FireGauge is a modular platform. While the core is focused on hose testing (NFPA 1962), you can easily add modules for ground ladder inspections (NFPA 1932), fire pump testing (NFPA 1911), and other equipment. Each module provides the same intuitive interface and compliant reporting."
     },
     {
-      question: "How does the pricing for add-on modules work?",
-      answer: "You can add the Ladder Inspection or Pump Testing modules to any of our core paid plans (Basic, Standard, or Professional) for an additional $50/month per module. This allows you to tailor the system to your specific needs and only pay for the functionalities you use."
+      question: "How do the add-on modules work?",
+      answer: "Add-on modules like Ladder Inspections or Pump Testing can be added to Basic, Standard, or Professional plans for an additional $50/month per module. This allows you to tailor the system to your specific needs and only pay for the functionalities you use."
     },
+    
+    // Setup & Support  
     {
       question: "Can I import my existing equipment data?",
       answer: "Yes! We understand you have existing records. FireGauge supports importing your current equipment inventory and test history from common formats like Excel or CSV files. Our onboarding team can assist you in formatting and importing your data for a smooth transition."
@@ -44,12 +69,7 @@ const FAQ = () => {
     {
       question: "What kind of customer support do you offer?",
       answer: "We offer email support for all plans. The Standard plan includes priority email support, while the Professional plan adds phone support. Enterprise plans benefit from a dedicated account manager and custom support SLAs. Comprehensive documentation and video tutorials are also available 24/7."
-    },
-    {
-      question: "What happens after the 30-day free trial?",
-      answer: "Towards the end of your 30-day trial, you can choose to subscribe to one of our paid plans (Basic, Standard, or Professional) that best fits your needs. There is no automatic billing; you'll have the opportunity to make an informed decision. If you choose not to subscribe, your trial account will be deactivated, but you can inquire about data export options."
-    },
-    // Add more FAQs as needed
+    }
   ];
 
   return (
