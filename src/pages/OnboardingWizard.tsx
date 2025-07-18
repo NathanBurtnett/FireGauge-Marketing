@@ -104,7 +104,7 @@ const OnboardingWizard = () => {
     }
   };
 
-  const handleComplete = () => {
+  const handleComplete = async () => {
     // Track completion
     if (typeof gtag !== 'undefined') {
       gtag('event', 'onboarding_complete', {
@@ -113,8 +113,98 @@ const OnboardingWizard = () => {
       });
     }
 
-    // Redirect to main app
-    window.location.href = appUrl;
+    setIsLoading(true);
+    
+    try {
+      // Get current Supabase session
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        console.error('No valid session found:', sessionError);
+        toast({
+          title: 'Authentication Error',
+          description: 'Please sign in again to continue.',
+          variant: 'destructive',
+        });
+        // Redirect to sign in
+        setStep(0);
+        return;
+      }
+
+      // Get setup data from localStorage
+      const setupDataStr = localStorage.getItem('firegauge_setup_data');
+      const setupData = setupDataStr ? JSON.parse(setupDataStr) : {};
+
+      // Call main app's onboarding completion API
+      const response = await fetch(`${appUrl}/api/onboarding/complete-from-marketing`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          supabaseToken: session.access_token,
+          setupData: setupData
+        })
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        // Clear setup data since account is created
+        localStorage.removeItem('firegauge_setup_data');
+        
+        toast({
+          title: 'Success!',
+          description: result.message || 'Account created successfully!',
+        });
+
+        // Small delay to show success message
+        setTimeout(() => {
+          // Redirect to main app dashboard
+          window.location.href = `${appUrl}${result.redirect_url || '/dashboard'}`;
+        }, 1500);
+        
+      } else {
+        throw new Error(result.error || 'Failed to create account');
+      }
+
+    } catch (error) {
+      console.error('Error completing onboarding:', error);
+      
+      // Try the bridge fallback approach
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          const setupDataStr = localStorage.getItem('firegauge_setup_data');
+          const bridgeUrl = `${appUrl}/onboarding-bridge?token=${encodeURIComponent(session.access_token)}&data=${encodeURIComponent(setupDataStr || '{}')}`;
+          
+          toast({
+            title: 'Using alternative setup method...',
+            description: 'Redirecting to complete your account setup.',
+          });
+          
+          setTimeout(() => {
+            window.location.href = bridgeUrl;
+          }, 1000);
+          return;
+        }
+      } catch (bridgeError) {
+        console.error('Bridge fallback failed:', bridgeError);
+      }
+      
+      toast({
+        title: 'Setup Error',
+        description: error instanceof Error ? error.message : 'Failed to complete setup. Please try again.',
+        variant: 'destructive',
+      });
+      
+      // Final fallback: redirect to main app anyway
+      setTimeout(() => {
+        window.location.href = appUrl;
+      }, 2000);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Step 0: Email signup (if not authenticated)
@@ -287,9 +377,14 @@ const OnboardingWizard = () => {
           <Button
             className="w-full bg-firegauge-red hover:bg-firegauge-red/90"
             onClick={handleComplete}
+            disabled={isLoading}
           >
-            <Rocket className="mr-2 h-4 w-4" />
-            Launch FireGauge
+            {isLoading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Rocket className="mr-2 h-4 w-4" />
+            )}
+            {isLoading ? 'Setting up your account...' : 'Launch FireGauge'}
           </Button>
           
           <p className="text-xs text-gray-500">
