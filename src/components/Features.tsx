@@ -36,8 +36,8 @@ const Features = () => {
   const features = [
     {
       icon: <Smartphone className="h-12 w-12 text-firegauge-red" />,
-      title: "Mobile-First Testing Interface",
-      description: "Purpose-built for field operations. Test hoses, ladders, and pumps directly from your smartphone—even offline. Our intuitive mobile interface reduces training time and eliminates the need for separate devices or clipboards.",
+      title: "Mobile-First Testing Interface", 
+      description: "Purpose-built for field operations. Test fire hoses, hydrants, ladders, pumps, extinguishers and custom equipment directly from your smartphone—even offline. Our intuitive mobile interface reduces training time and eliminates the need for separate devices or clipboards.",
       highlight: "Cuts admin workload up to 75 %"
     },
     {
@@ -95,7 +95,7 @@ const Features = () => {
       <div className="container">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-firegauge-charcoal">
-            Why Fire Departments & Contractors Choose FireGauge
+            Why Fire Departments Choose FireGauge
           </h2>
           <p className="text-lg text-gray-700 max-w-3xl mx-auto">
             Built from the ground up for modern fire safety professionals who demand efficiency, compliance, and reliability in their testing operations.

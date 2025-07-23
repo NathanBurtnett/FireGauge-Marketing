@@ -33,7 +33,6 @@ const Navbar = () => {
   const navigation = isHome ? [
     { name: 'Benefits', href: '#benefits' },
     { name: 'Features', href: '#features' },
-    { name: 'Testimonials', href: '#testimonials' },
     { name: 'Pricing', href: '#pricing' },
     { name: 'FAQ', href: '#faq' }
   ] : [

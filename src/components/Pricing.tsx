@@ -29,17 +29,17 @@ const Pricing = () => {
   const plans: PricingPlan[] = [
     {
       id: 'pilot',
-      name: "Pilot 90",
+      name: "Pilot",
       price: "Free",
       priceNote: "90-day trial",
       description: "Run one full test season at no cost",
-      userCount: "1 Admin + 1 Inspector",
+      userCount: "Unlimited users",
       assetCount: "Up to 100 assets",
       features: [
-        "Offline PWA / Mobile App",
-        "PDF export (1-yr archive)",
-        "Guided Pass/Fail flow",
-        "Basic hose testing (NFPA-1962)"
+        "All equipment types (hoses, hydrants, ladders, pumps)",
+        "Offline mobile app with sync",
+        "NFPA/ISO compliant PDF reports",
+        "Basic email support"
       ],
       ctaText: "Start Free Trial"
     },
@@ -49,14 +49,14 @@ const Pricing = () => {
       price: "$39",
       priceNote: "/month",
       description: "Perfect for volunteer or single-station departments",
-      userCount: "1 Admin + 2 Inspectors",
+      userCount: "Unlimited users",
       assetCount: "Up to 300 assets",
       features: [
         "Everything in Pilot",
-        "5-yr PDF archive",
         "CSV import/export",
-        "Email support + updates",
-        "Ladder add-on ready"
+        "Priority email support",
+        "Equipment lifecycle tracking",
+        "Compliance reporting"
       ],
       ctaText: "Choose Essential"
     },
@@ -66,14 +66,14 @@ const Pricing = () => {
       price: "$99",
       priceNote: "/month",
       description: "For career departments that need bigger capacity",
-      userCount: "3 Admins + 5 Inspectors",
+      userCount: "Unlimited users",
       assetCount: "Up to 1,500 assets",
       features: [
         "Everything in Essential",
-        "Automated ISO audit packet",
         "Role-based permissions",
-        "Zapier / CSV integrations",
-        "Advanced reporting"
+        "Advanced reporting & analytics",
+        "Custom branding options",
+        "Phone support"
       ],
       ctaText: "Upgrade to Pro",
       recommended: true
@@ -83,15 +83,15 @@ const Pricing = () => {
       name: "Contractor",
       price: "$279",
       priceNote: "/month",
-      description: "Unlimited assets—ideal for hose-testing vendors",
+      description: "Unlimited assets for large operations",
       userCount: "Unlimited users",
       assetCount: "Unlimited assets",
       features: [
         "All Pro features",
-        "White-label PDF & portal",
+        "Multi-department management",
+        "Custom branding & white-labeling",
         "API access",
-        "Priority support (next-day)",
-        "Multi-department management"
+        "Priority support (next-day)"
       ],
       ctaText: "Get Contractor"
     },
@@ -100,15 +100,15 @@ const Pricing = () => {
       name: "Enterprise",
       price: "Custom",
       priceNote: "",
-      description: "County-wide or multi-station? Let's craft a custom solution",
-      userCount: "Unlimited users & assets",
-      assetCount: "Custom features",
+      description: "County-wide or multi-station departments",
+      userCount: "Unlimited users",
+      assetCount: "Unlimited assets + custom features",
       features: [
         "White-glove onboarding",
-        "SSO / LDAP / SCIM",
-        "Dedicated CSM & phone support",
-        "Custom contract terms",
-        "SLA guarantees"
+        "Dedicated account manager",
+        "Custom integrations",
+        "SLA guarantees",
+        "Custom contract terms"
       ],
       ctaText: "Contact Sales",
       isEnterprise: true

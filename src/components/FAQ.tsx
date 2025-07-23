@@ -42,11 +42,11 @@ const FAQ = () => {
     },
     {
       question: "Is FireGauge NFPA 1962 compliant?",
-      answer: "Absolutely. FireGauge was designed specifically to meet all NFPA 1962 requirements for fire hose testing and documentation. Our reports include all required fields and metrics, and we regularly update the platform to stay current with the latest NFPA standards."
+      answer: "Absolutely. FireGauge was designed specifically to meet NFPA requirements for fire equipment testing and documentation, including NFPA 1962 (fire hoses), NFPA 1932 (ladders), and NFPA 1911 (pumps). Our reports include all required fields and metrics, and we regularly update the platform to stay current with the latest NFPA standards."
     },
     {
       question: "Do you support testing for other equipment besides hoses?",
-      answer: "Yes! FireGauge is a modular platform. While the core is focused on hose testing (NFPA 1962), you can easily add modules for ground ladder inspections (NFPA 1932), fire pump testing (NFPA 1911), and other equipment. Each module provides the same intuitive interface and compliant reporting."
+      answer: "Yes! FireGauge supports comprehensive fire equipment testing including fire hoses (NFPA 1962), fire hydrants, ground ladders (NFPA 1932), fire pumps (NFPA 1911), extinguishers, and custom equipment types. All equipment types use the same intuitive interface and professional reporting system."
     },
     {
       question: "How do the add-on modules work?",

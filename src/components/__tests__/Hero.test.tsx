@@ -27,9 +27,9 @@ describe.skip('Hero Component', () => {
       </HeroWrapper>
     );
     
-    expect(screen.getByText('The Future of Fire Hose')).toBeInTheDocument();
+    expect(screen.getByText('The Future of Fire Equipment')).toBeInTheDocument();
     expect(screen.getByText('Testing & Compliance')).toBeInTheDocument();
-    expect(screen.getByText(/Mobile-first platform designed for contractors and fire departments/)).toBeInTheDocument();
+          expect(screen.getByText(/Mobile-first platform designed for fire departments/)).toBeInTheDocument();
   });
 
   it('displays key value propositions', () => {
@@ -174,13 +174,14 @@ describe.skip('Hero Component', () => {
       </HeroWrapper>
     );
 
-    // Check for fire hose related content
-    const fireHoseText = screen.getByText(/Fire Hose/i);
-    expect(fireHoseText).toBeInTheDocument();
+    // Check for fire equipment related content
+    const fireEquipmentText = screen.getByText(/Fire Equipment/i);
+    expect(fireEquipmentText).toBeInTheDocument();
     
-    // Check for NFPA compliance mentions - use getAllByText since there are multiple instances
-    const nfpaTexts = screen.getAllByText(/NFPA/i);
-    expect(nfpaTexts.length).toBeGreaterThan(0);
-    expect(nfpaTexts[0]).toBeInTheDocument();
+    // Check for compliance messaging
+    expect(screen.getByText(/compliance/i)).toBeInTheDocument();
+    
+    // Check for mobile-first messaging
+    expect(screen.getByText(/mobile/i)).toBeInTheDocument();
   });
 }); 

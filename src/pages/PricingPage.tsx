@@ -80,7 +80,7 @@ const PricingPage = () => {
       description: "Run one full test season at no cost. Auto-reminds you 75 days in. Includes billing setup for seamless transition.",
       userCount: "1 Admin + 1 Inspector",
       assetCount: "Up to 100 assets",
-      coreModules: "Hose Testing (NFPA-1962)",
+      coreModules: "All Equipment Testing (NFPA Compliant)",
       features: [
         "Offline PWA / Mobile App",
         "PDF export (1-yr archive)",

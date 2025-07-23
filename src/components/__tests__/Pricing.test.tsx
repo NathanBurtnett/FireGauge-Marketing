@@ -92,7 +92,7 @@ describe.skip('Pricing Component', () => {
     
     // Check for specific features
     expect(screen.getByText('Offline PWA / Mobile App')).toBeInTheDocument();
-    expect(screen.getByText('Hose Testing (NFPA-1962)')).toBeInTheDocument();
+    expect(screen.getByText('All Equipment Testing (NFPA Compliant)')).toBeInTheDocument();
   });
 
   it('displays plan information correctly', () => {

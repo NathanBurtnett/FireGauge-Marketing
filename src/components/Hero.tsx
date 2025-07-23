@@ -36,12 +36,12 @@ const Hero = () => {
           </div>
           
           <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-            The Future of Fire Hose
+            The Future of Fire Equipment
             <span className="text-firegauge-accent block">Testing & Compliance</span>
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-            Mobile-first platform designed for contractors and fire departments.
-            Streamlines workflows, <span className="font-semibold">cuts administrative effort by&nbsp;up&nbsp;to&nbsp;75 %</span>,
+            Mobile-first platform designed for fire departments.
+            Test hoses, hydrants, ladders, pumps and more. <span className="font-semibold">Cuts administrative effort by&nbsp;up&nbsp;to&nbsp;75%</span>,
             and eliminates manual paperwork—all from your smartphone.
           </p>
           

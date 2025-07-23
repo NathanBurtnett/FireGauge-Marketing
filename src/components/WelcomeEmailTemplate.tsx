@@ -35,7 +35,7 @@ export const getWelcomeEmailHTML = (props: WelcomeEmailTemplateProps) => {
                 🔥 FIREGAUGE
               </h1>
               <p style="margin: 8px 0 0 0; font-size: 16px; opacity: 0.9;">
-                Professional Digital Hose Testing
+                Professional Fire Equipment Testing
               </p>
             </td>
           </tr>
@@ -49,7 +49,7 @@ export const getWelcomeEmailHTML = (props: WelcomeEmailTemplateProps) => {
 
               <p style="font-size: 16px; line-height: 1.6; margin-bottom: 25px; color: #374151;">
                 Thank you for choosing FireGauge for <strong>${departmentName}</strong>. 
-                We're excited to help you streamline your hose testing process and ensure 
+                We're excited to help you streamline your fire equipment testing process and ensure 
                 compliance with NFPA standards.
               </p>
 

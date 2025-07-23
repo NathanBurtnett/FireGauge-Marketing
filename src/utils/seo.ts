@@ -9,17 +9,22 @@ export interface SEOConfig {
 }
 
 export const defaultSEO: SEOConfig = {
-  title: 'FireGauge - The Future of Fire Hose Testing & Compliance',
-  description: 'Mobile-first fire hose testing platform. 75% faster than traditional methods, 100% NFPA 1962 compliant. Try it free for 14 days.',
+  title: 'FireGauge - Fire Equipment Testing & Compliance Platform',
+  description: 'Mobile-first fire equipment testing platform for fire departments. Test hoses, hydrants, ladders, pumps & more. NFPA compliant reports. Try free for 90 days.',
   image: '/firegauge-og-image.jpg',
   type: 'website',
   keywords: [
+    'fire equipment testing',
     'fire hose testing',
+    'fire hydrant testing',
+    'ladder testing',
+    'pump testing',
     'NFPA 1962',
+    'NFPA 1932',
+    'NFPA 1911',
     'fire compliance',
     'digital testing',
     'fire department software',
-    'hose testing equipment',
     'mobile testing platform',
     'fire safety compliance'
   ],
@@ -102,7 +107,7 @@ export const generateOrganizationSchema = () => ({
   "@context": "https://schema.org",
   "@type": "Organization",
   "name": "FireGauge",
-  "description": "Mobile-first fire hose testing platform for NFPA 1962 compliance",
+  "description": "Mobile-first fire equipment testing platform for NFPA compliance and fire department operations",
   "url": "https://firegauge.app",
   "logo": "https://firegauge.app/logo.png",
   "contactPoint": {
@@ -122,7 +127,7 @@ export const generateSoftwareSchema = () => ({
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   "name": "FireGauge",
-  "description": "Mobile-first fire hose testing platform for NFPA 1962 compliance",
+  "description": "Mobile-first fire equipment testing platform for NFPA compliance and fire department operations",
   "applicationCategory": "BusinessApplication",
   "operatingSystem": "Web, iOS, Android",
   "offers": {

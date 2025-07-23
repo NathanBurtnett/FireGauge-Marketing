@@ -1,13 +1,13 @@
 import React from 'react';
-import { Check, X } from 'lucide-react'; // For checkmarks and X marks
+import { Check, X } from 'lucide-react';
 
 interface FeatureDetail {
   name: string;
-  basic: string | boolean;
-  standard: string | boolean;
-  professional: string | boolean;
+  pilot: string | boolean;
+  essential: string | boolean;
+  pro: string | boolean;
+  contractor: string | boolean;
   enterprise: string | boolean;
-  tooltip?: string; // Optional tooltip for more info
 }
 
 interface FeatureCategory {
@@ -19,62 +19,50 @@ const featureComparisonData: FeatureCategory[] = [
   {
     name: "Core Testing & Compliance",
     features: [
-      { name: "Hose Testing (NFPA 1962)", basic: true, standard: true, professional: true, enterprise: true },
-      { name: "Guided Pass/Fail Tests", basic: true, standard: true, professional: true, enterprise: true },
-      { name: "Offline Mode & Auto-Sync", basic: true, standard: true, professional: true, enterprise: true },
-      { name: "Barcode/QR Code Scanning Support", basic: "Limited", standard: true, professional: true, enterprise: true, tooltip: "Basic plan may have limits on scan types or frequency." },
-      { name: "Ladder Inspections Module (NFPA 1932)", basic: "Add-on", standard: "Add-on", professional: "Add-on", enterprise: "Included Option" },
-      { name: "Pump Testing Module (NFPA 1911)", basic: "Add-on", standard: "Add-on", professional: "Add-on", enterprise: "Included Option" },
+      { name: "Fire Hose Testing (NFPA 1962)", pilot: true, essential: true, pro: true, contractor: true, enterprise: true },
+      { name: "Fire Hydrant Testing", pilot: true, essential: true, pro: true, contractor: true, enterprise: true },
+      { name: "Ladder Testing (NFPA 1932)", pilot: true, essential: true, pro: true, contractor: true, enterprise: true },
+      { name: "Pump Testing (NFPA 1911)", pilot: true, essential: true, pro: true, contractor: true, enterprise: true },
+      { name: "Fire Extinguisher Testing", pilot: true, essential: true, pro: true, contractor: true, enterprise: true },
+      { name: "Custom Equipment Types", pilot: true, essential: true, pro: true, contractor: true, enterprise: true },
+      { name: "Pass/Fail Testing Workflow", pilot: true, essential: true, pro: true, contractor: true, enterprise: true },
+      { name: "Offline Mode & Auto-Sync", pilot: true, essential: true, pro: true, contractor: true, enterprise: true },
     ]
   },
   {
     name: "Reporting & Documentation",
     features: [
-      { name: "NFPA-Compliant PDF Reports", basic: "Standard Reports", standard: "Advanced Reports", professional: "Branded & Advanced", enterprise: "Fully Custom Reports" },
-      { name: "Automated Email Delivery of Reports", basic: false, standard: true, professional: true, enterprise: true },
-      { name: "CSV Data Exports", basic: true, standard: true, professional: true, enterprise: true },
-      { name: "Digital Record Keeping", basic: true, standard: true, professional: true, enterprise: true },
-      { name: "E-Signature Capture", basic: true, standard: true, professional: true, enterprise: true },
-      { name: "Full Test History Archives", basic: "90-day Retention", standard: "1-Year Retention", professional: "Unlimited Retention", enterprise: "Unlimited Retention" },
-      { name: "Audit Logs", basic: false, standard: true, professional: true, enterprise: true },
+      { name: "NFPA-Compliant PDF Reports", pilot: true, essential: true, pro: true, contractor: true, enterprise: true },
+      { name: "CSV Data Exports", pilot: true, essential: true, pro: true, contractor: true, enterprise: true },
+      { name: "Digital Record Keeping", pilot: true, essential: true, pro: true, contractor: true, enterprise: true },
+      { name: "Test History & Archives", pilot: true, essential: true, pro: true, contractor: true, enterprise: true },
+      { name: "Custom Branding Options", pilot: false, essential: false, pro: true, contractor: true, enterprise: true },
     ]
   },
   {
-    name: "User & Asset Management",
+    name: "Asset & User Management",
     features: [
-      { name: "Admin Users", basic: "1", standard: "2", professional: "3", enterprise: "Unlimited" },
-      { name: "Inspector/Operator Users", basic: "1", standard: "5", professional: "10", enterprise: "Unlimited" },
-      { name: "Hose Count Limit", basic: "≤ 75", standard: "Up to 500", professional: "Up to 2,000", enterprise: "Custom/Unlimited" },
-      { name: "Asset Tracking (Other Equipment)", basic: false, standard: "Limited", professional: "Unlimited", enterprise: "Unlimited" },
-      { name: "Role-Based Access Control", basic: false, standard: true, professional: true, enterprise: true },
+      { name: "Asset Limit", pilot: "100", essential: "300", pro: "1,500", contractor: "Unlimited", enterprise: "Unlimited" },
+      { name: "User Accounts", pilot: "Unlimited", essential: "Unlimited", pro: "Unlimited", contractor: "Unlimited", enterprise: "Unlimited" },
+      { name: "Role-Based Access Control", pilot: false, essential: false, pro: true, contractor: true, enterprise: true },
+      { name: "Multi-Department Management", pilot: false, essential: false, pro: false, contractor: true, enterprise: true },
     ]
   },
   {
-    name: "Support & Onboarding",
+    name: "Support & Advanced Features",
     features: [
-      { name: "Email Support", basic: true, standard: "Priority Email", professional: "Priority Email", enterprise: "Dedicated Support Channel" },
-      { name: "Phone Support", basic: false, standard: false, professional: true, enterprise: true },
-      { name: "Dedicated Account Manager", basic: false, standard: false, professional: false, enterprise: true },
-      { name: "Knowledge Base & Tutorials", basic: true, standard: true, professional: true, enterprise: true },
-      { name: "Standard Onboarding Assistance", basic: true, standard: true, professional: true, enterprise: false },
-      { name: "White-Glove Onboarding & Data Migration", basic: false, standard: false, professional: "Paid Add-on", enterprise: true },
-    ]
-  },
-  {
-    name: "Integrations & Advanced Features",
-    features: [
-      { name: "Basic Integrations (e.g., QuickBooks)", basic: false, standard: true, professional: true, enterprise: "Custom Integrations" },
-      { name: "API Access", basic: false, standard: false, professional: true, enterprise: true },
-      { name: "SSO/LDAP Integration", basic: false, standard: false, professional: false, enterprise: true },
-      { name: "Custom Branding Options (Reports/Portal)", basic: false, standard: false, professional: true, enterprise: true },
-      { name: "Custom SLAs", basic: false, standard: false, professional: false, enterprise: true },
+      { name: "Email Support", pilot: "Basic", essential: "Priority", pro: "Priority", contractor: "Priority", enterprise: "Dedicated" },
+      { name: "Phone Support", pilot: false, essential: false, pro: true, contractor: true, enterprise: true },
+      { name: "API Access", pilot: false, essential: false, pro: false, contractor: true, enterprise: true },
+      { name: "Dedicated Account Manager", pilot: false, essential: false, pro: false, contractor: false, enterprise: true },
+      { name: "Custom Integrations", pilot: false, essential: false, pro: false, contractor: false, enterprise: true },
     ]
   }
 ];
 
 const FeatureComparisonTable = () => {
   return (
-    <section className="py-12 bg-white"> {/* Changed background for contrast if page is gray */}
+    <section className="py-12 bg-white">
       <div className="container mx-auto px-4">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-firegauge-charcoal">
           Compare Plans & Features
@@ -84,9 +72,10 @@ const FeatureComparisonTable = () => {
             <thead className="bg-gray-50">
               <tr>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3 lg:w-2/5">Feature</th>
-                <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Basic</th>
-                <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Standard</th>
-                <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Professional</th>
+                <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Pilot</th>
+                <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Essential</th>
+                <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Pro</th>
+                <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Contractor</th>
                 <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Enterprise</th>
               </tr>
             </thead>
@@ -94,19 +83,19 @@ const FeatureComparisonTable = () => {
               {featureComparisonData.map((category) => (
                 <React.Fragment key={category.name}>
                   <tr>
-                    <td colSpan={5} className="px-4 py-3 bg-gray-100">
+                    <td colSpan={6} className="px-4 py-3 bg-gray-100">
                       <h3 className="text-lg font-semibold text-firegauge-charcoal">{category.name}</h3>
                     </td>
                   </tr>
                   {category.features.map((feature) => (
                     <tr key={feature.name}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{feature.name}</td>
-                      {[feature.basic, feature.standard, feature.professional, feature.enterprise].map((value, idx) => (
+                      {[feature.pilot, feature.essential, feature.pro, feature.contractor, feature.enterprise].map((value, idx) => (
                         <td key={idx} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
                           {typeof value === 'boolean' ? (
                             value ? <Check className="h-5 w-5 text-green-500 mx-auto" /> : <X className="h-5 w-5 text-red-500 mx-auto" />
                           ) : (
-                            value
+                            <span className={typeof value === 'string' && value.includes('Unlimited') ? 'font-semibold text-green-600' : ''}>{value}</span>
                           )}
                         </td>
                       ))}
@@ -118,7 +107,7 @@ const FeatureComparisonTable = () => {
           </table>
         </div>
         <p className="text-xs text-gray-500 mt-4">
-          * "Add-on" features are available for an additional monthly fee on Basic, Standard, and Professional plans.
+          * All plans include unlimited user accounts. Only asset limits vary by plan.
         </p>
       </div>
     </section>
