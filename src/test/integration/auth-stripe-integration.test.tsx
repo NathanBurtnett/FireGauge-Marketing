@@ -13,38 +13,32 @@ const createIntegrationTestWrapper = ({ children }: { children: React.ReactNode 
   </AuthProvider>
 );
 
-// Mock the entire Supabase client with realistic behavior
-const mockSupabaseAuth = {
-  getSession: vi.fn(),
-  getUser: vi.fn(),
-  signInWithPassword: vi.fn(),
-  signUp: vi.fn(),
-  signOut: vi.fn(),
-  onAuthStateChange: vi.fn(),
-  updateUser: vi.fn(),
-};
+// Mock Supabase client with factory-scoped mocks (avoids hoisting issues)
+vi.mock('@/lib/supabase', () => {
+  const auth = {
+    getSession: vi.fn(),
+    getUser: vi.fn(),
+    signInWithPassword: vi.fn(),
+    signUp: vi.fn(),
+    signOut: vi.fn(),
+    onAuthStateChange: vi.fn(),
+    updateUser: vi.fn(),
+  };
+  const functions = { invoke: vi.fn() };
+  const fromImpl = {
+    select: vi.fn().mockReturnThis(),
+    eq: vi.fn().mockReturnThis(),
+    single: vi.fn(),
+    insert: vi.fn(),
+    update: vi.fn(),
+    upsert: vi.fn(),
+  };
+  const from = vi.fn(() => fromImpl);
+  return { supabase: { auth, functions, from }, __mocks: { auth, functions, fromImpl, from } };
+});
 
-const mockSupabaseFunctions = {
-  invoke: vi.fn(),
-};
-
-const mockSupabaseFrom = {
-  select: vi.fn().mockReturnThis(),
-  eq: vi.fn().mockReturnThis(),
-  single: vi.fn(),
-  insert: vi.fn(),
-  update: vi.fn(),
-  upsert: vi.fn(),
-};
-
-// Mock Supabase client
-vi.mock('@/lib/supabase', () => ({
-  supabase: {
-    auth: mockSupabaseAuth,
-    functions: mockSupabaseFunctions,
-    from: vi.fn(() => mockSupabaseFrom),
-  },
-}));
+// Access exported mocks to configure behavior inside tests
+import { __mocks as supabaseMocks } from '@/lib/supabase';
 
 // Mock Stripe integration
 const mockStripeCheckout = {
@@ -122,12 +116,12 @@ describe('Supabase Authentication & Stripe Checkout Integration Tests', () => {
     vi.clearAllMocks();
     
     // Default successful authentication state
-    mockSupabaseAuth.getSession.mockResolvedValue({
+    supabaseMocks.auth.getSession.mockResolvedValue({
       data: { session: mockSession },
       error: null,
     });
     
-    mockSupabaseAuth.getUser.mockResolvedValue({
+    supabaseMocks.auth.getUser.mockResolvedValue({
       data: { user: mockUser },
       error: null,
     });
@@ -147,13 +141,13 @@ describe('Supabase Authentication & Stripe Checkout Integration Tests', () => {
     });
 
     // Mock successful Supabase function calls
-    mockSupabaseFunctions.invoke.mockResolvedValue({
+    supabaseMocks.functions.invoke.mockResolvedValue({
       data: { subscribed: true, subscription_tier: 'price_1RSqV400HE2ZS1pmK1uKuTCe' },
       error: null,
     });
 
     // Mock successful database operations
-    mockSupabaseFrom.single.mockResolvedValue({
+    supabaseMocks.fromImpl.single.mockResolvedValue({
       data: { preferences: { theme: 'light' } },
       error: null,
     });
@@ -168,13 +162,13 @@ describe('Supabase Authentication & Stripe Checkout Integration Tests', () => {
       const user = userEvent.setup();
       
       // Mock successful sign up
-      mockSupabaseAuth.signUp.mockResolvedValue({
+      supabaseMocks.auth.signUp.mockResolvedValue({
         data: { user: mockUser, session: mockSession },
         error: null,
       });
 
       // Mock onAuthStateChange for sign up
-      mockSupabaseAuth.onAuthStateChange.mockReturnValue({
+      supabaseMocks.auth.onAuthStateChange.mockReturnValue({
         data: { 
           subscription: { unsubscribe: vi.fn() }
         },
@@ -187,16 +181,16 @@ describe('Supabase Authentication & Stripe Checkout Integration Tests', () => {
       };
 
       // Simulate the sign up call
-      const result = await mockSupabaseAuth.signUp(signUpData);
+      const result = await supabaseMocks.auth.signUp(signUpData);
       
       expect(result.data.user).toBeDefined();
       expect(result.error).toBeNull();
-      expect(mockSupabaseAuth.signUp).toHaveBeenCalledWith(signUpData);
+      expect(supabaseMocks.auth.signUp).toHaveBeenCalledWith(signUpData);
     });
 
     it('should handle successful user login', async () => {
       // Mock successful login
-      mockSupabaseAuth.signInWithPassword.mockResolvedValue({
+      supabaseMocks.auth.signInWithPassword.mockResolvedValue({
         data: { user: mockUser, session: mockSession },
         error: null,
       });
@@ -206,17 +200,17 @@ describe('Supabase Authentication & Stripe Checkout Integration Tests', () => {
         password: 'password123!',
       };
 
-      const result = await mockSupabaseAuth.signInWithPassword(loginData);
+      const result = await supabaseMocks.auth.signInWithPassword(loginData);
       
       expect(result.data.user).toBeDefined();
       expect(result.data.session).toBeDefined();
       expect(result.error).toBeNull();
-      expect(mockSupabaseAuth.signInWithPassword).toHaveBeenCalledWith(loginData);
+      expect(supabaseMocks.auth.signInWithPassword).toHaveBeenCalledWith(loginData);
     });
 
     it('should handle authentication errors gracefully', async () => {
       // Mock authentication error
-      mockSupabaseAuth.signInWithPassword.mockResolvedValue({
+      supabaseMocks.auth.signInWithPassword.mockResolvedValue({
         data: { user: null, session: null },
         error: { message: 'Invalid credentials' },
       });
@@ -226,7 +220,7 @@ describe('Supabase Authentication & Stripe Checkout Integration Tests', () => {
         password: 'wrongpassword',
       };
 
-      const result = await mockSupabaseAuth.signInWithPassword(loginData);
+      const result = await supabaseMocks.auth.signInWithPassword(loginData);
       
       expect(result.data.user).toBeNull();
       expect(result.data.session).toBeNull();
@@ -236,9 +230,9 @@ describe('Supabase Authentication & Stripe Checkout Integration Tests', () => {
 
     it('should handle user logout', async () => {
       // Mock successful logout
-      mockSupabaseAuth.signOut.mockResolvedValue({ error: null });
+      supabaseMocks.auth.signOut.mockResolvedValue({ error: null });
 
-      const result = await mockSupabaseAuth.signOut();
+      const result = await supabaseMocks.auth.signOut();
       
       expect(result.error).toBeNull();
       expect(mockSupabaseAuth.signOut).toHaveBeenCalled();
@@ -246,16 +240,16 @@ describe('Supabase Authentication & Stripe Checkout Integration Tests', () => {
 
     it('should handle auth state changes', async () => {
       const mockCallback = vi.fn();
-      mockSupabaseAuth.onAuthStateChange.mockReturnValue({
+      supabaseMocks.auth.onAuthStateChange.mockReturnValue({
         data: { 
           subscription: { unsubscribe: vi.fn() }
         },
       });
 
       // Simulate auth state change setup
-      const { data } = mockSupabaseAuth.onAuthStateChange(mockCallback);
+      const { data } = supabaseMocks.auth.onAuthStateChange(mockCallback);
       
-      expect(mockSupabaseAuth.onAuthStateChange).toHaveBeenCalledWith(mockCallback);
+      expect(supabaseMocks.auth.onAuthStateChange).toHaveBeenCalledWith(mockCallback);
       expect(data.subscription.unsubscribe).toBeDefined();
     });
   });
@@ -265,7 +259,7 @@ describe('Supabase Authentication & Stripe Checkout Integration Tests', () => {
       const mockCheckoutUrl = 'https://checkout.stripe.com/pay/cs_test_123';
       
       // Mock successful checkout session creation
-      mockSupabaseFunctions.invoke.mockResolvedValue({
+      supabaseMocks.functions.invoke.mockResolvedValue({
         data: { url: mockCheckoutUrl },
         error: null,
       });
@@ -339,7 +333,7 @@ describe('Supabase Authentication & Stripe Checkout Integration Tests', () => {
   describe('Subscription Management', () => {
     it('should check subscription status', async () => {
       // Mock subscription check function response
-      mockSupabaseFunctions.invoke.mockResolvedValue({
+      supabaseMocks.functions.invoke.mockResolvedValue({
         data: {
           subscribed: true,
           subscription_tier: 'price_1RSqV400HE2ZS1pmK1uKuTCe',
@@ -427,7 +421,7 @@ describe('Supabase Authentication & Stripe Checkout Integration Tests', () => {
   describe('Error Handling and Edge Cases', () => {
     it('should handle network errors gracefully', async () => {
       // Mock network error
-      mockSupabaseFunctions.invoke.mockRejectedValue(new Error('Network error'));
+      supabaseMocks.functions.invoke.mockRejectedValue(new Error('Network error'));
 
       const mockCheckSubscription = vi.fn().mockRejectedValue(new Error('Network error'));
       mockUseSubscription.mockReturnValue({
@@ -461,14 +455,14 @@ describe('Supabase Authentication & Stripe Checkout Integration Tests', () => {
 
     it('should handle authentication timeouts', async () => {
       // Mock authentication timeout
-      mockSupabaseAuth.getSession.mockImplementation(() => 
+      supabaseMocks.auth.getSession.mockImplementation(() => 
         new Promise((_, reject) => 
           setTimeout(() => reject(new Error('Request timeout')), 100)
         )
       );
 
       try {
-        await mockSupabaseAuth.getSession();
+      await supabaseMocks.auth.getSession();
       } catch (error) {
         expect(error.message).toBe('Request timeout');
       }
@@ -492,23 +486,23 @@ describe('Supabase Authentication & Stripe Checkout Integration Tests', () => {
     it('should save and retrieve user preferences', async () => {
       const preferences = { theme: 'dark', notifications: true };
       
-      mockSupabaseFrom.upsert.mockResolvedValue({
+      supabaseMocks.fromImpl.upsert.mockResolvedValue({
         data: preferences,
         error: null,
       });
 
-      mockSupabaseFrom.single.mockResolvedValue({
+      supabaseMocks.fromImpl.single.mockResolvedValue({
         data: { preferences },
         error: null,
       });
 
       // Test preference save
-      const saveResult = await mockSupabaseFrom.upsert(preferences);
+      const saveResult = await supabaseMocks.fromImpl.upsert(preferences);
       expect(saveResult.data).toEqual(preferences);
       expect(saveResult.error).toBeNull();
 
       // Test preference retrieval
-      const getResult = await mockSupabaseFrom.single();
+      const getResult = await supabaseMocks.fromImpl.single();
       expect(getResult.data.preferences).toEqual(preferences);
       expect(getResult.error).toBeNull();
     });
@@ -519,12 +513,12 @@ describe('Supabase Authentication & Stripe Checkout Integration Tests', () => {
         stripe_customer_id: 'cus_updated123' 
       };
 
-      mockSupabaseAuth.updateUser.mockResolvedValue({
+      supabaseMocks.auth.updateUser.mockResolvedValue({
         data: { user: { ...mockUser, user_metadata: updatedMetadata } },
         error: null,
       });
 
-      const result = await mockSupabaseAuth.updateUser({ data: updatedMetadata });
+      const result = await supabaseMocks.auth.updateUser({ data: updatedMetadata });
       
       expect(result.data.user.user_metadata).toEqual(updatedMetadata);
       expect(result.error).toBeNull();

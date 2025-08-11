@@ -18,6 +18,7 @@ import AuthCallbackHandler from "./pages/AuthCallbackHandler";
 import { initializeSEO } from "./utils/seo";
 import { analytics } from "./lib/analytics";
 import { useAuth, AuthProvider } from "@/components/providers/AuthProvider";
+import FeedbackWidget from "@/components/FeedbackWidget";
 
 const queryClient = new QueryClient();
 
@@ -70,11 +71,13 @@ const AppContent = () => {
         <Route path="/legal" element={<LegalPage />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/onboarding" element={<OnboardingWizard />} />
+        <Route path="/feedback" element={React.createElement(require('./pages/FeedbackPage').default)} />
         <Route path="/auth/callback" element={<AuthCallbackHandler />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
       <ScrollToTop />
+      <FeedbackWidget />
     </BrowserRouter>
   );
 };
