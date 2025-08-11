@@ -20,7 +20,7 @@ const FAQ = () => {
     },
     {
       question: "What happens after the 90-day free trial?",
-      answer: "Towards the end of your 90-day trial, you can choose to subscribe to one of our paid plans (Basic, Standard, or Professional) that best fits your needs. There is no automatic billing; you'll have the opportunity to make an informed decision about continuing with FireGauge."
+      answer: "Towards the end of your 90-day trial, you can choose to subscribe to one of our paid plans. There is no automatic billing; you'll have the opportunity to make an informed decision about continuing with FireGauge."
     },
     {
       question: "What counts as a user?",
@@ -50,7 +50,7 @@ const FAQ = () => {
     },
     {
       question: "How do the add-on modules work?",
-      answer: "Add-on modules like Ladder Inspections or Pump Testing can be added to Basic, Standard, or Professional plans for an additional $50/month per module. This allows you to tailor the system to your specific needs and only pay for the functionalities you use."
+      answer: "All plans include core testing workflows. Additional integrations and advanced features (like API access) are on our roadmap and will be communicated when available."
     },
     
     // Setup & Support  
@@ -64,11 +64,11 @@ const FAQ = () => {
     },
     {
       question: "Can I manage multiple users and assign different roles?",
-      answer: "Yes. All our plans support multiple users. Our Standard, Professional, and Enterprise plans offer role-based access control, allowing you to define Administrators (who can manage settings, users, and billing) and Field Operators/Inspectors (who focus on testing and data entry)."
+      answer: "Yes. All plans support multiple users, and role-based access control is available to separate administrative functions from field testing."
     },
     {
       question: "What kind of customer support do you offer?",
-      answer: "We offer email support for all plans. The Standard plan includes priority email support, while the Professional plan adds phone support. Enterprise plans benefit from a dedicated account manager and custom support SLAs. Comprehensive documentation and video tutorials are also available 24/7."
+      answer: "We offer email support for all plans. Enterprise plans can include phone support and a dedicated account manager. Documentation and tutorials are available 24/7."
     }
   ];
 

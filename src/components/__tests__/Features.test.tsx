@@ -9,7 +9,7 @@ global.IntersectionObserver = vi.fn().mockImplementation((callback) => ({
   disconnect: vi.fn(),
 }));
 
-describe.skip('Features Component', () => {
+describe('Features Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -17,7 +17,7 @@ describe.skip('Features Component', () => {
   it('renders the main features section heading', () => {
     render(<Features />);
     
-    expect(screen.getByText('Why Fire Departments & Contractors Choose FireGauge')).toBeInTheDocument();
+    expect(screen.getByText('Why Fire Departments Choose FireGauge')).toBeInTheDocument();
     expect(screen.getByText(/Built from the ground up for modern fire safety professionals/)).toBeInTheDocument();
   });
 
@@ -27,45 +27,42 @@ describe.skip('Features Component', () => {
     // Check for all 9 feature titles
     expect(screen.getByText('Mobile-First Testing Interface')).toBeInTheDocument();
     expect(screen.getByText('Automated NFPA/ISO Compliance')).toBeInTheDocument();
-    expect(screen.getByText('Multi-Tenant Contractor Platform')).toBeInTheDocument();
+    expect(screen.getByText('Multi-Organization Contractor Platform')).toBeInTheDocument();
     expect(screen.getByText('Instant Report Generation')).toBeInTheDocument();
     expect(screen.getByText('Digital Asset Management')).toBeInTheDocument();
     expect(screen.getByText('Offline-First Architecture')).toBeInTheDocument();
-    expect(screen.getByText('Proven ROI & Cost Savings')).toBeInTheDocument();
+    expect(screen.getByText('Time Savings & Efficiency')).toBeInTheDocument();
     expect(screen.getByText('Scalable for Any Size Operation')).toBeInTheDocument();
-    expect(screen.getByText('API Integration & Interoperability')).toBeInTheDocument();
+    expect(screen.getByText('Data Export & Interoperability')).toBeInTheDocument();
   });
 
   it('shows feature highlights and benefits', () => {
     render(<Features />);
     
     // Check for specific highlight badges
-    expect(screen.getByText('75% faster than traditional methods')).toBeInTheDocument();
-    expect(screen.getByText('100% compliance guarantee')).toBeInTheDocument();
+    // Neutral highlights
     expect(screen.getByText('Unlimited departments & users')).toBeInTheDocument();
-    expect(screen.getByText('Reports in under 30 seconds')).toBeInTheDocument();
+    expect(screen.getByText('Fast report creation')).toBeInTheDocument();
     expect(screen.getByText('Automated scheduling & alerts')).toBeInTheDocument();
     expect(screen.getByText('Works anywhere, syncs everywhere')).toBeInTheDocument();
-    expect(screen.getByText('$50K+ annual savings')).toBeInTheDocument();
+    expect(screen.queryByText('$50K+ annual savings')).toBeNull();
     expect(screen.getByText('Volunteer to Enterprise ready')).toBeInTheDocument();
-    expect(screen.getByText('Integration-ready architecture')).toBeInTheDocument();
+    expect(screen.getByText('CSV/PDF exports')).toBeInTheDocument();
   });
 
   it('displays trust metrics and statistics', () => {
     render(<Features />);
     
     // Check for the trust section
-    expect(screen.getByText('Trusted by Progressive Fire Departments & Contractors')).toBeInTheDocument();
+    expect(screen.queryByText('Trusted by Progressive Fire Departments & Contractors')).toBeNull();
     
     // Check for statistics
-    expect(screen.getByText('25+')).toBeInTheDocument();
-    expect(screen.getByText('Fire Departments Served')).toBeInTheDocument();
-    
-    expect(screen.getByText('10,000+')).toBeInTheDocument();
-    expect(screen.getByText('Tests Completed')).toBeInTheDocument();
-    
-    expect(screen.getByText('100%')).toBeInTheDocument();
-    expect(screen.getByText('Audit Pass Rate')).toBeInTheDocument();
+    expect(screen.queryByText('25+')).toBeNull();
+    expect(screen.queryByText('Fire Departments Served')).toBeNull();
+    expect(screen.queryByText('10,000+')).toBeNull();
+    expect(screen.queryByText('Tests Completed')).toBeNull();
+    expect(screen.queryByText('100%')).toBeNull();
+    expect(screen.queryByText('Audit Pass Rate')).toBeNull();
   });
 
   it('includes mobile-first and compliance messaging', () => {
@@ -92,10 +89,8 @@ describe.skip('Features Component', () => {
   it('displays cost savings and ROI information', () => {
     render(<Features />);
     
-    // Check for ROI and savings content
-    expect(screen.getByText(/save \$50,000\+ annually/)).toBeInTheDocument();
-    expect(screen.getByText(/ROI realized within first quarter/)).toBeInTheDocument();
-    expect(screen.getByText(/reduced labor costs/)).toBeInTheDocument();
+    // ROI copy removed, ensure conservative language exists
+    expect(screen.getByText(/Time Savings & Efficiency/)).toBeInTheDocument();
   });
 
   it('includes offline capabilities and technical features', () => {
@@ -107,8 +102,8 @@ describe.skip('Features Component', () => {
     expect(screen.getByText(/automatically syncs/)).toBeInTheDocument();
     
     // Check for API integration
-    expect(screen.getByText(/robust API/)).toBeInTheDocument();
-    expect(screen.getByText(/existing fire department software/)).toBeInTheDocument();
+    expect(screen.queryByText(/robust API/)).toBeNull();
+    expect(screen.getByText(/Export your data via CSV and PDF/)).toBeInTheDocument();
   });
 
   it('shows scalability messaging', () => {

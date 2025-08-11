@@ -52,10 +52,10 @@ const Pricing = () => {
       userCount: "Unlimited users",
       assetCount: "Up to 300 assets",
       features: [
-        "Everything in Pilot",
+        "Same core features as Pilot",
         "CSV import/export",
-        "Priority email support",
-        "Equipment lifecycle tracking",
+        "Email support",
+        "Equipment tracking",
         "Compliance reporting"
       ],
       ctaText: "Choose Essential"
@@ -69,11 +69,11 @@ const Pricing = () => {
       userCount: "Unlimited users",
       assetCount: "Up to 1,500 assets",
       features: [
-        "Everything in Essential",
+        "Same core features as Essential",
         "Role-based permissions",
-        "Advanced reporting & analytics",
-        "Custom branding options",
-        "Phone support"
+        "Advanced reports",
+        "Custom branding (Contractor/Enterprise)",
+        "Priority email support"
       ],
       ctaText: "Upgrade to Pro",
       recommended: true
@@ -87,11 +87,11 @@ const Pricing = () => {
       userCount: "Unlimited users",
       assetCount: "Unlimited assets",
       features: [
-        "All Pro features",
+        "All core features",
         "Multi-department management",
-        "Custom branding & white-labeling",
-        "API access",
-        "Priority support (next-day)"
+        "Branding & white-labeling",
+        "CSV/PDF exports",
+        "Priority support"
       ],
       ctaText: "Get Contractor"
     },
@@ -106,8 +106,8 @@ const Pricing = () => {
       features: [
         "White-glove onboarding",
         "Dedicated account manager",
-        "Custom integrations",
-        "SLA guarantees",
+        "Custom integrations (case-by-case)",
+        "SLA arrangements",
         "Custom contract terms"
       ],
       ctaText: "Contact Sales",

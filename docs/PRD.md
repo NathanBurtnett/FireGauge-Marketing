@@ -38,7 +38,7 @@ The FireGauge Marketing Site (`www.firegauge.app`) is now **exclusively focused 
 | User Type | Marketing Site Role | Post-Signup Experience |
 |-----------|-------------------|------------------------|
 | **Prospective Department** | Learn value → See pricing → Start trial/subscription | Redirect to `app.firegauge.app` for ALL management |
-| **Contractor** | Understand multi-tenant capabilities → Sign up | Access unified admin in main app for billing/users |
+| **Contractor** | Understand multi-organization capabilities → Sign up | Access unified admin in main app for billing/users |
 | **Decision Maker** | Request demo → Schedule call → Convert | Complete onboarding in main application |
 
 **3. Functional Scope - SIMPLIFIED**

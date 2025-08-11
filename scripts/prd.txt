@@ -34,7 +34,7 @@ The FireGauge Marketing & Account Portal (`www.firegauge.app`) serves as the pri
     *   Minimal training for volunteer crews—large buttons, guided flows.
 *   **Modular, Scalable Platform:**
     *   Start with hose testing, then add ladder and pump modules as needed.
-    *   Multi-tenant, role-based access (admins vs. inspectors).
+    *   Multi-organization, role-based access (admins vs. inspectors).
 *   **ROI & Risk Reduction:**
     *   Cut 20–30 min off each hose test; reclaim dozens of staff hours per year.
     *   Avoid ISO/insurance penalties by maintaining complete, up-to-date records.

@@ -36,7 +36,7 @@ const featureComparisonData: FeatureCategory[] = [
       { name: "CSV Data Exports", pilot: true, essential: true, pro: true, contractor: true, enterprise: true },
       { name: "Digital Record Keeping", pilot: true, essential: true, pro: true, contractor: true, enterprise: true },
       { name: "Test History & Archives", pilot: true, essential: true, pro: true, contractor: true, enterprise: true },
-      { name: "Custom Branding Options", pilot: false, essential: false, pro: true, contractor: true, enterprise: true },
+      { name: "Custom Branding Options", pilot: false, essential: false, pro: false, contractor: true, enterprise: true },
     ]
   },
   {
@@ -52,10 +52,10 @@ const featureComparisonData: FeatureCategory[] = [
     name: "Support & Advanced Features",
     features: [
       { name: "Email Support", pilot: "Basic", essential: "Priority", pro: "Priority", contractor: "Priority", enterprise: "Dedicated" },
-      { name: "Phone Support", pilot: false, essential: false, pro: true, contractor: true, enterprise: true },
-      { name: "API Access", pilot: false, essential: false, pro: false, contractor: true, enterprise: true },
+      { name: "Phone Support", pilot: false, essential: false, pro: false, contractor: false, enterprise: true },
+      { name: "API Access (Roadmap)", pilot: false, essential: false, pro: false, contractor: false, enterprise: false },
       { name: "Dedicated Account Manager", pilot: false, essential: false, pro: false, contractor: false, enterprise: true },
-      { name: "Custom Integrations", pilot: false, essential: false, pro: false, contractor: false, enterprise: true },
+      { name: "Custom Integrations (Case-by-case)", pilot: false, essential: false, pro: false, contractor: false, enterprise: true },
     ]
   }
 ];
@@ -107,7 +107,7 @@ const FeatureComparisonTable = () => {
           </table>
         </div>
         <p className="text-xs text-gray-500 mt-4">
-          * All plans include unlimited user accounts. Only asset limits vary by plan.
+          * All plans include the same core features. Asset limits vary by plan.
         </p>
       </div>
     </section>

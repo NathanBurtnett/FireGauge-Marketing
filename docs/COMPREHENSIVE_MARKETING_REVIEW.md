@@ -200,7 +200,7 @@ The FireGauge marketing site demonstrates **enterprise-level quality** across al
 
 **Primary Audiences:**
 1. **Fire Departments**: Compliance-focused messaging with operational benefits
-2. **Testing Contractors**: Multi-tenant platform with unlimited department management
+2. **Testing Contractors**: Multi-organization platform with unlimited department management
 3. **Decision Makers**: ROI-focused content with quantified savings
 4. **Field Operators**: Mobile-first, offline-capable solution
 
@@ -230,7 +230,7 @@ The FireGauge marketing site demonstrates **enterprise-level quality** across al
 
 1. **Mobile-First Architecture**: Purpose-built for field operations vs office-based solutions
 2. **Offline Capability**: Works in basements and remote areas vs connectivity-dependent tools
-3. **Multi-Tenant Design**: Unlimited departments vs single-department limitations
+3. **Multi-Organization Design**: Unlimited departments vs single-department limitations
 4. **Instant Reporting**: <30s report generation vs manual paperwork processes
 5. **Compliance Automation**: Built-in NFPA validation vs manual compliance checking
 

@@ -15,7 +15,7 @@ const HeroWrapper = ({ children }: { children: React.ReactNode }) => (
   </BrowserRouter>
 );
 
-describe.skip('Hero Component', () => {
+describe('Hero Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -39,15 +39,11 @@ describe.skip('Hero Component', () => {
       </HeroWrapper>
     );
     
-    // Check for specific value propositions
-    expect(screen.getByText('75%')).toBeInTheDocument();
-    expect(screen.getByText('Faster Testing Process')).toBeInTheDocument();
-    
-    expect(screen.getByText('100%')).toBeInTheDocument();
-    expect(screen.getByText('NFPA Compliant Reports')).toBeInTheDocument();
-    
-    expect(screen.getByText('$50K+')).toBeInTheDocument();
-    expect(screen.getByText('Annual Savings Per Dept')).toBeInTheDocument();
+    // Check for current neutral value props
+    expect(screen.getByText('Mobile-First')).toBeInTheDocument();
+    expect(screen.getByText('Field-ready testing UI')).toBeInTheDocument();
+    expect(screen.getByText('Fast Exports')).toBeInTheDocument();
+    expect(screen.getByText('PDF and CSV when you need them')).toBeInTheDocument();
   });
 
   it('shows feature badges correctly', () => {
@@ -60,7 +56,7 @@ describe.skip('Hero Component', () => {
     // Check for feature badges
     expect(screen.getByText('Mobile-First Testing')).toBeInTheDocument();
     expect(screen.getByText('ISO/NFPA Compliant')).toBeInTheDocument();
-    expect(screen.getByText('Multi-Tenant Ready')).toBeInTheDocument();
+    expect(screen.getByText('Multi-Organization Ready')).toBeInTheDocument();
   });
 
   it('renders call-to-action buttons', () => {
@@ -181,7 +177,7 @@ describe.skip('Hero Component', () => {
     // Check for compliance messaging
     expect(screen.getByText(/compliance/i)).toBeInTheDocument();
     
-    // Check for mobile-first messaging
-    expect(screen.getByText(/mobile/i)).toBeInTheDocument();
+    // Check for mobile-first messaging (multiple occurrences acceptable)
+    expect(screen.getAllByText(/mobile/i).length).toBeGreaterThan(0);
   });
 }); 

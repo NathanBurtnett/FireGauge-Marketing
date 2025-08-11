@@ -31,7 +31,7 @@ const Hero = () => {
             </div>
             <div className="flex items-center space-x-2">
               <Users className="h-6 w-6 text-firegauge-accent" />
-              <span className="text-sm font-medium">Multi-Tenant Ready</span>
+              <span className="text-sm font-medium">Multi-Organization Ready</span>
             </div>
           </div>
           
@@ -41,8 +41,7 @@ const Hero = () => {
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
             Mobile-first platform designed for fire departments.
-            Test hoses, hydrants, ladders, pumps and more. <span className="font-semibold">Cuts administrative effort by&nbsp;up&nbsp;to&nbsp;75%</span>,
-            and eliminates manual paperwork—all from your smartphone.
+            Test hoses, hydrants, ladders, pumps and more. Streamline administrative work and reduce manual paperwork—all from your smartphone.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
@@ -69,12 +68,12 @@ const Hero = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto text-center">
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
-              <div className="text-3xl font-bold text-firegauge-accent mb-2">Up&nbsp;to&nbsp;75 %</div>
-              <div className="text-sm">Less Admin Time</div>
+              <div className="text-3xl font-bold text-firegauge-accent mb-2">Mobile-First</div>
+              <div className="text-sm">Field-ready testing UI</div>
             </div>
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
-              <div className="text-3xl font-bold text-firegauge-accent mb-2">&lt;30&nbsp;s</div>
-              <div className="text-sm">Report Generation</div>
+              <div className="text-3xl font-bold text-firegauge-accent mb-2">Fast Exports</div>
+              <div className="text-sm">PDF and CSV when you need them</div>
             </div>
           </div>
         </div>

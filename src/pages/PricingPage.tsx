@@ -78,7 +78,7 @@ const PricingPage = () => {
       priceAnnotation: "90-day trial",
       monthlyPriceId: "price_1RSqV400HE2ZS1pmK1uKuTCe",
       description: "Run one full test season at no cost. Auto-reminds you 75 days in. Includes billing setup for seamless transition.",
-      userCount: "1 Admin + 1 Inspector",
+      userCount: "Unlimited users",
       assetCount: "Up to 100 assets",
       coreModules: "All Equipment Testing (NFPA Compliant)",
       features: [
@@ -100,12 +100,12 @@ const PricingPage = () => {
       annualPriceId: "price_1RSqW500HE2ZS1pmn2qPRJ16",
       annualPrice: "$399/yr (save 15%)",
       description: "Perfect for volunteer or single-station departments.",
-      userCount: "1 Admin + 2 Inspectors",
+      userCount: "Unlimited users",
       assetCount: "Up to 300 assets",
-      coreModules: "Hose, Ladder add-on ready",
+      coreModules: "Same core features as Pilot",
       features: [
-        "Everything in Pilot",
-        "5-yr PDF archive",
+        "Same core features as Pilot",
+        "Multi-year PDF archive",
         "CSV import/export",
         "Email support + updates"
       ],
@@ -120,14 +120,13 @@ const PricingPage = () => {
       annualPriceId: "price_1RSqWs00HE2ZS1pmkDdtxYdV",
       annualPrice: "$999/yr (save 15%)",
       description: "For career departments that need bigger capacity & audit automation.",
-      userCount: "3 Admins + 5 Inspectors",
+      userCount: "Unlimited users",
       assetCount: "Up to 1,500 assets",
-      coreModules: "Hose + Audit Logs + Reminders",
+      coreModules: "Same core features as Essential",
       features: [
-        "Everything in Essential",
-        "Automated ISO audit packet",
+        "Advanced reporting",
         "Role-based permissions",
-        "Zapier / CSV integrations"
+        "CSV integrations"
       ],
       ctaText: "Upgrade to Pro",
       recommended: true,
@@ -143,12 +142,12 @@ const PricingPage = () => {
       description: "Unlimited assets & child departments—ideal for hose-testing vendors.",
       userCount: "Unlimited users",
       assetCount: "Unlimited assets",
-      coreModules: "All Pro features + White Label",
+      coreModules: "All core features + White Label",
       features: [
         "Unlimited departments & assets",
         "White-label PDF & portal",
-        "API access",
-        "Priority support (next-day)"
+        "CSV/PDF exports",
+        "Priority support"
       ],
       ctaText: "Get Contractor",
       supportsInvoice: true
@@ -164,8 +163,8 @@ const PricingPage = () => {
       coreModules: "All modules + custom SLAs",
       features: [
         "White-glove onboarding",
-        "SSO / LDAP / SCIM",
-        "Dedicated CSM & phone support",
+        "Dedicated account manager",
+        "Phone support",
         "Custom contract terms"
       ],
       ctaText: "Contact Sales",

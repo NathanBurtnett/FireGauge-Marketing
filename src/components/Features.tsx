@@ -48,15 +48,15 @@ const Features = () => {
     },
     {
       icon: <Users className="h-12 w-12 text-firegauge-red" />,
-      title: "Multi-Tenant Contractor Platform",
+      title: "Multi-Organization Contractor Platform",
       description: "Designed for testing contractors serving multiple fire departments. Manage unlimited departments, white-label reports, and maintain separate data silos while centralizing operations and billing—all in one platform.",
       highlight: "Unlimited departments & users"
     },
     {
       icon: <Zap className="h-12 w-12 text-firegauge-red" />,
       title: "Instant Report Generation",
-      description: "Generate professional, branded PDF reports instantly upon test completion. Digital signatures, automatic calculations, and customizable templates mean no more manual report writing or follow-up paperwork.",
-      highlight: "Reports in under 30 seconds"
+      description: "Generate professional, branded PDF reports upon test completion. Digital signatures, automatic calculations, and customizable templates reduce manual report writing and follow-up paperwork.",
+      highlight: "Fast report creation"
     },
     {
       icon: <FileCheck className="h-12 w-12 text-firegauge-red" />,
@@ -72,9 +72,9 @@ const Features = () => {
     },
     {
       icon: <DollarSign className="h-12 w-12 text-firegauge-red" />,
-      title: "Proven ROI & Cost Savings",
-      description: "Departments typically save $50,000+ annually through reduced labor costs, eliminated re-testing, faster inspector workflows, and streamlined compliance processes. ROI realized within first quarter.",
-      highlight: "Cost-saving potential"
+      title: "Time Savings & Efficiency",
+      description: "Designed to reduce administrative workload, re-entry, and follow-up paperwork with fast, guided workflows and exports. Actual results vary by department and process.",
+      highlight: "Time-saving workflows"
     },
     {
       icon: <Building2 className="h-12 w-12 text-firegauge-red" />,
@@ -84,9 +84,9 @@ const Features = () => {
     },
     {
       icon: <CheckCircle className="h-12 w-12 text-firegauge-red" />,
-      title: "API Integration & Interoperability",
-      description: "Seamlessly connect with existing fire department software, asset management systems, and municipal platforms through our robust API. Export data in any format your AHJ requires.",
-      highlight: "Integration-ready architecture"
+      title: "Data Export & Interoperability",
+      description: "Export your data via CSV and PDF for easy sharing with AHJs and existing systems. API access is on our roadmap and will be introduced with clear documentation.",
+      highlight: "CSV/PDF exports"
     }
   ];
 
