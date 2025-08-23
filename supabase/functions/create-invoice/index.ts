@@ -47,7 +47,8 @@ serve(async (req) => {
       customerInfo, 
       metadata = {},
       billingCycle = 'monthly',
-      planName 
+      planName,
+      promoCode
     } = body;
 
     if (!priceId) {
@@ -174,6 +175,23 @@ serve(async (req) => {
       });
 
       logStep("Added line item to invoice");
+
+      // Apply promoCode if provided (coupon or promotion code)
+      if (promoCode && typeof promoCode === 'string') {
+        try {
+          const promoList = await stripe.promotionCodes.list({ code: promoCode, active: true, limit: 1 });
+          if (promoList.data.length > 0) {
+            await stripe.invoices.update(invoice.id, { discounts: [{ promotion_code: promoList.data[0].id }] as any });
+          } else {
+            try {
+              const coupon = await stripe.coupons.retrieve(promoCode);
+              if (coupon && coupon.valid) {
+                await stripe.invoices.update(invoice.id, { discounts: [{ coupon: coupon.id }] as any });
+              }
+            } catch (_) {}
+          }
+        } catch (_) {}
+      }
 
       // Finalize the invoice to make it sendable
       const finalizedInvoice = await stripe.invoices.finalizeInvoice(invoice.id);

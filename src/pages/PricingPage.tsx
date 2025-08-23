@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { trackingHelpers } from "../lib/analytics";
 import { Check, Loader2, CreditCard, FileText, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -45,11 +46,14 @@ interface BillingMethodOption {
 }
 
 const PricingPage = () => {
+  const [searchParams] = useSearchParams();
+  const referralCode = searchParams.get('ref') || '';
   const { user } = useAuth();
   const { createCheckoutSession: hookCreateCheckout } = useSubscription();
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const [selectedBillingMethod, setSelectedBillingMethod] = useState<BillingMethod>(BillingMethod.SUBSCRIPTION);
   const [selectedBillingCycle, setSelectedBillingCycle] = useState<BillingCycle>(BillingCycle.MONTHLY);
+  const [promoCode, setPromoCode] = useState<string>("");
 
   // Track pricing page view
   useEffect(() => {
@@ -204,7 +208,7 @@ const PricingPage = () => {
         }
 
         // For invoice method, redirect to a form where they can enter their details
-        const invoiceUrl = `/invoice-request?plan=${plan.name}&priceId=${priceId}&cycle=${selectedBillingCycle}`;
+        const invoiceUrl = `/invoice-request?plan=${plan.name}&priceId=${priceId}&cycle=${selectedBillingCycle}${referralCode ? `&ref=${encodeURIComponent(referralCode)}` : ''}${promoCode ? `&promo=${encodeURIComponent(promoCode)}` : ''}`;
         window.location.href = invoiceUrl;
         setIsLoading(null);
         return;
@@ -216,6 +220,7 @@ const PricingPage = () => {
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: {
           priceId: priceId,
+          promoCode: promoCode || undefined,
           metadata: {
             plan_name: plan.name,
             billing_method: selectedBillingMethod,
@@ -223,7 +228,8 @@ const PricingPage = () => {
             source: 'pricing_page',
             checkout_session_id: Date.now().toString(),
             requires_account_creation: user ? 'false' : 'true',
-            is_free_trial: plan.name === 'Pilot 90' ? 'true' : 'false'
+            is_free_trial: plan.name === 'Pilot 90' ? 'true' : 'false',
+            ...(referralCode ? { referral_code: referralCode } : {})
           }
         }
       });
@@ -336,6 +342,19 @@ const PricingPage = () => {
                 </div>
               </div>
             )}
+            {/* Promo Code (optional) */}
+            <div className="max-w-sm mx-auto mb-8">
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                Promo Code (optional)
+              </label>
+              <input
+                type="text"
+                value={promoCode}
+                onChange={(e) => setPromoCode(e.target.value.trim())}
+                placeholder="Enter promo code"
+                className="w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-firegauge-red"
+              />
+            </div>
             
             {/* Existing Customer Portal */}
             {user && (

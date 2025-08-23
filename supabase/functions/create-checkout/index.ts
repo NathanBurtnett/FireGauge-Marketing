@@ -42,7 +42,7 @@ serve(async (req) => {
     const body = await req.json();
     logStep("Request body parsed", { bodyKeys: Object.keys(body) });
 
-    const { priceId, metadata = {} } = body;
+    const { priceId, promoCode, metadata = {} } = body;
 
     if (!priceId) {
       logError("Validation", new Error("priceId is required"));
@@ -120,6 +120,26 @@ serve(async (req) => {
 
     logStep("Session metadata prepared", sessionMetadata);
 
+    // Build discounts if promoCode provided
+    let discounts: Array<{coupon?: string, promotion_code?: string}> | undefined = undefined;
+    if (promoCode && typeof promoCode === 'string') {
+      try {
+        // Try finding a promotion code first
+        const promoList = await stripe.promotionCodes.list({ code: promoCode, active: true, limit: 1 });
+        if (promoList.data.length > 0) {
+          discounts = [{ promotion_code: promoList.data[0].id }];
+        } else {
+          // Fallback: treat as coupon ID directly if matches
+          try {
+            const coupon = await stripe.coupons.retrieve(promoCode);
+            if (coupon && coupon.valid) {
+              discounts = [{ coupon: coupon.id }];
+            }
+          } catch (_) {}
+        }
+      } catch (_) {}
+    }
+
     // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -137,6 +157,7 @@ serve(async (req) => {
       subscription_data: {
         metadata: sessionMetadata, // Also add to subscription metadata
       },
+      discounts,
       // Collect customer information for anonymous users
       ...(flowType === "anonymous" && {
         customer_creation: "always",

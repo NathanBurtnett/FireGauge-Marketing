@@ -32,6 +32,8 @@ interface InvoiceFormData {
 
 const InvoiceRequestPage = () => {
   const [searchParams] = useSearchParams();
+  const referralCode = searchParams.get('ref') || '';
+  const promoCode = searchParams.get('promo') || '';
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -130,6 +132,7 @@ const InvoiceRequestPage = () => {
         priceId,
         planName: plan.name,
         billingCycle,
+        promoCode: promoCode || undefined,
         customerInfo: {
           email: formData.email,
           name: `${formData.firstName} ${formData.lastName}`,
@@ -147,7 +150,8 @@ const InvoiceRequestPage = () => {
           department_name: formData.departmentName,
           notes: formData.notes,
           source: 'invoice_request_page',
-          billing_cycle: billingCycle
+          billing_cycle: billingCycle,
+          ...(referralCode ? { referral_code: referralCode } : {})
         }
       });
 

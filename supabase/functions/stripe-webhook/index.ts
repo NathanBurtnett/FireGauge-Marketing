@@ -124,6 +124,49 @@ serve(async (req) => {
             throw new Error(`Could not retrieve subscription ${subscriptionId} from Stripe.`);
           }
 
+          // Record referral if present on session
+          const referralCode = session.metadata?.referral_code;
+          try {
+            if (referralCode && stripeCustomerId) {
+              // Get price from line items
+              const expandedSession = await stripe.checkout.sessions.retrieve(session.id, { expand: ['line_items'] });
+              const priceId = expandedSession.line_items?.data?.[0]?.price?.id as string | undefined;
+
+              // Upsert referral row
+              const { data: existingRef, error: existingRefErr } = await supabaseAdmin
+                .from('referral')
+                .select('id, reward_applied_cents')
+                .eq('code', referralCode)
+                .eq('referred_stripe_customer_id', stripeCustomerId)
+                .single();
+
+              if (existingRefErr && existingRefErr.code !== 'PGRST116') {
+                logStep('Referral lookup error (non-fatal)', { error: existingRefErr.message });
+              }
+
+              if (!existingRef) {
+                const { error: insertRefErr } = await supabaseAdmin
+                  .from('referral')
+                  .insert({
+                    code: referralCode,
+                    referred_stripe_customer_id: stripeCustomerId,
+                    referred_subscription_id: subscriptionId,
+                    referred_price_id: priceId || null,
+                    qualified: false,
+                    reward_cents: 0,
+                    reward_applied_cents: 0,
+                  });
+                if (insertRefErr) {
+                  logStep('Referral insert error (non-fatal)', { error: insertRefErr.message });
+                } else {
+                  logStep('Referral recorded from checkout.session.completed', { referralCode, stripeCustomerId, subscriptionId });
+                }
+              }
+            }
+          } catch (refErr: any) {
+            logStep('Referral record exception (non-fatal)', { error: refErr.message });
+          }
+
           const supabaseUserIdFromMetadata = session.metadata?.supabase_user_id;
           const requiresAccountCreation = session.metadata?.requires_account_creation === "true";
 
@@ -321,6 +364,110 @@ serve(async (req) => {
             await manageSubscriptionInSupabase(supabaseAdmin, relevantSubscription, existingSubDataInv.tenant_id, stripeCustomerId);
           } else {
             await manageSubscriptionInSupabase(supabaseAdmin, relevantSubscription, tenantDataInv.id, stripeCustomerId);
+          }
+          // Referral qualification and crediting
+          try {
+            // Determine referral code from invoice or subscription metadata
+            const referralCode = (invoice.metadata && (invoice.metadata as any).referral_code) || (relevantSubscription.metadata && (relevantSubscription.metadata as any).referral_code) || null;
+            // Determine if annual
+            const isAnnual = relevantSubscription.items.data.some((it) => it.price?.recurring?.interval === 'year');
+
+            if (referralCode && isAnnual) {
+              // Upsert/find referral row
+              const { data: refRow, error: refFetchErr } = await supabaseAdmin
+                .from('referral')
+                .select('id, qualified, reward_cents, reward_applied_cents')
+                .eq('code', referralCode)
+                .eq('referred_stripe_customer_id', stripeCustomerId)
+                .single();
+
+              if (refFetchErr && refFetchErr.code !== 'PGRST116') {
+                logStep('Referral fetch error (non-fatal)', { error: refFetchErr.message });
+              }
+
+              if (!refRow) {
+                const priceId = relevantSubscription.items.data[0]?.price?.id || null;
+                const { error: refCreateErr } = await supabaseAdmin
+                  .from('referral')
+                  .insert({
+                    code: referralCode,
+                    referred_stripe_customer_id: stripeCustomerId,
+                    referred_subscription_id: relevantSubscription.id,
+                    referred_price_id: priceId,
+                    qualified: true,
+                    reward_cents: 50000,
+                    reward_applied_cents: 0,
+                  });
+                if (refCreateErr) {
+                  logStep('Referral create error (non-fatal)', { error: refCreateErr.message });
+                }
+              } else if (!refRow.qualified) {
+                const { error: refUpdateErr } = await supabaseAdmin
+                  .from('referral')
+                  .update({ qualified: true, reward_cents: 50000 })
+                  .eq('code', referralCode)
+                  .eq('referred_stripe_customer_id', stripeCustomerId);
+                if (refUpdateErr) {
+                  logStep('Referral qualify update error (non-fatal)', { error: refUpdateErr.message });
+                }
+              }
+
+              // Credit referrer if not already applied
+              const { data: referrerCodeRow, error: refCodeErr } = await supabaseAdmin
+                .from('referral_code')
+                .select('tenant_id')
+                .eq('code', referralCode)
+                .single();
+
+              if (!refCodeErr && referrerCodeRow?.tenant_id) {
+                const { data: tenantRow, error: tenantFetchErr } = await supabaseAdmin
+                  .from('tenant')
+                  .select('stripe_customer_id')
+                  .eq('id', referrerCodeRow.tenant_id)
+                  .single();
+
+                const referrerStripeCustomerId = tenantRow?.stripe_customer_id || null;
+                if (tenantFetchErr) {
+                  logStep('Referrer tenant fetch error (non-fatal)', { error: tenantFetchErr.message });
+                }
+
+                if (referrerStripeCustomerId) {
+                  // Check if already applied
+                  const { data: refAppliedRow, error: refAppliedErr } = await supabaseAdmin
+                    .from('referral')
+                    .select('reward_applied_cents')
+                    .eq('code', referralCode)
+                    .eq('referred_stripe_customer_id', stripeCustomerId)
+                    .single();
+
+                  const alreadyApplied = !!refAppliedRow && (refAppliedRow.reward_applied_cents || 0) > 0;
+
+                  if (!alreadyApplied) {
+                    try {
+                      await stripe.customers.createBalanceTransaction(referrerStripeCustomerId, {
+                        amount: -50000, // credit $500
+                        currency: 'usd',
+                        description: `Referral reward for ${stripeCustomerId}`,
+                      });
+                      const { error: markAppliedErr } = await supabaseAdmin
+                        .from('referral')
+                        .update({ reward_applied_cents: 50000 })
+                        .eq('code', referralCode)
+                        .eq('referred_stripe_customer_id', stripeCustomerId);
+                      if (markAppliedErr) {
+                        logStep('Failed to mark referral reward as applied (non-fatal)', { error: markAppliedErr.message });
+                      } else {
+                        logStep('Applied $500 referral credit to referrer customer balance', { referrerStripeCustomerId });
+                      }
+                    } catch (creditErr: any) {
+                      logStep('Stripe balance credit error (non-fatal)', { error: creditErr.message });
+                    }
+                  }
+                }
+              }
+            }
+          } catch (referralProcessErr: any) {
+            logStep('Referral processing failed (non-fatal)', { error: referralProcessErr.message });
           }
         } else {
             logStep("Skipping invoice.payment_succeeded: Not a subscription cycle or missing info.");
