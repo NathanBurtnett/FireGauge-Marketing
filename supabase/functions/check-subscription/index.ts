@@ -112,15 +112,15 @@ serve(async (req) => {
 
       logStep("User data fetched", { userCount: userData?.length });
 
-      // If no user record exists, return default free subscription state
+      // If no user record exists, return neutral non-subscribed state
       if (!userData || userData.length === 0) {
-        logStep("No user record found, returning default free subscription state");
+        logStep("No user record found, returning neutral subscription state");
         return new Response(
           JSON.stringify({ 
-            subscribed: true, // Consider them subscribed to free tier
-            subscription_tier: "price_1RSqV400HE2ZS1pmK1uKuTCe", // Pilot 90 - Free tier
+            subscribed: false,
+            subscription_tier: null,
             subscription_end: null,
-            plan_id: "price_1RSqV400HE2ZS1pmK1uKuTCe",
+            plan_id: null,
             current_period_end: null
           }),
           {
@@ -144,15 +144,15 @@ serve(async (req) => {
 
         logStep("Subscription data fetched", { subscriptionCount: subscriptionData?.length });
 
-        // If no active subscription found, return free tier
+        // If no active subscription found, return neutral non-subscribed
         if (!subscriptionData || subscriptionData.length === 0) {
-          logStep("No active subscription found in database, returning free tier");
+          logStep("No active subscription found in database, returning neutral state");
           return new Response(
             JSON.stringify({ 
-              subscribed: true,
-              subscription_tier: "price_1RSqV400HE2ZS1pmK1uKuTCe", // Free tier
+              subscribed: false,
+              subscription_tier: null,
               subscription_end: null,
-              plan_id: "price_1RSqV400HE2ZS1pmK1uKuTCe",
+              plan_id: null,
               current_period_end: null
             }),
             {
@@ -187,13 +187,13 @@ serve(async (req) => {
 
       } catch (subscriptionError) {
         logStep("Error fetching subscription", { error: subscriptionError.message });
-        // Return free tier if subscription lookup fails
+        // Return neutral state if subscription lookup fails
         return new Response(
           JSON.stringify({ 
-            subscribed: true,
-            subscription_tier: "price_1RSqV400HE2ZS1pmK1uKuTCe", // Pilot 90 - Free tier
+            subscribed: false,
+            subscription_tier: null,
             subscription_end: null,
-            plan_id: "price_1RSqV400HE2ZS1pmK1uKuTCe",
+            plan_id: null,
             current_period_end: null
           }),
           {
@@ -205,13 +205,13 @@ serve(async (req) => {
 
     } catch (userError) {
       logStep("Error fetching user record", { error: userError.message });
-      // Return free tier if user lookup fails
+      // Return neutral state if user lookup fails
       return new Response(
         JSON.stringify({ 
-          subscribed: true, 
-          subscription_tier: "price_1RSqV400HE2ZS1pmK1uKuTCe",
+          subscribed: false,
+          subscription_tier: null,
           subscription_end: null,
-          plan_id: "price_1RSqV400HE2ZS1pmK1uKuTCe",
+          plan_id: null,
           current_period_end: null
         }),
         {
@@ -225,10 +225,10 @@ serve(async (req) => {
     logStep("Unexpected error in check-subscription", { error: error.message });
     return new Response(
       JSON.stringify({ 
-        subscribed: true, // Default to free tier on any error
-        subscription_tier: "price_1RSqV400HE2ZS1pmK1uKuTCe",
+        subscribed: false,
+        subscription_tier: null,
         subscription_end: null,
-        plan_id: "price_1RSqV400HE2ZS1pmK1uKuTCe",
+        plan_id: null,
         current_period_end: null,
         error: "Internal server error" 
       }),

@@ -21,6 +21,24 @@ export interface FireGaugePlan {
   supportsInvoice: boolean;
 }
 
+// Explicit env reads so Vite injects values reliably in dev and build
+const envVal = (v: unknown) => typeof v === 'string' ? v.trim() : '';
+
+const VITE_PRICE_PILOT_MONTHLY = envVal((import.meta as any)?.env?.VITE_PRICE_PILOT_MONTHLY);
+const VITE_PRICE_PILOT_ANNUAL = envVal((import.meta as any)?.env?.VITE_PRICE_PILOT_ANNUAL);
+const VITE_PRICE_PILOT_INVOICE = envVal((import.meta as any)?.env?.VITE_PRICE_PILOT_INVOICE);
+
+const VITE_PRICE_ESSENTIAL_MONTHLY = envVal((import.meta as any)?.env?.VITE_PRICE_ESSENTIAL_MONTHLY);
+const VITE_PRICE_ESSENTIAL_ANNUAL = envVal((import.meta as any)?.env?.VITE_PRICE_ESSENTIAL_ANNUAL);
+
+const VITE_PRICE_PRO_MONTHLY = envVal((import.meta as any)?.env?.VITE_PRICE_PRO_MONTHLY);
+const VITE_PRICE_PRO_ANNUAL = envVal((import.meta as any)?.env?.VITE_PRICE_PRO_ANNUAL);
+
+const VITE_PRICE_CONTRACTOR_MONTHLY = envVal((import.meta as any)?.env?.VITE_PRICE_CONTRACTOR_MONTHLY);
+const VITE_PRICE_CONTRACTOR_ANNUAL = envVal((import.meta as any)?.env?.VITE_PRICE_CONTRACTOR_ANNUAL);
+
+const VITE_PRICE_ENTERPRISE_MONTHLY = envVal((import.meta as any)?.env?.VITE_PRICE_ENTERPRISE_MONTHLY);
+
 export const FIREGAUGE_PLANS: Record<string, FireGaugePlan> = {
   pilot: {
     id: 'pilot',
@@ -40,9 +58,9 @@ export const FIREGAUGE_PLANS: Record<string, FireGaugePlan> = {
     ],
     ctaText: 'Start Free Trial',
     pricing: {
-      monthly: 'price_1RSqV400HE2ZS1pmK1uKuTCe', // Free trial price
-      annual: 'price_1RSqV400HE2ZS1pmK1uKuTCe', // Same as monthly for free trial
-      invoice: 'price_1RSqV400HE2ZS1pmK1uKuTCe', // Enable invoice option for trial
+      monthly: VITE_PRICE_PILOT_MONTHLY || '',
+      annual: VITE_PRICE_PILOT_ANNUAL || '',
+      invoice: VITE_PRICE_PILOT_INVOICE || '',
     },
     supportsInvoice: true, // Enable for proper billing setup
   },
@@ -62,8 +80,8 @@ export const FIREGAUGE_PLANS: Record<string, FireGaugePlan> = {
     ],
     ctaText: 'Choose Essential',
     pricing: {
-      monthly: 'price_1RSqVe00HE2ZS1pmDEo9KWsH',
-      annual: 'price_1RSqW500HE2ZS1pmn2qPRJ16',
+      monthly: VITE_PRICE_ESSENTIAL_MONTHLY || '',
+      annual: VITE_PRICE_ESSENTIAL_ANNUAL || '',
     },
     annualSavings: '$399/yr (save 15%)',
     supportsInvoice: true,
@@ -84,8 +102,8 @@ export const FIREGAUGE_PLANS: Record<string, FireGaugePlan> = {
     ctaText: 'Upgrade to Pro',
     recommended: true,
     pricing: {
-      monthly: 'price_1RSqWZ00HE2ZS1pmcp0iWhqg',
-      annual: 'price_1RSqWs00HE2ZS1pmkDdtxYdV',
+      monthly: VITE_PRICE_PRO_MONTHLY || '',
+      annual: VITE_PRICE_PRO_ANNUAL || '',
     },
     annualSavings: '$999/yr (save 15%)',
     supportsInvoice: true,
@@ -106,8 +124,8 @@ export const FIREGAUGE_PLANS: Record<string, FireGaugePlan> = {
     ],
     ctaText: 'Get Contractor',
     pricing: {
-      monthly: 'price_1RSqXb00HE2ZS1pmNY4PlTA5',
-      annual: 'price_1RSqY000HE2ZS1pmKSzq7p3i',
+      monthly: VITE_PRICE_CONTRACTOR_MONTHLY || '',
+      annual: VITE_PRICE_CONTRACTOR_ANNUAL || '',
     },
     annualSavings: '$2,999/yr (save 10%)',
     supportsInvoice: true,
@@ -129,9 +147,8 @@ export const FIREGAUGE_PLANS: Record<string, FireGaugePlan> = {
     ctaText: 'Contact Sales',
     isEnterprise: true,
     pricing: {
-      monthly: 'price_1RSqYn00HE2ZS1pmrIORlH1Q',
-      // TODO: Add annual price ID when created in Stripe
-      // annual: 'price_[TO_BE_CREATED]',
+      monthly: VITE_PRICE_ENTERPRISE_MONTHLY || '',
+      // annual: VITE_PRICE_ENTERPRISE_ANNUAL || '',
     },
     supportsInvoice: true,
   },

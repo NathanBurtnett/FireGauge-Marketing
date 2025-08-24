@@ -21,11 +21,12 @@ declare global {
 }
 
 interface PricingPlan {
+  planId: string; // maps to config plan keys: pilot, essential, pro, contractor, enterprise
   name: string;
   priceDisplay: string;
   priceAnnotation: string;
-  monthlyPriceId: string;
-  annualPriceId?: string;
+  monthlyPriceId?: string; // legacy hardcoded; not used for checkout
+  annualPriceId?: string;  // legacy hardcoded; not used for checkout
   annualPrice?: string;
   description: string;
   userCount: string;
@@ -77,10 +78,11 @@ const PricingPage = () => {
 
   const plans: PricingPlan[] = [
     {
+      planId: 'pilot',
       name: "Pilot 90",
       priceDisplay: "Free",
       priceAnnotation: "90-day trial",
-      monthlyPriceId: "price_1RSqV400HE2ZS1pmK1uKuTCe",
+      monthlyPriceId: import.meta.env.VITE_PRICE_PILOT_MONTHLY || "",
       description: "Run one full test season at no cost. Auto-reminds you 75 days in. Includes billing setup for seamless transition.",
       userCount: "Unlimited users",
       assetCount: "Up to 100 assets",
@@ -97,11 +99,12 @@ const PricingPage = () => {
       supportsInvoice: true
     },
     {
+      planId: 'essential',
       name: "Essential",
       priceDisplay: "$39",
       priceAnnotation: "/mo",
-      monthlyPriceId: "price_1RSqVe00HE2ZS1pmDEo9KWsH",
-      annualPriceId: "price_1RSqW500HE2ZS1pmn2qPRJ16",
+      monthlyPriceId: import.meta.env.VITE_PRICE_ESSENTIAL_MONTHLY || "",
+      annualPriceId: import.meta.env.VITE_PRICE_ESSENTIAL_ANNUAL || "",
       annualPrice: "$399/yr (save 15%)",
       description: "Perfect for volunteer or single-station departments.",
       userCount: "Unlimited users",
@@ -117,11 +120,12 @@ const PricingPage = () => {
       supportsInvoice: true
     },
     {
+      planId: 'pro',
       name: "Pro",
       priceDisplay: "$99",
       priceAnnotation: "/mo",
-      monthlyPriceId: "price_1RSqWZ00HE2ZS1pmcp0iWhqg",
-      annualPriceId: "price_1RSqWs00HE2ZS1pmkDdtxYdV",
+      monthlyPriceId: import.meta.env.VITE_PRICE_PRO_MONTHLY || "",
+      annualPriceId: import.meta.env.VITE_PRICE_PRO_ANNUAL || "",
       annualPrice: "$999/yr (save 15%)",
       description: "For career departments that need bigger capacity & audit automation.",
       userCount: "Unlimited users",
@@ -137,11 +141,12 @@ const PricingPage = () => {
       supportsInvoice: true
     },
     {
+      planId: 'contractor',
       name: "Contractor",
       priceDisplay: "$279",
       priceAnnotation: "/mo",
-      monthlyPriceId: "price_1RSqXb00HE2ZS1pmNY4PlTA5",
-      annualPriceId: "price_1RSqY000HE2ZS1pmKSzq7p3i",
+      monthlyPriceId: import.meta.env.VITE_PRICE_CONTRACTOR_MONTHLY || "",
+      annualPriceId: import.meta.env.VITE_PRICE_CONTRACTOR_ANNUAL || "",
       annualPrice: "$2,999/yr (save 10%)",
       description: "Unlimited assets & child departments—ideal for hose-testing vendors.",
       userCount: "Unlimited users",
@@ -155,25 +160,6 @@ const PricingPage = () => {
       ],
       ctaText: "Get Contractor",
       supportsInvoice: true
-    },
-    {
-      name: "Enterprise",
-      priceDisplay: "Custom",
-      priceAnnotation: "",
-      monthlyPriceId: "price_1RSqYn00HE2ZS1pmrIORlH1Q",
-      description: "County-wide or multi-station? Let's craft a custom solution.",
-      userCount: "Unlimited users & assets",
-      assetCount: "Unlimited assets",
-      coreModules: "All modules + custom SLAs",
-      features: [
-        "White-glove onboarding",
-        "Dedicated account manager",
-        "Phone support",
-        "Custom contract terms"
-      ],
-      ctaText: "Contact Sales",
-      isEnterprise: true,
-      supportsInvoice: true
     }
   ];
 
@@ -184,8 +170,8 @@ const PricingPage = () => {
     // Track plan selection
     trackingHelpers.trackPricingView(plan.name);
 
+    // Enterprise removed from catalog; if present, route to sales
     if (plan.isEnterprise) {
-      // Track enterprise contact
       trackingHelpers.trackContactForm(true);
       window.location.href = "mailto:sales@firegauge.app?subject=Enterprise%20Plan%20Inquiry";
       setIsLoading(null);
@@ -193,10 +179,8 @@ const PricingPage = () => {
     }
 
     try {
-      const priceId = selectedBillingCycle === BillingCycle.ANNUAL && plan.annualPriceId 
-        ? plan.annualPriceId 
-        : plan.monthlyPriceId;
-
+      // Server will resolve price via PRICE_MAP_*_JSON; we send plan/cycle
+ 
       if (selectedBillingMethod === BillingMethod.INVOICE) {
         // Handle invoice billing
         if (!plan.supportsInvoice) {
@@ -206,20 +190,21 @@ const PricingPage = () => {
           setIsLoading(null);
           return;
         }
-
+ 
         // For invoice method, redirect to a form where they can enter their details
-        const invoiceUrl = `/invoice-request?plan=${plan.name}&priceId=${priceId}&cycle=${selectedBillingCycle}${referralCode ? `&ref=${encodeURIComponent(referralCode)}` : ''}${promoCode ? `&promo=${encodeURIComponent(promoCode)}` : ''}`;
+        const invoiceUrl = `/invoice-request?plan=${plan.name}&planId=${plan.planId}&cycle=${selectedBillingCycle}${referralCode ? `&ref=${encodeURIComponent(referralCode)}` : ''}${promoCode ? `&promo=${encodeURIComponent(promoCode)}` : ''}`;
         window.location.href = invoiceUrl;
         setIsLoading(null);
         return;
       }
-
+ 
       // Handle subscription billing (existing flow)
-      console.log(`[PRICING PAGE] Creating checkout session for ${plan.name} (${priceId})`);
+      console.log(`[PRICING PAGE] Creating checkout session for ${plan.name} (${plan.planId}/${selectedBillingCycle})`);
       
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: {
-          priceId: priceId,
+          planId: plan.planId,
+          billingCycle: selectedBillingCycle,
           promoCode: promoCode || undefined,
           metadata: {
             plan_name: plan.name,
@@ -228,17 +213,20 @@ const PricingPage = () => {
             source: 'pricing_page',
             checkout_session_id: Date.now().toString(),
             requires_account_creation: user ? 'false' : 'true',
-            is_free_trial: plan.name === 'Pilot 90' ? 'true' : 'false',
+            // Treat Pilot selection as a trial flag regardless of target plan
+            is_free_trial: plan.planId === 'pilot' ? 'true' : 'false',
             ...(referralCode ? { referral_code: referralCode } : {})
           }
         }
       });
-
+ 
       if (error) {
         console.error('[PRICING PAGE] Supabase function error:', error);
-        throw error;
+        toast.error("Checkout Error", { description: error.message || 'Server error' });
+        setIsLoading(null);
+        return;
       }
-
+ 
       if (!data?.url) {
         console.error('[PRICING PAGE] No checkout URL returned:', data);
         throw new Error('No checkout URL returned from server');
@@ -251,12 +239,10 @@ const PricingPage = () => {
       
       // Redirect to Stripe checkout
       window.location.href = data.url;
-
+ 
     } catch (error) {
       console.error('[PRICING PAGE] Error:', error);
-      toast.error("Checkout Error", {
-        description: "Failed to create checkout session. Please try again or contact support.",
-      });
+      toast.error("Price not available for selected plan/cycle", { description: 'Please try Monthly billing or contact support.' });
     } finally {
       setIsLoading(null);
     }

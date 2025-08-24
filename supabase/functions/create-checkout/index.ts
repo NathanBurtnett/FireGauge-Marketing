@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -26,33 +27,97 @@ serve(async (req) => {
   try {
     logStep("Function started");
     
-    // Check environment variables
-    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+    // Check environment variables and resolve Stripe key based on STRIPE_MODE
+    const stripeModeRaw = (Deno.env.get("STRIPE_MODE") || "test").toLowerCase();
+    const resolvedMode = stripeModeRaw === "live" ? "live" : "test";
+    const keyByMode = resolvedMode === "live" 
+      ? Deno.env.get("STRIPE_SECRET_KEY_LIVE") 
+      : Deno.env.get("STRIPE_SECRET_KEY_TEST");
+    const stripeKey = keyByMode || Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) {
-      logError("Environment check", new Error("STRIPE_SECRET_KEY is not set"));
+      logError("Environment check", new Error("No Stripe secret key found. Expected STRIPE_SECRET_KEY_" + resolvedMode.toUpperCase() + " or STRIPE_SECRET_KEY"));
       return new Response(
         JSON.stringify({ error: "Stripe configuration missing" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    
-    logStep("Environment variables OK");
+
+    logStep("Environment variables OK", { mode: resolvedMode, keySource: keyByMode ? `STRIPE_SECRET_KEY_${resolvedMode.toUpperCase()}` : "STRIPE_SECRET_KEY" });
 
     // Parse request body
     const body = await req.json();
     logStep("Request body parsed", { bodyKeys: Object.keys(body) });
 
-    const { priceId, promoCode, metadata = {} } = body;
+    const { priceId, promoCode, metadata = {}, planId, billingCycle } = body as {
+      priceId?: string;
+      promoCode?: string;
+      metadata?: Record<string, string>;
+      planId?: string;
+      billingCycle?: 'monthly' | 'annual';
+    };
 
-    if (!priceId) {
-      logError("Validation", new Error("priceId is required"));
+    // Resolve priceId from inputs, DB map, or env map
+    let resolvedPriceId = priceId && String(priceId).trim().length > 0 ? String(priceId).trim() : '';
+
+    if (!resolvedPriceId && planId && billingCycle) {
+      // 1) Try database map first (public.billing_price_map)
+      try {
+        const supabaseUrl = Deno.env.get("SUPABASE_URL");
+        const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+        if (supabaseUrl && supabaseServiceKey) {
+          const supabase = createClient(supabaseUrl, supabaseServiceKey, { auth: { persistSession: false } });
+          const { data: row, error: dbErr } = await supabase
+            .from('billing_price_map')
+            .select('price_id')
+            .eq('mode', resolvedMode)
+            .eq('plan_id', planId)
+            .eq('cycle', billingCycle)
+            .eq('active', true)
+            .maybeSingle();
+          if (dbErr) {
+            logStep("DB price map lookup error (non-fatal)", { error: dbErr.message });
+          } else if (row?.price_id) {
+            resolvedPriceId = String(row.price_id);
+            logStep("Resolved price from DB map", { planId, billingCycle, resolvedPriceId });
+          }
+        }
+      } catch (e: any) {
+        logStep("DB price map exception (non-fatal)", { error: e.message });
+      }
+
+      // 2) Fallback to env JSON map
+      if (!resolvedPriceId) {
+        try {
+          const mapEnvRaw = resolvedMode === "live"
+            ? Deno.env.get("PRICE_MAP_LIVE_JSON")
+            : Deno.env.get("PRICE_MAP_TEST_JSON");
+          if (mapEnvRaw) {
+            const priceMap = JSON.parse(mapEnvRaw);
+            const candidate = priceMap?.[planId]?.[billingCycle];
+            if (candidate && typeof candidate === 'string' && candidate.trim().length > 0) {
+              resolvedPriceId = candidate.trim();
+              logStep("Resolved price from env price map", { planId, billingCycle, resolvedPriceId });
+            } else {
+              logStep("Env price map missing mapping", { planId, billingCycle });
+            }
+          } else {
+            logStep("No env price map set (PRICE_MAP_*_JSON)", { mode: resolvedMode });
+          }
+        } catch (e: any) {
+          logStep("Env price map parse error (non-fatal)", { error: e.message });
+        }
+      }
+    }
+
+    if (!resolvedPriceId) {
+      logError("Validation", new Error("priceId or planId/billingCycle is required (and must map to a configured price)"));
       return new Response(
-        JSON.stringify({ error: "priceId is required" }),
+        JSON.stringify({ error: "Price not configured for selection" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    logStep("Price ID validated", { priceId });
+    logStep("Price ID finalized", { priceId: resolvedPriceId, planId, billingCycle });
 
     // Initialize Stripe
     const stripe = new Stripe(stripeKey, {
@@ -140,30 +205,55 @@ serve(async (req) => {
       } catch (_) {}
     }
 
+    // Determine trial settings from metadata
+    const isFreeTrial = (metadata as any)?.is_free_trial === 'true' || (metadata as any)?.is_free_trial === true;
+    const trialDays = isFreeTrial ? 90 : undefined;
+
     // Create Stripe checkout session
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
+    let session;
+    try {
+      session = await stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        line_items: [
+          {
+            price: resolvedPriceId,
+            quantity: 1,
+          },
+        ],
+        mode: "subscription",
+        success_url: `${req.headers.get("origin") || "https://firegauge.app"}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${req.headers.get("origin") || "https://firegauge.app"}/`,
+        customer_email: userEmail,
+        metadata: sessionMetadata,
+        subscription_data: {
+          metadata: sessionMetadata,
+          ...(trialDays ? { trial_period_days: trialDays } : {}),
         },
-      ],
-      mode: "subscription",
-      success_url: `${req.headers.get("origin") || "https://firegauge.app"}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.headers.get("origin") || "https://firegauge.app"}/`,
-      customer_email: userEmail,
-      metadata: sessionMetadata,
-      subscription_data: {
-        metadata: sessionMetadata, // Also add to subscription metadata
-      },
-      discounts,
-      // Collect customer information for anonymous users
-      ...(flowType === "anonymous" && {
-        customer_creation: "always",
-        billing_address_collection: "required",
-      }),
-    });
+        allow_promotion_codes: true,
+        discounts,
+        // Collect customer information for anonymous users
+        ...(flowType === "anonymous" && {
+          billing_address_collection: "required",
+        }),
+      });
+    } catch (err: any) {
+      const message = err?.message || String(err);
+      logError("Stripe checkout session create failed", err);
+      // Common pitfall: using test price with live key or vice versa
+      if (/No such price/i.test(message)) {
+        return new Response(
+          JSON.stringify({
+            error: "Invalid Stripe price for current mode",
+            details: `Price ${priceId} not found in ${resolvedMode} mode. Verify STRIPE_MODE and price IDs.`,
+          }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      return new Response(
+        JSON.stringify({ error: "Failed to create checkout session", details: message }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     logStep("Stripe checkout session created", { 
       sessionId: session.id, 

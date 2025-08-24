@@ -10,7 +10,6 @@ import AboutUsPage from "./pages/AboutUsPage";
 import ContactPage from "./pages/ContactPage";
 import LegalPage from "./pages/LegalPage";
 import ScrollToTop from "./components/ScrollToTop";
-import PricingPage from "./pages/PricingPage";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import OnboardingWizard from "./pages/OnboardingWizard";
 import AuthCallback from "./components/AuthCallback";
@@ -66,7 +65,7 @@ const AppContent = () => {
       <AuthCallback />
       <Routes>
         <Route path="/" element={<Index />} />
-        <Route path="/pricing" element={<PricingPage />} />
+        {/* Pricing route removed: plans selected via home page signup */}
         <Route path="/about" element={<AboutUsPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/legal" element={<LegalPage />} />

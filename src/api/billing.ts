@@ -23,7 +23,8 @@ export interface CheckoutSessionRequest {
 }
 
 export interface InvoiceRequest {
-  priceId: string;
+  priceId?: string;
+  planId?: string;
   planName: string;
   billingCycle: BillingCycle;
   customerInfo: {
@@ -40,6 +41,7 @@ export interface InvoiceRequest {
     };
   };
   metadata?: Record<string, string>;
+  promoCode?: string;
 }
 
 export interface CheckoutResponse {
@@ -163,9 +165,11 @@ export const createInvoice = async (
     const { data, error } = await supabase.functions.invoke('create-invoice', {
       body: {
         priceId: request.priceId,
+        planId: request.planId,
         planName: request.planName,
         billingCycle: request.billingCycle,
         customerInfo: request.customerInfo,
+        promoCode: request.promoCode,
         metadata: {
           source: 'marketing_site',
           billing_method: 'invoice',

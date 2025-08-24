@@ -5,6 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "@/components/ui/sonner";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { FormDialog } from "@/components/ui/marketing-dialogs";
+import { supabase } from "@/lib/supabase";
+import { BillingCycle, getPlanById } from "@/config/stripe-config";
 
 // Simple pricing structure for clarity
 interface PricingPlan {
@@ -25,6 +28,10 @@ const Pricing = () => {
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
+  const [billingCycle, setBillingCycle] = useState<BillingCycle>(BillingCycle.MONTHLY);
+  const [promoCode, setPromoCode] = useState<string>("");
 
   const plans: PricingPlan[] = [
     {
@@ -130,9 +137,9 @@ const Pricing = () => {
         navigate(`/onboarding?plan=${plan.id}`);
         return;
       }
-
-      // For paid plans, go to pricing page for checkout
-      navigate(`/pricing?selected=${plan.id}`);
+      // Open inline dialog for billing cycle and promo, then start checkout
+      setSelectedPlanId(plan.id);
+      setDialogOpen(true);
       
     } catch (error) {
       console.error('Plan selection error:', error);
@@ -141,6 +148,47 @@ const Pricing = () => {
       });
     } finally {
       setIsLoading(null);
+    }
+  };
+
+  const startCheckout = async () => {
+    if (!selectedPlanId) return;
+    const plan = getPlanById(selectedPlanId);
+    if (!plan) {
+      toast.error("Invalid plan selected");
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: {
+          planId: selectedPlanId,
+          billingCycle,
+          promoCode: promoCode || undefined,
+          metadata: {
+            plan_name: selectedPlanId,
+            billing_method: 'subscription',
+            billing_cycle: billingCycle,
+            source: 'home_pricing',
+            checkout_session_id: Date.now().toString(),
+            requires_account_creation: user ? 'false' : 'true',
+            is_free_trial: selectedPlanId === 'pilot' ? 'true' : 'false',
+          }
+        }
+      });
+
+      if (error) throw error;
+      if (!data?.url) throw new Error('No checkout URL returned');
+
+      window.location.href = data.url;
+    } catch (err) {
+      console.error('[HOME PRICING] Checkout error:', err);
+      toast.error("Checkout Error", { description: "Failed to create checkout session." });
+    } finally {
+      setDialogOpen(false);
+      setSelectedPlanId(null);
+      setPromoCode("");
+      setBillingCycle(BillingCycle.MONTHLY);
     }
   };
 
@@ -255,6 +303,31 @@ const Pricing = () => {
           </p>
         </div>
       </div>
+
+      {/* Inline billing dialog */}
+      <FormDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        title="Select billing options"
+        submitText="Continue to Checkout"
+        onSubmit={async (e) => { e.preventDefault(); await startCheckout(); }}
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Billing cycle</label>
+            <div className="grid grid-cols-2 gap-3">
+              <button type="button" onClick={() => setBillingCycle(BillingCycle.MONTHLY)}
+                className={`p-3 rounded-lg border-2 transition-all ${billingCycle === BillingCycle.MONTHLY ? 'border-firegauge-red bg-red-50 text-firegauge-red' : 'border-gray-200 hover:border-gray-300'}`}>Monthly</button>
+              <button type="button" onClick={() => setBillingCycle(BillingCycle.ANNUAL)}
+                className={`p-3 rounded-lg border-2 transition-all ${billingCycle === BillingCycle.ANNUAL ? 'border-firegauge-red bg-red-50 text-firegauge-red' : 'border-gray-200 hover:border-gray-300'}`}>Annual</button>
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Promo code (optional)</label>
+            <input value={promoCode} onChange={(e) => setPromoCode(e.target.value.trim())} placeholder="Enter promo code" className="w-full rounded-lg border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-firegauge-red" />
+          </div>
+        </div>
+      </FormDialog>
     </section>
   );
 };

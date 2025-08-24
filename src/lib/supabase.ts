@@ -13,7 +13,11 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true
-  }
+  },
+  // In test mode, include anon key as Authorization header so Edge Functions with verify_jwt work
+  global: (import.meta as any)?.env?.MODE === 'test'
+    ? { headers: { Authorization: `Bearer ${supabaseAnonKey}` } }
+    : undefined
 })
 
 // Helper function to get the current user

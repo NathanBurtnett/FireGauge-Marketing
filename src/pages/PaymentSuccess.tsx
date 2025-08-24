@@ -12,20 +12,21 @@ const PaymentSuccess = () => {
   const sessionId = searchParams.get('session_id');
 
   useEffect(() => {
-    if (!sessionId) {
-      return;
-    }
+    if (!sessionId) return;
 
     // Track successful conversion
     trackingHelpers.trackSignupComplete('Pro', 99);
-    
-    // Show account creation info after a brief delay
-    const timer = setTimeout(() => {
-      setShowAccountInfo(true);
-    }, 2000);
 
+    // Test mode to bypass delay (e.g., /payment-success?session_id=...&test=1)
+    const isTest = searchParams.get('test') === '1';
+    if (isTest) {
+      setShowAccountInfo(true);
+      return;
+    }
+
+    const timer = setTimeout(() => setShowAccountInfo(true), 2000);
     return () => clearTimeout(timer);
-  }, [sessionId]);
+  }, [sessionId, searchParams]);
 
   const handleOnboardingRedirect = () => {
     // Redirect to onboarding wizard for consistent flow

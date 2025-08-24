@@ -73,12 +73,21 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+  // Resolve Stripe keys/secrets by STRIPE_MODE with safe fallbacks
+  const stripeModeRaw = (Deno.env.get("STRIPE_MODE") || "test").toLowerCase();
+  const resolvedMode = stripeModeRaw === "live" ? "live" : "test";
+  const stripeKeyByMode = resolvedMode === "live" 
+    ? Deno.env.get("STRIPE_SECRET_KEY_LIVE")
+    : Deno.env.get("STRIPE_SECRET_KEY_TEST");
+  const stripeKey = stripeKeyByMode || Deno.env.get("STRIPE_SECRET_KEY");
   const stripeSignature = req.headers.get("stripe-signature");
-  const stripeWebhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
+  const webhookSecretByMode = resolvedMode === "live"
+    ? Deno.env.get("STRIPE_WEBHOOK_SECRET_LIVE")
+    : Deno.env.get("STRIPE_WEBHOOK_SECRET_TEST");
+  const stripeWebhookSecret = webhookSecretByMode || Deno.env.get("STRIPE_WEBHOOK_SECRET");
 
   if (!stripeKey || !stripeWebhookSecret || !stripeSignature) {
-    logStep("Missing Stripe config", { stripeKey: !!stripeKey, stripeWebhookSecret: !!stripeWebhookSecret, stripeSignature: !!stripeSignature });
+    logStep("Missing Stripe config", { stripeKey: !!stripeKey, stripeWebhookSecret: !!stripeWebhookSecret, stripeSignature: !!stripeSignature, mode: resolvedMode });
     return new Response("Stripe configuration error.", { status: 400 });
   }
   
@@ -98,7 +107,7 @@ serve(async (req) => {
       undefined,
       Stripe.createSubtleCryptoProvider() // For Deno signature verification
     );
-    logStep("Webhook event constructed", { eventId: event.id, eventType: event.type });
+    logStep("Webhook event constructed", { eventId: event.id, eventType: event.type, mode: resolvedMode });
   } catch (err: any) {
     logStep("Webhook signature verification failed", { error: err.message });
     return new Response(`Webhook Error: ${err.message}`, { status: 400 });
@@ -223,7 +232,28 @@ serve(async (req) => {
                 email: customerEmail
               });
 
-              // The main app handles all account creation, so we're done here for new users
+              // Also upsert subscription in Supabase now that we have tenantId
+              try {
+                const createdTenantId = accountResult.tenant_id as number | undefined;
+                if (createdTenantId && relevantSubscription && stripeCustomerId) {
+                  await manageSubscriptionInSupabase(supabaseAdmin, relevantSubscription, createdTenantId, stripeCustomerId);
+                  // Ensure tenant has stripe_customer_id set
+                  const { error: tenantUpdateErrorNew } = await supabaseAdmin
+                    .from('tenant')
+                    .update({ stripe_customer_id: stripeCustomerId })
+                    .eq('id', createdTenantId)
+                    .is('stripe_customer_id', null);
+                  if (tenantUpdateErrorNew) {
+                    logStep("Warning: Could not update tenant with stripe_customer_id (new user)", { tenantId: createdTenantId, error: tenantUpdateErrorNew.message });
+                  }
+                } else {
+                  logStep("Skipping subscription upsert for new user: missing tenantId or subscription/customer", { createdTenantId, hasSub: !!relevantSubscription, hasCustomer: !!stripeCustomerId });
+                }
+              } catch (subUpsertErr: any) {
+                logStep("Non-fatal: Failed to upsert subscription for new user", { error: subUpsertErr.message });
+              }
+
+              // Done handling new users
               break;
               
             } catch (error: any) {

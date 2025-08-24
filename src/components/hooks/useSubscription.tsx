@@ -34,10 +34,10 @@ const EMERGENCY_FALLBACK_MODE = false; // Set to false when edge functions are w
 export const useSubscription = () => {
   const { user, loading: authLoading } = useAuth();
   const [status, setStatus] = useState<SubscriptionStatus>({
-    subscribed: true, // Default to subscribed (free tier) to prevent hanging
-    subscription_tier: 'price_1RSqV400HE2ZS1pmK1uKuTCe', // Default to free tier
+    subscribed: false,
+    subscription_tier: null,
     subscription_end: null,
-    isLoading: false, // Start with loading false to prevent hanging
+    isLoading: false,
     error: null,
     retryCount: 0,
   });
@@ -46,10 +46,10 @@ export const useSubscription = () => {
   const checkSubscription = useCallback(async (retryAttempt = 0) => {
     // Emergency fallback mode - skip edge function calls when they're failing
     if (EMERGENCY_FALLBACK_MODE) {
-      console.log("useSubscription: Emergency fallback mode enabled - returning free tier subscription");
+      console.log("useSubscription: Emergency fallback mode enabled - returning neutral subscription");
       const emergencyFallbackStatus = {
-        subscribed: true,
-        subscription_tier: 'price_1RSqV400HE2ZS1pmK1uKuTCe', // Pilot 90 - Free tier
+        subscribed: false,
+        subscription_tier: null,
         subscription_end: null,
         isLoading: false,
         error: null,
@@ -63,14 +63,7 @@ export const useSubscription = () => {
 
     if (!user) {
       console.log("useSubscription: checkSubscription - No user, setting not subscribed");
-      const noUserStatus = {
-        subscribed: false,
-        subscription_tier: null,
-        subscription_end: null,
-        isLoading: false,
-        error: null,
-        retryCount: retryAttempt,
-      };
+      const noUserStatus = { subscribed: false, subscription_tier: null, subscription_end: null, isLoading: false, error: null, retryCount: retryAttempt };
       setStatus(noUserStatus);
       return;
     }
@@ -116,15 +109,6 @@ export const useSubscription = () => {
             name: error.name
           });
           
-          // Handle specific HTTP status codes
-          if (error.status === 500) {
-            console.error("useSubscription: checkSubscription - 500 Internal Server Error - likely edge function deployment issue");
-          } else if (error.status === 401) {
-            console.error("useSubscription: checkSubscription - 401 Unauthorized - authentication issue");
-          } else if (error.status === 404) {
-            console.error("useSubscription: checkSubscription - 404 Not Found - edge function not deployed");
-          }
-          
           throw error;
         }
 
@@ -154,16 +138,8 @@ export const useSubscription = () => {
         
         // Handle timeout specifically
         if (err instanceof Error && err.message === 'Subscription check timeout') {
-          console.warn("useSubscription: checkSubscription - Subscription check timed out, falling back to free tier");
-          // Fallback to free tier immediately on timeout
-          const timeoutFallbackStatus = {
-            subscribed: true,
-            subscription_tier: 'price_1RSqV400HE2ZS1pmK1uKuTCe', // Pilot 90 - Free tier
-            subscription_end: null,
-            isLoading: false,
-            error: null,
-            retryCount: retryAttempt,
-          };
+          console.warn("useSubscription: checkSubscription - Subscription check timed out, returning neutral state");
+          const timeoutFallbackStatus = { subscribed: false, subscription_tier: null, subscription_end: null, isLoading: false, error: null, retryCount: retryAttempt };
           setStatus(timeoutFallbackStatus);
           globalSubscriptionCache = timeoutFallbackStatus;
           cacheTimestamp = Date.now();
@@ -177,15 +153,8 @@ export const useSubscription = () => {
           return;
         }
         
-        // Fallback to free tier after max retries
-        const errorFallbackStatus = {
-          subscribed: true,
-          subscription_tier: 'price_1RSqV400HE2ZS1pmK1uKuTCe', // Pilot 90 - Free tier
-          subscription_end: null,
-          isLoading: false,
-          error: null, // Don't show error to user, just fallback gracefully
-          retryCount: retryAttempt,
-        };
+        // Final neutral fallback after max retries
+        const errorFallbackStatus = { subscribed: false, subscription_tier: null, subscription_end: null, isLoading: false, error: null, retryCount: retryAttempt };
         setStatus(errorFallbackStatus);
         globalSubscriptionCache = errorFallbackStatus;
         cacheTimestamp = Date.now();
@@ -241,15 +210,6 @@ export const useSubscription = () => {
           context: error.context,
           name: error.name
         });
-        
-        // Handle specific HTTP status codes
-        if (error.status === 500) {
-          console.error("useSubscription: createCheckoutSession - 500 Internal Server Error - likely edge function deployment issue");
-        } else if (error.status === 401) {
-          console.error("useSubscription: createCheckoutSession - 401 Unauthorized - authentication issue");
-        } else if (error.status === 404) {
-          console.error("useSubscription: createCheckoutSession - 404 Not Found - edge function not deployed");
-        }
         
         toast.error("Error creating checkout session", {
           description: error.message || "Please try again later.",
@@ -338,9 +298,9 @@ export const useSubscription = () => {
     // Wait for auth to finish loading before starting subscription check
     if (!authLoading) {
       if (user) {
-        console.log("useSubscription: useEffect - Auth is loaded and user exists. Setting immediate fallback and calling checkSubscription.");
+        console.log("useSubscription: useEffect - Auth is loaded and user exists. Starting checkSubscription.");
         
-        // Check if we already have cached data for this user
+        // Use cached data if present
         const now = Date.now();
         if (globalSubscriptionCache && (now - cacheTimestamp < CACHE_DURATION)) {
           console.log("useSubscription: Using cached subscription data");
@@ -348,21 +308,13 @@ export const useSubscription = () => {
           return;
         }
         
-        // Set immediate fallback to prevent hanging
-        const immediateFallback = {
-          subscribed: true,
-          subscription_tier: 'price_1RSqV400HE2ZS1pmK1uKuTCe', // Free tier
-          subscription_end: null,
-          isLoading: false,
-          error: null,
-          retryCount: 0,
-        };
+        // Initial neutral state while checking
+        const immediateFallback = { subscribed: false, subscription_tier: null, subscription_end: null, isLoading: false, error: null, retryCount: 0 };
         setStatus(immediateFallback);
         
-        // Then try to get real subscription data with very short timeout
         const timeoutId = setTimeout(() => {
           checkSubscription(0);
-        }, 100); // Increased from 50ms to 100ms for stability
+        }, 100);
         return () => clearTimeout(timeoutId);
       } else {
         console.log("useSubscription: useEffect - Auth is loaded but NO user. Setting subscription status to not subscribed, loading false.");
@@ -371,14 +323,7 @@ export const useSubscription = () => {
         cacheTimestamp = 0;
         globalCheckPromise = null;
         
-        const loggedOutStatus = {
-          subscribed: false,
-          subscription_tier: null,
-          subscription_end: null,
-          isLoading: false, 
-          error: null,
-          retryCount: 0,
-        };
+        const loggedOutStatus = { subscribed: false, subscription_tier: null, subscription_end: null, isLoading: false, error: null, retryCount: 0 };
         setStatus(loggedOutStatus);
       }
     }

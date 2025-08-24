@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -26,35 +27,96 @@ serve(async (req) => {
   try {
     logStep("Invoice creation function started");
     
-    // Check environment variables
-    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+    // Check environment variables and resolve Stripe key based on STRIPE_MODE
+    const stripeModeRaw = (Deno.env.get("STRIPE_MODE") || "test").toLowerCase();
+    const resolvedMode = stripeModeRaw === "live" ? "live" : "test";
+    const keyByMode = resolvedMode === "live" 
+      ? Deno.env.get("STRIPE_SECRET_KEY_LIVE") 
+      : Deno.env.get("STRIPE_SECRET_KEY_TEST");
+    const stripeKey = keyByMode || Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) {
-      logError("Environment check", new Error("STRIPE_SECRET_KEY is not set"));
+      logError("Environment check", new Error("No Stripe secret key found. Expected STRIPE_SECRET_KEY_" + resolvedMode.toUpperCase() + " or STRIPE_SECRET_KEY"));
       return new Response(
         JSON.stringify({ error: "Stripe configuration missing" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    
-    logStep("Environment variables OK");
+
+    logStep("Environment variables OK", { mode: resolvedMode, keySource: keyByMode ? `STRIPE_SECRET_KEY_${resolvedMode.toUpperCase()}` : "STRIPE_SECRET_KEY" });
 
     // Parse request body
     const body = await req.json();
     logStep("Request body parsed", { bodyKeys: Object.keys(body) });
 
     const { 
-      priceId, 
+      priceId: incomingPriceId, 
       customerInfo, 
       metadata = {},
       billingCycle = 'monthly',
       planName,
+      planId,
       promoCode
     } = body;
 
-    if (!priceId) {
-      logError("Validation", new Error("priceId is required"));
+    // Resolve priceId: prefer explicit priceId, else map via DB/env using planId + billingCycle
+    let resolvedPriceId: string | null = (incomingPriceId && String(incomingPriceId).trim().length > 0)
+      ? String(incomingPriceId).trim()
+      : null;
+
+    if (!resolvedPriceId && planId && billingCycle) {
+      // 1) Try database map first (public.billing_price_map)
+      try {
+        const supabaseUrl = Deno.env.get("SUPABASE_URL");
+        const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+        if (supabaseUrl && supabaseServiceKey) {
+          const supabase = createClient(supabaseUrl, supabaseServiceKey, { auth: { persistSession: false } });
+          const { data: row, error: dbErr } = await supabase
+            .from('billing_price_map')
+            .select('price_id')
+            .eq('mode', resolvedMode)
+            .eq('plan_id', planId)
+            .eq('cycle', billingCycle)
+            .eq('active', true)
+            .maybeSingle();
+          if (dbErr) {
+            logStep("DB price map lookup error (non-fatal)", { error: dbErr.message });
+          } else if (row?.price_id) {
+            resolvedPriceId = String(row.price_id);
+            logStep("Resolved price from DB map", { planId, billingCycle, resolvedPriceId });
+          }
+        }
+      } catch (e: any) {
+        logStep("DB price map exception (non-fatal)", { error: e.message });
+      }
+
+      // 2) Fallback to env JSON map
+      if (!resolvedPriceId) {
+        try {
+          const mapEnvRaw = resolvedMode === "live"
+            ? Deno.env.get("PRICE_MAP_LIVE_JSON")
+            : Deno.env.get("PRICE_MAP_TEST_JSON");
+          if (mapEnvRaw) {
+            const priceMap = JSON.parse(mapEnvRaw);
+            const candidate = priceMap?.[planId]?.[billingCycle];
+            if (candidate && typeof candidate === 'string' && candidate.trim().length > 0) {
+              resolvedPriceId = candidate.trim();
+              logStep("Resolved price from env price map", { planId, billingCycle, resolvedPriceId });
+            } else {
+              logStep("Env price map missing mapping", { planId, billingCycle });
+            }
+          } else {
+            logStep("No env price map set (PRICE_MAP_*_JSON)", { mode: resolvedMode });
+          }
+        } catch (e: any) {
+          logStep("Env price map parse error (non-fatal)", { error: e.message });
+        }
+      }
+    }
+
+    if (!resolvedPriceId) {
+      logError("Validation", new Error("priceId or planId/billingCycle is required (and must map to a configured price)"));
       return new Response(
-        JSON.stringify({ error: "priceId is required" }),
+        JSON.stringify({ error: "Price not configured for selection" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -124,16 +186,26 @@ serve(async (req) => {
     // Get price details to calculate invoice amount
     let price: Stripe.Price;
     try {
-      price = await stripe.prices.retrieve(priceId);
+      price = await stripe.prices.retrieve(resolvedPriceId);
       logStep("Retrieved price details", { 
         priceId: price.id, 
         amount: price.unit_amount, 
         currency: price.currency 
       });
     } catch (error) {
+      const message = (error as any)?.message || String(error);
       logError("Price retrieval failed", error);
+      if (/No such price/i.test(message)) {
+        return new Response(
+          JSON.stringify({
+            error: "Invalid Stripe price for current mode",
+            details: `Price ${resolvedPriceId} not found in ${resolvedMode} mode. Verify STRIPE_MODE and price IDs.`,
+          }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
       return new Response(
-        JSON.stringify({ error: "Invalid price ID" }),
+        JSON.stringify({ error: "Invalid price ID", details: message }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -170,7 +242,7 @@ serve(async (req) => {
       await stripe.invoiceItems.create({
         customer: customer.id,
         invoice: invoice.id,
-        price: priceId,
+        price: resolvedPriceId,
         quantity: 1,
       });
 

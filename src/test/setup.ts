@@ -89,6 +89,8 @@ vi.mock('@/lib/analytics', () => ({
   trackingHelpers: {
     trackOnboardingStart: vi.fn(),
     trackOnboardingComplete: vi.fn(),
+    trackPricingView: vi.fn(),
+    trackSignupComplete: vi.fn(),
   },
 }));
 

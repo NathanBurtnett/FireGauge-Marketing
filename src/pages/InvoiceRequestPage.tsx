@@ -41,8 +41,9 @@ const InvoiceRequestPage = () => {
 
   // Get plan details from URL params
   const planName = searchParams.get('plan') || '';
-  const priceId = searchParams.get('priceId') || '';
   const billingCycle = searchParams.get('cycle') as BillingCycle || BillingCycle.MONTHLY;
+  const planEntry = Object.entries(FIREGAUGE_PLANS).find(([, p]) => p.name === planName);
+  const planId = planEntry ? planEntry[0] : '';
   
   const plan = Object.values(FIREGAUGE_PLANS).find(p => p.name === planName);
 
@@ -64,13 +65,13 @@ const InvoiceRequestPage = () => {
   });
 
   useEffect(() => {
-    if (!plan || !priceId) {
+    if (!plan) {
       toast.error("Invalid request", {
         description: "Please select a plan from the pricing page first.",
       });
       navigate('/pricing');
     }
-  }, [plan, priceId, navigate]);
+  }, [plan, navigate]);
 
   const handleInputChange = (field: string, value: string) => {
     if (field.startsWith('address.')) {
@@ -121,7 +122,7 @@ const InvoiceRequestPage = () => {
     e.preventDefault();
     
     if (!validateForm()) return;
-    if (!plan || !priceId) return;
+    if (!plan) return;
 
     setIsLoading(true);
 
@@ -129,7 +130,7 @@ const InvoiceRequestPage = () => {
       console.log('[INVOICE REQUEST] Creating invoice for:', plan.name);
       
       const result = await createInvoice({
-        priceId,
+        planId: planId || undefined,
         planName: plan.name,
         billingCycle,
         promoCode: promoCode || undefined,
