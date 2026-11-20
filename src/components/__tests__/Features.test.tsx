@@ -2,13 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import Features from '../Features';
 
-// Mock IntersectionObserver
-global.IntersectionObserver = vi.fn().mockImplementation((callback) => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn(),
-}));
-
 describe('Features Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
